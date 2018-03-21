@@ -20,3 +20,7 @@
 ## [test_result_analysis.py](test_result_analysis.py)
 ### 读取CSV文件，统计后绘图
 ![Image text](images/test_result_analysis_result.jpg)
+
+## [stock_line1.py](stock_line1.py)
+### 股票数据统计分析专辑
+
