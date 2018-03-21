@@ -16,3 +16,7 @@
 ## [random_distribution.py](random_distribution.py)
 ### 随机方法生成随机数后的分布对照图
 ![Image text](images/random_distribution_result.jpg)
+
+## [test_result_analysis.py](test_result_analysis.py)
+### 读取CSV文件，统计后绘图
+![Image text](images/test_result_analysis_result.jpg)

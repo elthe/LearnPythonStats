@@ -3,10 +3,12 @@
 # pandas是基于numpy构建的，为时间序列分析提供了很好的支持。
 # pandas中有两个主要的数据结构，一个是Series，另一个是DataFrame。
 
+import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import os
 from pandas import DataFrame, Series
+
 
 # Mac下加载CSV文件的方法
 path = os.getcwd() + '/data/test_result.csv'
@@ -20,31 +22,45 @@ data = pd.read_csv(path)
 
 df1 = DataFrame(data)
 print(df1)
-print('------------------')
+print('----full data loaded---------\n')
 
-# 取前N个
-dfHead = df1.head(10)
+# 按分数排倒序，取前20名
+dfSort = df1.sort_values(by='score', ascending=False)
+dfHead = dfSort.head(20)
 print(dfHead)
-print('------------------')
+print('----head 10 of high score in total-----------\n')
 
-# 取末尾N个
-dfTail = df1.tail(10)
+# 取倒数20名
+dfTail = dfSort.tail(20)
 print(dfTail)
-print('------------------')
+print('----tail 10 of high score in total--------------\n')
+
+#按code，对平均分排序
+dfGroupSortMean = DataFrame(data, columns=['code', 'score']).groupby('code').mean().sort_values(by='score', ascending=False)
+print(dfGroupSortMean)
+print('----group data by code with score mean and sort DESC--------------\n')
+
+#按code，对平均分排序
+dfGroupSortCount = DataFrame(data, columns=['code', 'score']).groupby('code').count().sort_values(by='score', ascending=False)
+print(dfGroupSortCount)
+print('----group data by code with count mean and sort DESC--------------\n')
 
 # 按照Code，统计：平均值,合计值，总件数
-dfGroup = DataFrame(data, columns=['code', 'score']).groupby('code').agg([np.mean, np.sum, np.count_nonzero])
-print(dfGroup)
-print(type(dfGroup))
-#dfGroup.sort_values(by=['code'])
-#print(dfGroup)
-#print(DataFrame(data, columns=['code', 'score']).groupby('code').sum())
-#print(DataFrame(data, columns=['code', 'score']).groupby('code').count())
-#dfGroup2 = dfGroup.reset_index()
-#print(type(dfGroup2))
-#dfGroup2.sort()
-#print(dfGroup2)
-#print(dfGroup2.sort_values(by = ['score']))
+dfSub = DataFrame(data, columns=['code', 'name', 'score'])
+print(dfSub)
+print('----pick some columns to make a sub dataframe--------------\n')
+
+# 组合Groupby统计，每个列可以有一个函数
+dfGroupMulti = dfSub.groupby('code').agg({'score':'mean', 'name':'count'})
+print(dfGroupMulti)
+print('----group data by code with mean, count--------------\n')
+
+# 修改显示的列名
+dfGroupMulti = dfGroupMulti.rename(columns={'name' : 'count', 'score' : 'mean'})
+# 排序
+dfGroupSortMulti = dfGroupMulti.sort_values(by='mean', ascending=False)
+print(dfGroupSortMulti)
+print('----after column rename and sort by mean DESC--------------\n')
 
 # Series 类似于一维数组与字典(map)数据结构的结合。
 # 它由一组数据和一组与数据相对应的数据标签（索引index）组成。
@@ -54,9 +70,36 @@ print(type(dfGroup))
 
 seriesCode = dfHead['code']
 print(seriesCode)
-print('------------------')
+print('----pick column code to series--------------\n')
 
 seriesScore = dfTail['score']
 print(seriesScore)
-print('------------------')
+print('----pick column score to series--------------\n')
 
+# 绘制报告图
+# 多子图绘制
+fig, axes = plt.subplots(2, 2, sharex=True)
+# 设置图片尺寸
+#fig.set_size_inches(10, 6)
+# 总标题
+fig.suptitle(u'分数分布报表')
+# 设置标题(中文字体)
+plt.rcParams['font.sans-serif']=['SimHei'] #用来正常显示中文标签
+plt.rcParams['axes.unicode_minus']=False #用来正常显示负号
+
+df2 = DataFrame(data, columns=['code', 'score']).groupby('code').mean().rename(columns={'score' : 'mean'})
+df2.plot(kind='bar', ax=axes[0][0], title='mean')
+
+df3 = DataFrame(data, columns=['code', 'score']).groupby('code').max().rename(columns={'score' : 'max'})
+df3.plot(kind='bar', ax=axes[1][0], title='max')
+
+df4 = DataFrame(data, columns=['code', 'score']).groupby('code').std().rename(columns={'score' : 'std'})
+df4.plot(kind='bar', ax=axes[1][1], title='std')
+
+df5 = DataFrame(data, columns=['code', 'score']).groupby('code').count().rename(columns={'score' : 'count'})
+df5.plot(kind='bar', ax=axes[0][1], title='count')
+
+# 保存图片
+plt.savefig('images/test_result_analysis_result.jpg')
+# 显示绘制后的图片
+plt.show()
