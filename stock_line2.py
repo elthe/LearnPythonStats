@@ -5,7 +5,7 @@ import matplotlib.finance as mpf
 import datetime
 from matplotlib.pylab import date2num
 
-wdyx = ts.get_k_data('002739','2017-02-01','2017-06-01')
+wdyx = ts.get_k_data('000001','2015-01-01','2016-12-31')
 print(wdyx)
 
 # 对tushare获取到的数据转换成candlestick_ohlc()方法可读取的格式
