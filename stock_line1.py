@@ -33,8 +33,8 @@ axes[0].set_ylabel('价格（元）')
 df2.plot(ax=axes[1], grid=True, title='成交量变化')
 axes[1].set_ylabel('成交量')
 # X轴：旋转50度
-plt.xticks(rotation=50)
-plt.xlabel('日期')
+plt.xticks(rotation=30)
+plt.xlabel('')
 
 # 保存图片
 plt.savefig('images/stock_line1_result.jpg')
