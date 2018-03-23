@@ -10,5 +10,5 @@
 ![Image text](images/stock_line2_result.jpg)
 
 ## [stock_diff.py](stock_diff.py)
-### 根据股票的价格分析变化规律
+### 根据股票的价格变化差分，判断是否属于平稳的时间序列
 ![Image text](images/stock_diff_result.jpg)
