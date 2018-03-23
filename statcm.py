@@ -74,7 +74,7 @@ def adf_test(slist, diff, log=False, full=False):
     @param diff: 差分相隔数
     @param log: 使用对数值
     @param full: 取得完整报告
-    @:return 无
+    @:return 完整报告或单独p值
     """
 
     # 是否使用对数
