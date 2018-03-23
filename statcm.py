@@ -7,6 +7,7 @@ Stat common api
 """
 
 import statsmodels.api as sm
+import pandas as pd
 import numpy as np
 import logcm
 
@@ -65,3 +66,44 @@ def plot_acf(ax, slist, diff, unit='天', log=False, pacf=False, show_p=False):
         ax.text(50, 0.8, text, fontsize=12, verticalalignment="top", fontdict=font,
                 horizontalalignment="left")
     return None
+
+def adf_test(slist, diff, log=False, full=False):
+    """
+    取得指定数据序列残差的ADF测试
+    @param slist: 数据序列
+    @param diff: 差分相隔数
+    @param log: 使用对数值
+    @param full: 取得完整报告
+    @:return 无
+    """
+
+    # 是否使用对数
+    if log:
+        # 对数转换
+        slist = np.log(slist)
+    # 计算差分
+    slist_diff = slist.diff(diff)[diff:]
+    # ADF检测
+    test_result = sm.tsa.stattools.adfuller(slist_diff)
+    # 返回ADF检测报告
+    if full :
+        # 完整报告
+        output = pd.DataFrame(index=['Test Statistic Value',
+                                     "p-value",
+                                     "Lags Used",
+                                     "Number of Observations Used",
+                                     "Critical Value(1%)",
+                                     "Critical Value(5%)",
+                                     "Critical Value(10%)"], columns=['value'])
+        output['value']['Test Statistic Value'] = test_result[0]
+        output['value']['p-value'] = test_result[1]
+        output['value']['Lags Used'] = test_result[2]
+        output['value']['Number of Observations Used'] = test_result[3]
+        output['value']['Critical Value(1%)'] = test_result[4]['1%']
+        output['value']['Critical Value(5%)'] = test_result[4]['5%']
+        output['value']['Critical Value(10%)'] = test_result[4]['10%']
+        # 输出报告
+        logcm.print_obj(output, 'output')
+        return output
+    else :
+        return test_result[1]

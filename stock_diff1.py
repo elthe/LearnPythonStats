@@ -50,6 +50,6 @@ for row in range(len(days_list)):
 # 调整每隔子图之间的距离
 plt.tight_layout()
 # 保存图片
-plt.savefig('images/stock_diff_result.jpg')
+plt.savefig('images/stock_diff1_result.jpg')
 # 显示绘制后的图片
 plt.show()
