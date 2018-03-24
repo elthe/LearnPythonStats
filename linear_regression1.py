@@ -16,6 +16,7 @@ from sklearn import datasets, linear_model
 from sklearn.metrics import mean_squared_error, r2_score
 from pandas import DataFrame, Series
 import logcm
+import statcm
 
 # Load the diabetes dataset
 # 加载线性回归的样本数据
@@ -77,10 +78,13 @@ logcm.print_obj(diabetes_y_pred, 'diabetes_y_pred')
 # 训练数据散点图
 axes[0][1].scatter(diabetes_X_train, diabetes_y_train,  color='black')
 # 计算训练数据的相关系数
-s1=Series(diabetes_X_train.reshape(len(diabetes_X_train)))
-s2=Series(diabetes_y_train.reshape(len(diabetes_y_train)))
-corr = s1.corr(s2)
+corr, corr_level = statcm.corr_test(diabetes_X_train, diabetes_y_train)
 logcm.print_obj(corr, 'corr : 相关系数')
+logcm.print_obj(corr_level, 'corr_level : 相关程度')
+yt = np.max(diabetes_y_train)
+xt = np.min(diabetes_X_train)
+axes[0][1].text(xt, yt, '相关系数 : %f \n相关程度 : %s' % (corr, corr_level), fontdict = {'color': 'r'},
+                fontsize=9, verticalalignment="top", horizontalalignment="left")
 
 # 线性回归后的预测直线
 axes[0][1].plot(diabetes_X_test, diabetes_y_pred, color='blue', linewidth=3)
@@ -119,6 +123,3 @@ plt.yticks(())
 plt.savefig('images/linear_regression1_result.jpg')
 # 显示绘制后的图片
 plt.show()
-
-
-
