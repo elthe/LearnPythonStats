@@ -9,12 +9,12 @@ Log common api
 from numpy import *
 
 
-def print_obj(obj, title, full=False):
+def print_obj(obj, title, full_show=False):
     """
     print输出对象内容，同时输出描述，类型
     @param obj: 输出对象
     @param title: 对象的标题
-    @param full: 全部显示，默认否
+    @param full_show: 全部显示，默认否
     @:return 无
     """
 
@@ -31,7 +31,7 @@ def print_obj(obj, title, full=False):
     # 开始线
     print('-' * 100)
     # 输出对象数据
-    print_obj_data(obj, type_name, full)
+    print_obj_data(obj, type_name, full_show)
     # 结束线
     print('-' * 100)
     return None
@@ -83,16 +83,16 @@ def print_obj_prop(obj, type_name):
     return None
 
 
-def print_obj_data(obj, type_name, full):
+def print_obj_data(obj, type_name, full_show):
     """
     print数据对象，根据类型进行特殊处理
     @param obj : 对象
     @param type_name : 类型名
-    @param full : 是否全部显示
+    @param full_show : 是否全部显示
     @:return 无
     """
 
-    if full == False:
+    if full_show == False:
         # 打印列表
         if type_name == 'list':
             if array(obj).ndim > 1:
@@ -110,24 +110,24 @@ def print_obj_data(obj, type_name, full):
     return None
 
 
-def print_list_data(list, max):
+def print_list_data(list_obj, max_num):
     """
     print列表数据对象
-    @param list : 列表对象
-    @param max : 最大显示数（超过后省略显示）
+    @param list_obj : 列表对象
+    @param max_num : 最大显示数（超过后省略显示）
     @:return 无
     """
 
     # 小于最大数量时，直接输出
-    if len(list) <= max:
-        print(list)
+    if len(list_obj) <= max_num:
+        print(list_obj)
         return None
     # 一半
-    half = round(max / 2)
+    half = round(max_num / 2)
 
     # 截取头尾
-    heads = '%s' % list[:half]
-    tails = '%s' % list[-1 * half:]
+    heads = '%s' % list_obj[:half]
+    tails = '%s' % list_obj[-1 * half:]
 
     print('[', end='')
     print(heads[1:-1])
@@ -137,24 +137,24 @@ def print_list_data(list, max):
     return None
 
 
-def print_matrix_data(mat, max):
+def print_matrix_data(mat_obj, max_num):
     """
     print矩阵数据对象
-    @param mat : 矩阵对象
-    @param max : 最大显示数（超过后省略显示）
+    @param mat_obj : 矩阵对象
+    @param max_num : 最大显示数（超过后省略显示）
     @:return 无
     """
 
     # 小于最大数量时，直接输出
-    if len(mat) <= max:
-        print(mat)
+    if len(mat_obj) <= max_num:
+        print(mat_obj)
         return None
     # 一半
-    half = round(max / 2)
+    half = round(max_num / 2)
 
     # 截取头尾
-    heads = mat[:half]
-    tails = mat[-1 * half:]
+    heads = mat_obj[:half]
+    tails = mat_obj[-1 * half:]
 
     print('[')
     for i in range(len(heads)):

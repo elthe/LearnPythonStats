@@ -6,63 +6,64 @@ Stat common api
 统计相关共通函数
 """
 
-import statsmodels.api as sm
 import pandas as pd
+import statsmodels.api as sm
 import numpy as np
-import logcm
+
 from numpy import *
-from pandas import DataFrame, Series
+from pandas import Series
+from common import logcm
 
 
-def plot_acf(ax, slist, diff, unit='天', log=False, pacf=False, show_p=False):
+def plot_acf(ax, s_list, diff_num, unit='天', use_log=False, plt_pacf=False, show_p=False):
     """
     绘制指定数据序列残差的ACF图或PACF图
     @param ax: 坐标轴
-    @param slist: 数据序列
-    @param diff: 差分相隔数
+    @param s_list: 数据序列
+    @param diff_num: 差分相隔数
     @param unit: 差分单位名（如：天
-    @param log: 使用对数值
-    @param pacf: 绘制PACF图
+    @param use_log: 使用对数值
+    @param plt_pacf: 绘制PACF图
     @param show_p: 显示P值
     @:return 无
     """
 
     # 是否使用对数
-    if log:
+    if use_log:
         # 对数转换
-        slist = np.log(slist)
+        s_list = np.log(s_list)
         diff_name = '对数差分'
     else:
         diff_name = '差分'
 
     # 是否绘制PACF图
-    if pacf:
+    if plt_pacf:
         plot_name = 'PACF图'
     else:
         plot_name = 'ACF图'
 
     # 设置标题
-    title = '%d%s-%s%s' % (diff, unit, diff_name, plot_name)
+    title = '%d%s-%s%s' % (diff_num, unit, diff_name, plot_name)
 
     # 残差的ACF和PACF图
-    slist_diff = slist.diff(diff)[diff:]
-    logcm.print_obj(slist_diff, 'series_diff-' + title)
-    if pacf:
-        sm.graphics.tsa.plot_pacf(slist_diff, ax=ax, title=title)
+    s_diff = s_list.diff(diff_num)[diff_num:]
+    logcm.print_obj(s_diff, 'series_diff-' + title)
+    if plt_pacf:
+        sm.graphics.tsa.plot_pacf(s_diff, ax=ax, title=title)
     else:
-        sm.graphics.tsa.plot_acf(slist_diff, ax=ax, title=title)
+        sm.graphics.tsa.plot_acf(s_diff, ax=ax, title=title)
 
     # 是否显示P值
     if show_p:
-        adftest = sm.tsa.stattools.adfuller(slist_diff)
-        p_value = adftest[1]
+        adf_result = sm.tsa.stattools.adfuller(s_diff)
+        p_value = adf_result[1]
         logcm.print_obj(p_value, 'p_value')
         # 根据p值是否合格显示成败。
         if p_value < 0.05:
-            text = 'p = %f ok!' % adftest[1]
+            text = 'p = %f ok!' % adf_result[1]
             font = {'color': 'g'}
         else:
-            text = 'p = %f fail!!' % adftest[1]
+            text = 'p = %f fail!!' % adf_result[1]
             font = {'color': 'r'}
         # 输出文字
         ax.text(50, 0.8, text, fontsize=12, verticalalignment="top", fontdict=font,
@@ -70,26 +71,26 @@ def plot_acf(ax, slist, diff, unit='天', log=False, pacf=False, show_p=False):
     return None
 
 
-def adf_test(slist, diff, log=False, full=False):
+def adf_test(s_list, diff_num, use_log=False, full_show=False):
     """
     取得指定数据序列残差的ADF测试
-    @param slist: 数据序列
-    @param diff: 差分相隔数
-    @param log: 使用对数值
-    @param full: 取得完整报告
+    @param s_list: 数据序列
+    @param diff_num: 差分相隔数
+    @param use_log: 使用对数值
+    @param full_show: 取得完整报告
     @:return 完整报告或单独p值
     """
 
     # 是否使用对数
-    if log:
+    if use_log:
         # 对数转换
-        slist = np.log(slist)
+        s_list = np.log(s_list)
     # 计算差分
-    slist_diff = slist.diff(diff)[diff:]
+    s_diff = s_list.diff(diff_num)[diff_num:]
     # ADF检测
-    test_result = sm.tsa.stattools.adfuller(slist_diff)
+    test_result = sm.tsa.stattools.adfuller(s_diff)
     # 返回ADF检测报告
-    if full:
+    if full_show:
         # 完整报告
         output = pd.DataFrame(index=['Test Statistic Value',
                                      "p-value",

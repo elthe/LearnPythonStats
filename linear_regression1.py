@@ -14,10 +14,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn import datasets, linear_model
 from sklearn.metrics import mean_squared_error, r2_score
-from pandas import DataFrame, Series
-import logcm
-import statcm
-import plotcm
+
+from common import plotcm
+from common import statcm
+from common import logcm
 
 # Load the diabetes dataset
 # 加载线性回归的样本数据
@@ -120,7 +120,6 @@ text = '相关系数 : %f\n相关程度 : %s' % (corr, corr_level)
 plotcm.draw_text(axes[1][0], diabetes_X_test, diabetes_y_test, text,
                  color='r', font_size='9', v_align="top", h_align="left")
 
-
 # Plot outputs
 # 测试数据散点图
 axes[1][1].scatter(diabetes_X_test, diabetes_y_test, color='black')
@@ -131,7 +130,6 @@ axes[1][1].set_title('测试数据和预测数据对比图')
 text = '均方差 : %f （越大越分散）\n拟合优度 : %f （1最好，0最差）' % (squared_error, score)
 plotcm.draw_text(axes[1][1], diabetes_X_test, diabetes_y_test, text,
                  color='r', font_size='9', v_align="top", h_align="left")
-
 
 # 不显示XY轴刻度
 plt.xticks(())

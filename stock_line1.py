@@ -3,10 +3,11 @@
 
 # 根据Tushare取得股票数据，绘制曲线图。
 
-import tushare as ts
 import matplotlib.pyplot as plt
-from pandas import DataFrame, Series
-import logcm
+import tushare as ts
+from pandas import DataFrame
+
+from common import logcm
 
 # 多子图绘制
 fig, axes = plt.subplots(2, 1, figsize=(15, 7), sharey=False, sharex=True)

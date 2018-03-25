@@ -10,14 +10,12 @@ PACF ：偏自相关系数
 --- 非平稳的时间序列表现出在不同时间段有不同的均值（持续上升或下降）
 """
 
-import tushare as ts
-import matplotlib.pyplot as plt
-import statsmodels.api as sm
-import numpy as np
-import logcm
-import statcm
 
-from pandas import DataFrame, Series
+import matplotlib.pyplot as plt
+import tushare as ts
+
+from common import statcm
+from common import logcm
 
 # 取得K线数据
 df = ts.get_k_data('000001', '2015-01-01', '2016-12-31')
@@ -41,11 +39,11 @@ for row in range(len(days_list)):
     # 差值ACF图-显示P值
     statcm.plot_acf(axes[row][0], df.close.copy(), diff_days, show_p=True)
     # 差值PACF图
-    statcm.plot_acf(axes[row][1], df.close.copy(), diff_days, pacf=True)
+    statcm.plot_acf(axes[row][1], df.close.copy(), diff_days, plt_pacf=True)
     # 对数差值ACF图-显示P值
-    statcm.plot_acf(axes[row][2], df.close.copy(), diff_days, log=True, show_p=True)
+    statcm.plot_acf(axes[row][2], df.close.copy(), diff_days, use_log=True, show_p=True)
     # 对数差值PACF图
-    statcm.plot_acf(axes[row][3], df.close.copy(), diff_days, log=True, pacf=True)
+    statcm.plot_acf(axes[row][3], df.close.copy(), diff_days, use_log=True, plt_pacf=True)
 
 # 调整每隔子图之间的距离
 plt.tight_layout()

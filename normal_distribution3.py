@@ -8,10 +8,11 @@
   2) 方差σ2 (sigma)。
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from scipy import stats
-import logcm
+
+from common import logcm
 
 # 参数组设置（多组参数）
 mu = [3, 5, 7, 5, 5, 5]
@@ -64,11 +65,11 @@ for i in range(2):
 
         # 设置每条线的备注
         if i == 0:
-            l = '$\mu=%d$' % (m)
-            l2 = '$\sigma^2=%d$' % (s)
+            l = '$\mu=%d$' % m
+            l2 = '$\sigma^2=%d$' % s
         else:
-            l = '$\sigma^2=%d$' % (s)
-            l2 = '$\mu=%d$' % (m)
+            l = '$\sigma^2=%d$' % s
+            l2 = '$\mu=%d$' % m
         # 绘制备注
         ax.text(m, maxY, l, fontsize=12, verticalalignment="bottom", horizontalalignment="center")
         if j == 0:

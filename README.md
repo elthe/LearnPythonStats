@@ -1,4 +1,4 @@
-# LearnPythonStats
+# Python 统计相关功能学习
 
 ## [正态分布专辑](NORMAL.md)
 

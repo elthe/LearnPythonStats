@@ -10,11 +10,12 @@ PACF ：偏自相关系数
 --- 非平稳的时间序列表现出在不同时间段有不同的均值（持续上升或下降）
 """
 
-import tushare as ts
 import matplotlib.pyplot as plt
 import numpy as np
-import logcm
-import statcm
+import tushare as ts
+
+from common import statcm
+from common import logcm
 
 # 取得K线数据
 df = ts.get_k_data('000001', '2015-01-01', '2016-12-31')
@@ -40,7 +41,7 @@ pv_log_list = []
 for row in range(len(days_list)):
     diff_days = days_list[row]
     pv_list.append(statcm.adf_test(df.close.copy(), diff_days))
-    pv_log_list.append(statcm.adf_test(df.close.copy(), diff_days, log=True))
+    pv_log_list.append(statcm.adf_test(df.close.copy(), diff_days, use_log=True))
 logcm.print_obj(pv_list, 'pv_list')
 logcm.print_obj(pv_log_list, 'pv_log_list')
 
@@ -50,12 +51,12 @@ line_list = np.repeat(MAX_P_OK, len(days_list))
 # 上图
 axes[0].plot(days_list, pv_list)
 axes[0].plot(days_list, line_list, '--')
-axes[0].fill_between(days_list, pv_list, MAX_P_OK, where=pv_list<=line_list, facecolors='g')
+axes[0].fill_between(days_list, pv_list, MAX_P_OK, where=pv_list <= line_list, facecolors='g')
 axes[0].set_ylabel('差分P值')
 
 axes[1].plot(days_list, pv_log_list)
 axes[1].plot(days_list, line_list, '--')
-axes[1].fill_between(days_list, pv_log_list, MAX_P_OK, where=pv_log_list<=line_list, facecolors='g')
+axes[1].fill_between(days_list, pv_log_list, MAX_P_OK, where=pv_log_list <= line_list, facecolors='g')
 axes[1].set_ylabel('对数差分P值')
 
 # 设置XY轴标题

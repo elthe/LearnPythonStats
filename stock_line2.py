@@ -5,12 +5,14 @@
 获取指定股票代码，指定期间的K线数据
 """
 
-import tushare as ts
-import matplotlib.pyplot as plt
-import matplotlib.finance as mpf
 import datetime
+
+import matplotlib.finance as mpf
+import matplotlib.pyplot as plt
+import tushare as ts
 from matplotlib.pylab import date2num
-import logcm
+
+from common import logcm
 
 df = ts.get_k_data('000001', '2015-01-01', '2015-03-31')
 logcm.print_obj(df, 'df')

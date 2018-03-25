@@ -8,10 +8,11 @@
   2) 方差σ2 (sigma)。
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from scipy import stats
-import logcm
+
+from common import logcm
 
 # 参数组设置（多组参数）
 mu = [3, 7, 5, 5, 5]

@@ -6,9 +6,11 @@
 """
 
 import random
-import numpy as np
+
 import matplotlib.pyplot as plt
-import logcm
+import numpy as np
+
+from common import logcm
 
 # 随机数的数量
 randomNum = 10000
