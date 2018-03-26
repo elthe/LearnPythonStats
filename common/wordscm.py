@@ -7,10 +7,7 @@ Words相关共通函数
 """
 
 import jieba
-import pandas as pd
-import numpy as np
 import jieba.analyse
-import jieba.posseg as pseg
 
 from common import filecm
 
@@ -20,7 +17,7 @@ def load_stopwords(path, file_name, encoding):
     从指定路径加载停用词列表。
     @param path: 指定的文件路径
     @param file_name: 指定的文件名
-    @:param encoding: 编码
+    @param encoding: 编码
     @:return 停用词列表
     """
     stopwords = filecm.read_lines(path, file_name, encoding)
