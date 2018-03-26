@@ -33,7 +33,7 @@ jieba.analyse.set_stop_words('./data/words_stop1.txt')
 
 # 多子图绘制
 fig, axes = plt.subplots(2, 3, figsize=(15, 8), sharex=True, sharey=True)
-fig.suptitle(u'即时财经新闻-分类关键词云')
+fig.suptitle(u'')
 # 设置标题(中文字体)
 plt.rcParams['font.sans-serif'] = ['SimHei']  # 用来正常显示中文标签
 plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
@@ -41,25 +41,29 @@ plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
 for i in range(2):
     for j in range(3):
         index = i * 2 + j
+        # 当前分类
         classify_name = classify_list[index]
+        # 根据分类筛选得到数据子集
         news_tmp = news[news.classify == classify_name]
-        logcm.print_obj(news_tmp, 'news_tmp')
+        logcm.print_obj(news_tmp.shape, 'shape of ' + classify_name)
 
-        # 标题
+        # 设置标题
         axes[i][j].set_title('%s (%d 条)' % (classify_name, news_tmp.shape[0]))
+        # 如果没有数据，则跳过
         if news_tmp.size == 0:
             continue
 
         # 加载内容URL的内容
         content = ""
         for cont in list(news_tmp.content):
+            # 如果内容为None，则跳过
             if cont is not None:
                 content += cont
 
         # 文字频率排行
         seg = jieba.analyse.textrank(content, topK=50, withWeight=False, allowPOS=('nt', 'n', 'nv'))
         cut_text = " ".join(seg)
-        logcm.print_obj(cut_text, 'cut_text')
+        logcm.print_obj(cut_text, 'cut_text of ' + classify_name)
 
         # 产生词云
         color_mask = imread("./data/words_mask_china.png")  # 读取背景图片
@@ -73,7 +77,10 @@ for i in range(2):
             # 允许最大词汇
             max_words=50,
             # 最大号字体
-            max_font_size=40
+            max_font_size=50,
+            # 图片尺寸
+            width=500,
+            height=400
         )
         word_cloud = cloud.generate(cut_text)
         # 显示词云图片
@@ -82,6 +89,10 @@ for i in range(2):
 # 不显示XY轴刻度
 plt.xticks(())
 plt.yticks(())
+
+# 调整每隔子图之间的距离
+plt.tight_layout()
+
 # 保存图片
 plt.savefig('images/words_cloud2_result.jpg')
 # 显示
