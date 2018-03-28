@@ -1,5 +1,7 @@
 # Python 统计相关功能学习
 
+## [Python基础专辑](RM_BASE.md)
+
 ## [正态分布专辑](RM_NORMAL.md)
 
 ## [线性回归专辑](RM_LINEAR.md)
