@@ -16,7 +16,6 @@ out_file = "output" + datecm.now_time_str() + ".csv"
 # 配置
 # Excel文件名，可以对应到多个Sheet，每个Sheet有一个标题行。
 config_map = {
-    # 1-利得资本
     'XXXXXX': [{
         'sheet_name': '明细',
         'title_line': 0,
