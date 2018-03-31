@@ -48,3 +48,22 @@ def draw_text(ax, x_list, y_list, text, h_align='left', v_align='top', color='bl
     font = {'color': color}
     ax.text(xt, yt, text, fontdict=font,
             fontsize=font_size, verticalalignment=v_align, horizontalalignment=h_align)
+
+
+def ticks_list_pi(start, end, step=0.5):
+    """
+    PI的坐标轴标签的值和文本。
+    @param start: 开始
+    @param end: 结束
+    @param step: 不长
+    @:return 值列表,文本列表
+    """
+    pre_list = np.arange(start, end, step)
+    data_list = []
+    txt_list = []
+    for pre in pre_list:
+        val = pre * np.pi
+        txt = r'%.2f$\pi$' % pre
+        data_list.append(val)
+        txt_list.append(txt)
+    return (data_list, txt_list)
