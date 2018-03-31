@@ -1,7 +1,7 @@
 # 绘图专辑
 
 
-## [draw_sincos.py](draw_sin.py)
+## [draw_sin.py](draw_sin.py)
 ### 绘制三角函数波形图
 ![Image text](images/draw_sin_result.jpg)
 
