@@ -5,6 +5,10 @@
 ### 绘制三角函数波形图
 ![Image text](images/draw_sin_result.jpg)
 
+## [draw_line.py](draw_line.py)
+### 绘制常见函数线图
+![Image text](images/draw_line_result.jpg)
+
 ## [draw_triangulation1.py](draw_triangulation1.py)
 ### 绘制同心三角网，对分隔点数，层数变化，生成对比图。
 ![Image text](images/draw_triangulation1_result.jpg)
