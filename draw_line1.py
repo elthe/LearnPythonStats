@@ -67,6 +67,6 @@ plt.yticks(range(0, 11))
 ax.legend(loc='best')
 
 # 保存图片
-plt.savefig('images/draw_line_result.jpg')
+plt.savefig('images/draw_line1_result.jpg')
 # 显示绘制后的图片
 plt.show()

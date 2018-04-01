@@ -103,3 +103,25 @@ def draw_v_line(ax, start, end, val, color='gray', line_style='-'):
     y = np.arange(start, end, 0.01)
     x = np.repeat(val, len(y))
     line, = ax.plot(x, y, line_style, color=color)
+
+
+def draw_func_line(ax, x, func, label, x_lbl, color='gray', line='-'):
+    """
+    在坐标轴中指定范围，绘制竖直线
+    @param ax: 绘画坐标轴
+    @param x: x轴值列表
+    @param func: 函数
+    @param label: 标签
+    @param color: 颜色
+    @param line: 线条样式
+    @:return 无
+    """
+
+    # 执行匿名函数，计算Y轴值列表
+    y = func(x)
+    # 根据XY轴坐标画线
+    ax.plot(x, y, line, color=color, label=label)
+    # 计算标签的Y坐标
+    y_lbl = func(x_lbl)
+    # 绘制标签文本
+    ax.text(x_lbl+0.1, y_lbl-0.1, label, color=color, verticalalignment="top", horizontalalignment="left")
