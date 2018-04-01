@@ -48,6 +48,10 @@ vlist.append(1)
 tlist.append('-1.0')
 tlist.append('1.0')
 
+# 设置XY轴标题
+plt.xlabel('x')
+plt.ylabel('y')
+
 # X轴：旋转50度
 plt.xticks(vlist, tlist, rotation=80)
 
