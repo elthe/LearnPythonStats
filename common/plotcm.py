@@ -67,3 +67,39 @@ def ticks_list_pi(start, end, step=0.5):
         data_list.append(val)
         txt_list.append(txt)
     return (data_list, txt_list)
+
+
+def draw_h_line(ax, start, end, val, color='gray', line_style='-'):
+    """
+    在坐标轴中指定范围，绘制水平线
+    @param ax: 绘画坐标轴
+    @param start: 开始值
+    @param end: 终止值
+    @param val: 水平值
+    @param color: 颜色
+    @param line_style: 样式
+    @:return 无
+    """
+
+    # 绘制Y轴0线
+    x = np.arange(start, end, 0.01)
+    y = np.repeat(val, len(x))
+    line, = ax.plot(x, y, line_style, color=color)
+
+
+def draw_v_line(ax, start, end, val, color='gray', line_style='-'):
+    """
+    在坐标轴中指定范围，绘制竖直线
+    @param ax: 绘画坐标轴
+    @param start: 开始值
+    @param end: 终止值
+    @param val: 竖直值
+    @param color: 颜色
+    @param line_style: 样式
+    @:return 无
+    """
+
+    # 绘制Y轴0线
+    y = np.arange(start, end, 0.01)
+    x = np.repeat(val, len(y))
+    line, = ax.plot(x, y, line_style, color=color)

@@ -10,7 +10,6 @@ from common import plotcm
 
 import numpy as np
 import matplotlib.pyplot as plt
-from pylab import *
 
 # 多子图绘制
 fig, ax = plt.subplots(figsize=(10, 6))
@@ -27,18 +26,30 @@ y3 = np.arcsin(x)
 y4 = np.arccos(x)
 
 # 根据坐标画图
-ax.plot(x, y1, color='r', label='sin(x)')
-ax.plot(x, y2, color='b', label='cos(x)')
-ax.plot(x, y3, color='g', label='arcsin(x)')
-ax.plot(x, y4, color='black', label='arccos(x)')
+ax.plot(x, y1, '--', color='r', label='sin(x)')
+ax.plot(x, y2, '--', color='b', label='cos(x)')
+ax.plot(x, y3, '--', color='g', label='arcsin(x)')
+ax.plot(x, y4, '--', color='black', label='arccos(x)')
 
-# 绘制0轴线
-y0 = np.repeat(0, len(y2))
-ax.plot(x, y0, ':', color='gray')
+# 绘制水平线
+plotcm.draw_h_line(ax, -2 * np.pi, 2 * np.pi, 0.0, color='black', line_style='-')
+plotcm.draw_h_line(ax, -2 * np.pi, 2 * np.pi, 1.0, color='gray', line_style=':')
+plotcm.draw_h_line(ax, -2 * np.pi, 2 * np.pi, -1.0, color='gray', line_style=':')
+
+# 绘制Y轴0线
+plotcm.draw_v_line(ax, -2, 3, 0.0, color='black', line_style='-')
+plotcm.draw_v_line(ax, -2, 3, 1.0, color='gray', line_style=':')
+plotcm.draw_v_line(ax, -2, 3, -1.0, color='gray', line_style=':')
 
 # 标记PI单位
-vlist, tlist = plotcm.ticks_list_pi(-2, 2.5, 0.5)
-xticks(vlist, tlist)
+vlist, tlist = plotcm.ticks_list_pi(-2, 2.5, 0.25)
+vlist.append(-1)
+vlist.append(1)
+tlist.append('-1.0')
+tlist.append('1.0')
+
+# X轴：旋转50度
+plt.xticks(vlist, tlist, rotation=80)
 
 # 设置图例备注显示位置
 ax.legend(loc='best')
