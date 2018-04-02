@@ -69,6 +69,48 @@ def ticks_list_pi(start, end, step=0.5):
     return (data_list, txt_list)
 
 
+def draw_point_list(ax, x, y, show_line=True, show_label=True, color='gray', line_style=':'):
+    """
+    在坐标轴中指定坐标列表，绘制点，及对应的辅助线和标签
+    @param ax: 绘画坐标轴
+    @param x: X坐标列表
+    @param y: Y坐标列表
+    @param show_line: 显示辅助线
+    @param show_label: 显示标签
+    @param color: 颜色
+    @param line_style: 样式
+    @:return 无
+    """
+
+    for i in range(len(x)):
+        draw_point(ax, x[i], y[i], show_label=show_label, show_line=show_line, color=color, line_style=line_style)
+
+
+def draw_point(ax, x, y, show_line=True, show_label=True, color='gray', line_style=':'):
+    """
+    在坐标轴中指定坐标，绘制点，及对应的辅助线和标签
+    @param ax: 绘画坐标轴
+    @param x: X坐标
+    @param y: Y坐标
+    @param show_line: 显示辅助线
+    @param show_label: 显示标签
+    @param color: 颜色
+    @param line_style: 样式
+    @:return 无
+    """
+    # 画点
+    ax.scatter(x, y, marker='o', color=color)
+
+    # 辅助线
+    if show_line:
+        draw_h_line(ax, 0, x, y, color=color, line_style=line_style)
+        draw_v_line(ax, 0, y, x, color=color, line_style=line_style)
+    # 标签
+    if show_label:
+        label = '(%s, %.1f)' % (str(x), y)
+        ax.text(x + 0.1, y - 0.1, label, color=color, verticalalignment="top", horizontalalignment="left")
+
+
 def draw_h_line(ax, start, end, val, color='gray', line_style='-'):
     """
     在坐标轴中指定范围，绘制水平线
@@ -124,4 +166,4 @@ def draw_func_line(ax, x, func, label, x_lbl, color='gray', line='-'):
     # 计算标签的Y坐标
     y_lbl = func(x_lbl)
     # 绘制标签文本
-    ax.text(x_lbl+0.1, y_lbl-0.1, label, color=color, verticalalignment="top", horizontalalignment="left")
+    ax.text(x_lbl + 0.1, y_lbl - 0.1, label, color=color, verticalalignment="top", horizontalalignment="left")
