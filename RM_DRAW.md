@@ -13,6 +13,10 @@
 ### 绘制函数线图2(函数做参数)
 ![Image text](images/draw_line2_result.jpg)
 
+## [draw_box.py](draw_box.py)
+### 绘制散点图，直方图，箱形图
+![Image text](images/draw_box_result.jpg)
+
 ## [draw_triangulation1.py](draw_triangulation1.py)
 ### 绘制同心三角网，对分隔点数，层数变化，生成对比图。
 ![Image text](images/draw_triangulation1_result.jpg)
