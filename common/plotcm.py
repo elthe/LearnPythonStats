@@ -167,3 +167,4 @@ def draw_func_line(ax, x, func, label, x_lbl, color='gray', line='-'):
     y_lbl = func(x_lbl)
     # 绘制标签文本
     ax.text(x_lbl + 0.1, y_lbl - 0.1, label, color=color, verticalalignment="top", horizontalalignment="left")
+

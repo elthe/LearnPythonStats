@@ -22,6 +22,7 @@ import numpy as np
 from numpy import *
 from pandas import Series
 from common import logcm
+from common import plotcm
 
 
 def plot_acf(ax, s_list, diff_num, unit='天', use_log=False, plt_pacf=False, show_p=False):
@@ -177,3 +178,28 @@ def corr_test(s_list1, s_list2):
 
     # 同时返回两个值
     return corr, corr_level
+
+
+def scatter_corr(ax, x, y, title, h_align='left', v_align='top', color='black', marker='o'):
+    """
+    在坐标轴中绘制散点，绘制相关系数和程度
+    @param ax: 绘画坐标轴
+    @param x: x轴值列表
+    @param y: y轴值列表
+    @param title: 标题
+    @param color: 颜色
+    @param marker: 样式
+    @param h_align: 指定位置(left,center,right)
+    @param v_align: 指定位置(top,middle,bottom)
+    @:return 无
+    """
+
+    # 散点图
+    ax.scatter(x, y, color=color, marker=marker)
+    # 设置标题
+    ax.set_title(title)
+    # 显示相关系数
+    corr, corr_level = corr_test(x, y)
+    text = '相关系数 : %f\n相关程度 : %s' % (corr, corr_level)
+    plotcm.draw_text(ax, x, y, text,
+                     color=color, font_size='9', v_align=v_align, h_align=h_align)

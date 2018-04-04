@@ -14,7 +14,7 @@
 ![Image text](images/draw_line2_result.jpg)
 
 ## [draw_box.py](draw_box.py)
-### 绘制散点图，直方图，箱形图
+### 用正态分布的随机数，绘制散点图，直方图，箱形图
 ![Image text](images/draw_box_result.jpg)
 
 ## [draw_triangulation1.py](draw_triangulation1.py)

@@ -107,7 +107,7 @@ def exists(path, file_name):
     if not os.path.exists(path):
         return False
     # 文件完整路径
-    file_path = str(path + "/" + file_name)
+    file_path = os.path.join(path, file_name)
     return os.path.exists(file_path)
 
 
