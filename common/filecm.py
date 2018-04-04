@@ -12,6 +12,7 @@ import re
 
 import csv
 import xlrd
+import shutil
 
 
 def extension(path):
@@ -255,3 +256,53 @@ def load_excel_data(file_path, short_name, sheet_name, title_line, col_titles):
             data_list.append(row_data_list)
 
     return data_list
+
+
+def move_files(path_list, dest_path):
+    """
+    对指定文件列表，移动到指定目录。
+    @param path_list: 文件路径列表
+    @param dest_path: 目标路径
+    @return: 无
+    """
+    # 创建目标路径
+    if not os.path.exists(dest_path):
+        os.makedirs(dest_path)
+
+    # 移动文件
+    for src_file in path_list:
+        if not os.path.isfile(src_file):
+            print("%s not exist!" % src_file)
+        else:
+            # 分离文件名和路径
+            src_path, src_name = os.path.split(src_file)
+            # 目标路径
+            dest_file = os.path.join(dest_path, src_name)
+            # 移动文件
+            print("move %s -> %s" % (src_file, dest_file))
+            shutil.move(src_file, dest_file)
+
+
+def copy_files(path_list, dest_path):
+    """
+    对指定文件列表，复制到指定目录。
+    @param path_list: 文件路径列表
+    @param dest_path: 目标路径
+    @return: 无
+    """
+    # 创建目标路径
+    if not os.path.exists(dest_path):
+        os.makedirs(dest_path)
+
+    # 复制文件
+    for src_file in path_list:
+        if not os.path.isfile(src_file):
+            print("%s not exist!" % src_file)
+        else:
+            # 分离文件名和路径
+            src_path, src_name = os.path.split(src_file)
+            # 目标路径
+            dest_file = os.path.join(dest_path, src_name)
+            # 复制文件
+            print("copy %s -> %s" % (src_file, dest_file))
+            shutil.copyfile(src_file, dest_file)
