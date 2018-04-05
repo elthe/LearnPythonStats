@@ -91,25 +91,25 @@ def save_html_url(page_url, encoding, local_path, file_name):
     filecm.save_str(html, encoding, local_path, file_name)
 
 
-def down_img(page_no, soup, page_url, img_select, tag_select, local_path):
+def down_img(soup, page_url, img_select, tag_select, local_path, page_no=1):
     """
     从指定的网页URL，下载所有满足要求的图片到本地
-    @param page_no: 网页页码号
     @param soup: 网页Soup对象
     @param page_url: 网页URL
     @param img_select: 图片select语句
     @param tag_select: 标签select语句
     @param local_path: 本地文件保存路径
+    @param page_no: 网页页码号
     @return:下载到的图片数量
     """
 
     src_list = htmlcm.img_src_list(soup, page_url, img_select)
     print("Page." + str(page_no) + " find " + str(len(src_list)) + " images.")
     count = 0
-    for imgSrc in src_list:
+    for img_src in src_list:
         # 从链接取得文件名
-        file_path = urlcm.file_path(imgSrc)
-        file_name = urlcm.file_name(imgSrc)
+        file_path = urlcm.file_path(img_src)
+        file_name = urlcm.file_name(img_src)
         print("Page." + str(page_no) + " No." + str(count + 1) + " " + file_path + "/" + file_name)
         names = htmlcm.tag_name_list(soup, tag_select)
         if len(names) > 0:
@@ -119,6 +119,6 @@ def down_img(page_no, soup, page_url, img_select, tag_select, local_path):
 
         if not filecm.exists(local_save_path, file_name):
             # 如果本地不存在，保存文件到本地        
-            save_file_url(imgSrc, page_url, local_save_path, file_name)
+            save_file_url(img_src, page_url, local_save_path, file_name)
             count = count + 1
     return count
