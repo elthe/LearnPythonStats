@@ -21,7 +21,7 @@ def read_url(page_url, encoding):
     @return: 网页文本
     """
 
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0'}
+    headers = {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
     req = urllib.request.Request(url=page_url, headers=headers)
     response = urllib.request.urlopen(req)
     html = response.read().decode(encoding, 'ignore')
