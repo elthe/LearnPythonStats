@@ -12,22 +12,21 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn import datasets, linear_model
+from sklearn import linear_model
 from sklearn.metrics import mean_squared_error, r2_score
 
 from common import plotcm
 from common import statcm
 from common import logcm
+from common import loadskcm
 
 # Load the diabetes dataset
 # 加载线性回归的样本数据
-diabetes = datasets.load_diabetes()
-logcm.print_obj(diabetes.DESCR, 'diabetes.DESCR')
-logcm.print_obj(diabetes.data, '样本原始数据集')
+df_data, df_target = loadskcm.load_diabetes()
 
 # Use only one feature
 # np.newaxis 用来增加维度, 只用索引2的特征数据来演示
-diabetes_X = diabetes.data[:, np.newaxis, 2]
+diabetes_X = df_data[:, np.newaxis, 2]
 logcm.print_obj(diabetes_X, '样本提取数据集')
 
 # Split the data and targets into training/testing sets
@@ -36,7 +35,7 @@ diabetes_X_test = diabetes_X[-30:]
 logcm.print_obj(diabetes_X_test, 'diabetes_X_test')
 
 # 取测试数据对应的目标值
-diabetes_y_test = diabetes.target[-30:]
+diabetes_y_test = df_target[-30:]
 logcm.print_obj(diabetes_y_test, 'diabetes_y_test')
 
 # 末尾30之外所有数据为训练数据
@@ -44,7 +43,7 @@ diabetes_X_train = diabetes_X[:-30]
 logcm.print_obj(diabetes_X_train, 'diabetes_X_train')
 
 # 取得训练数据对应的目标值
-diabetes_y_train = diabetes.target[:-30]
+diabetes_y_train = df_target[:-30]
 logcm.print_obj(diabetes_y_train, 'diabetes_y_train')
 
 # 多子图绘制
