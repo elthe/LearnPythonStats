@@ -5,10 +5,9 @@
 随机生成数字，然后统计分布规律。
 """
 
-import random
-
 import matplotlib.pyplot as plt
 import numpy as np
+import random
 
 from common import logcm
 

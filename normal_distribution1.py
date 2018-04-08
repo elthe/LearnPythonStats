@@ -10,9 +10,9 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy import stats
 
 from common import logcm
+from scipy import stats
 
 # 参数组设置（多组参数）
 mu = [3, 7, 5, 5, 5]

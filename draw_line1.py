@@ -5,11 +5,8 @@
 绘制函数直线图。
 """
 
-from common import logcm
-from common import plotcm
-
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 # 多子图绘制
 fig, ax = plt.subplots(figsize=(8, 8))

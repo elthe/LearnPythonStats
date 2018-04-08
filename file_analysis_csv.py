@@ -8,13 +8,12 @@ pandas是基于numpy构建的，为时间序列分析提供了很好的支持。
 pandas中有两个主要的数据结构，一个是Series，另一个是DataFrame。
 """
 
-import os
-
 import matplotlib.pyplot as plt
+import os
 import pandas as pd
-from pandas import DataFrame
 
 from common import logcm
+from pandas import DataFrame
 
 # Mac下加载CSV文件的方法
 path = os.getcwd() + '/data/file_analysis.csv'

@@ -10,14 +10,13 @@
 5）使用plot.triplot绘制
 """
 
-from common import logcm
-
-import matplotlib.pyplot as plt
-import numpy as np
 import math
-
-import scipy.spatial
+import numpy as np
+import matplotlib.pyplot as plt
 import matplotlib.tri as mtri
+import scipy.spatial
+
+from common import logcm
 from mpl_toolkits.mplot3d import Axes3D
 
 # 角度分割数列表
@@ -26,7 +25,6 @@ angles_list = [2, 3, 4, 5, 6, 8, 10, 14, 20, 26, 30, 36, 42]
 radii_list = [2, 4, 8, 12]
 # Z value
 z_list = [5, 10, 15, 20]
-
 
 # 起始半径
 min_radius = 0.25

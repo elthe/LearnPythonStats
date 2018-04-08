@@ -5,11 +5,12 @@
 绘制函数直线图。
 """
 
+import matplotlib.pyplot as plt
+import numpy as np
+
 from common import logcm
 from common import plotcm
 
-import numpy as np
-import matplotlib.pyplot as plt
 
 # X轴范围
 x = np.arange(0.01, 10, 0.01)

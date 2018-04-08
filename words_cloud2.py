@@ -6,14 +6,13 @@
 """
 
 import jieba.analyse
-
-from wordcloud import WordCloud
-from scipy.misc import imread
 import matplotlib.pyplot as plt
 import tushare as ts
 
 from common import logcm
 from common import wordscm
+from scipy.misc import imread
+from wordcloud import WordCloud
 
 # 获取即时财经新闻，类型包括国内财经、证券、外汇、期货、港股和美股等新闻信息。
 # 数据更新较快，使用过程中可用定时任务来获取。

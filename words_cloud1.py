@@ -6,15 +6,14 @@
 """
 
 import jieba.analyse
-
-from wordcloud import WordCloud
-from scipy.misc import imread
 import matplotlib.pyplot as plt
 
-from common import logcm
-from common import wordscm
-from common import webcm
 from common import htmlcm
+from common import logcm
+from common import webcm
+from common import wordscm
+from scipy.misc import imread
+from wordcloud import WordCloud
 
 # 加载内容URL的内容
 url = 'http://www.leadbankmap.com/baogao/detail_4800.html'

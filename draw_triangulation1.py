@@ -10,12 +10,12 @@
 5）使用plot.triplot绘制
 """
 
-from common import logcm
-
+import math
 import matplotlib.pyplot as plt
 import matplotlib.tri as tri
 import numpy as np
-import math
+
+from common import logcm
 
 # 角度分割数列表
 angles_list = [2, 3, 4, 5, 6, 8, 10, 14, 20, 26, 30, 36, 42]
@@ -26,7 +26,7 @@ radii_list = [2, 4, 8, 12]
 min_radius = 0.25
 
 # 多子图绘制
-fig, axes = plt.subplots(len(angles_list)*2, len(radii_list), sharey=True, sharex=True)
+fig, axes = plt.subplots(len(angles_list) * 2, len(radii_list), sharey=True, sharex=True)
 # 设置图片尺寸
 fig.set_size_inches(12, 3 * len(angles_list) * 2)
 # 总标题
@@ -35,13 +35,12 @@ fig.suptitle('')
 plt.rcParams['font.sans-serif'] = ['SimHei']  # 用来正常显示中文标签
 plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
 
-
 for i in range(len(angles_list)):
     n_angles = angles_list[i]
-    for j in  range(len(radii_list)):
+    for j in range(len(radii_list)):
         n_radii = radii_list[j]
-        ax1 = axes[2*i][j]
-        ax2 = axes[2*i+1][j]
+        ax1 = axes[2 * i][j]
+        ax2 = axes[2 * i + 1][j]
 
         # 半径数组
         radii = np.linspace(min_radius, 0.95, n_radii)

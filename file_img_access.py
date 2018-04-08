@@ -5,9 +5,9 @@
 图片文件访问
 """
 
-from common import logcm
 from common import filecm
 from common import imagecm
+from common import logcm
 
 # 读取图片尺寸
 img_path = './images/draw_box_result.jpg'

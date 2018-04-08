@@ -2,7 +2,7 @@
 # !/usr/bin/python
 
 """
-Tushare Load Common
+TuShare Load Common
 TuShare用数据加载共通
 """
 
@@ -10,9 +10,7 @@ import os
 import tushare as ts
 import pandas as pd
 
-from matplotlib.pylab import date2num
 from common import logcm
-from common import filecm
 from common import datecm
 
 
@@ -30,6 +28,7 @@ def get_cpi(start_month, end_month):
     file_path = './cache/ts_cpi.csv'
     # 如果存在数据文件，则直接读取
     if os.path.exists(file_path):
+        logcm.print_info('读取缓存数据...')
         # 读取文件
         df_cpi = pd.read_csv(file_path, dtype={'month': str, 'cpi': float, 'month_num': int})
     else:
@@ -66,6 +65,7 @@ def month_boxoffice(month):
     file_path = './cache/ts_month_boxoffice_%s.csv' % month
     # 如果存在数据文件，则直接读取
     if os.path.exists(file_path):
+        logcm.print_info('读取缓存数据...')
         # 读取文件
         df_month = pd.read_csv(file_path)
     else:
@@ -75,3 +75,51 @@ def month_boxoffice(month):
         df_month.to_csv(file_path, index=False)
 
     return df_month
+
+
+def get_k_data(code, start_date, end_date):
+    """
+    按照股票代码和期间，查询K线数据
+    @param code: 股票代码
+    @param start_date: 开始日期YYYY-MM-DD
+    @param end_date: 结束日期YYYY-MM-DD
+    @return: K线数据
+    """
+
+    # 文件路径
+    file_path = './cache/ts_k_data_%s_%s_%s.csv' % (code, start_date, end_date)
+    # 如果存在数据文件，则直接读取
+    if os.path.exists(file_path):
+        logcm.print_info('读取缓存数据...')
+        # 读取文件
+        df_data = pd.read_csv(file_path)
+    else:
+        df_data = ts.get_k_data(code, start_date, end_date)
+        # 保存到文件
+        df_data.to_csv(file_path, index=False)
+
+    return df_data
+
+
+def get_hist_data(code, start_date, end_date):
+    """
+    按照股票代码和期间，查询历史数据
+    @param code: 股票代码
+    @param start_date: 开始日期YYYY-MM-DD
+    @param end_date: 结束日期YYYY-MM-DD
+    @return: 历史数据
+    """
+
+    # 文件路径
+    file_path = './cache/ts_hist_data_%s_%s_%s.csv' % (code, start_date, end_date)
+    # 如果存在数据文件，则直接读取
+    if os.path.exists(file_path):
+        logcm.print_info('读取缓存数据...')
+        # 读取文件
+        df_data = pd.read_csv(file_path)
+    else:
+        df_data = ts.get_hist_data(code, start=start_date, end=end_date).sort_index()
+        # 保存到文件
+        df_data.to_csv(file_path)
+
+    return df_data

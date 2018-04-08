@@ -5,17 +5,14 @@
 分析CPI指数和票房的关系。
 """
 
-from common import loadtscm
-
-from common import logcm
-from common import plotcm
-from common import datecm
-from common import statcm
-from common import convertcm
-from pandas import Series
-
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
+from common import convertcm
+from common import datecm
+from common import loadtscm
+from common import logcm
+from common import statcm
 
 # 居民消费价格指数
 df_cpi = loadtscm.get_cpi('2016.1', '2017.12')

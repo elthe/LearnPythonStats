@@ -5,11 +5,11 @@
 绘制三角函数曲线图。
 """
 
+import matplotlib.pyplot as plt
+import numpy as np
+
 from common import logcm
 from common import plotcm
-
-import numpy as np
-import matplotlib.pyplot as plt
 
 # 多子图绘制
 fig, ax = plt.subplots(figsize=(10, 6))

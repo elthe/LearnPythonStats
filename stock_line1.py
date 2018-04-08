@@ -4,10 +4,10 @@
 # 根据Tushare取得股票数据，绘制曲线图。
 
 import matplotlib.pyplot as plt
-import tushare as ts
-from pandas import DataFrame
 
 from common import logcm
+from common import loadtscm
+from pandas import DataFrame
 
 # 多子图绘制
 fig, axes = plt.subplots(2, 1, figsize=(15, 7), sharey=False, sharex=True)
@@ -19,10 +19,8 @@ fig.suptitle(u'股票价格成交量变化示例图')
 plt.rcParams['font.sans-serif'] = ['SimHei']  # 用来正常显示中文标签
 plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
 
-# 股票代码
-stcd = '000001'
 # 股票数据，日期为索引，其他列为数据
-df = ts.get_hist_data('000001', start='2015-01-01', end='2016-12-31').sort_index()
+df = loadtscm.get_hist_data('000001', '2015-01-01', '2016-12-31')
 # 截取：开盘, 收盘, 最高, 最低
 df1 = DataFrame(df, columns=['high', 'low', 'open', 'close'])
 logcm.print_obj(df1, 'df1')

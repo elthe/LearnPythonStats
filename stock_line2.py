@@ -5,33 +5,19 @@
 获取指定股票代码，指定期间的K线数据
 """
 
-import datetime
-
 import matplotlib.finance as mpf
 import matplotlib.pyplot as plt
-import tushare as ts
-from matplotlib.pylab import date2num
 
+from common import datecm
+from common import loadtscm
 from common import logcm
 
-df = ts.get_k_data('000001', '2015-01-01', '2015-03-31')
+df = loadtscm.get_k_data('000001', '2015-01-01', '2015-03-31')
 logcm.print_obj(df, 'df')
-
-# 对tushare获取到的数据转换成candlestick_ohlc()方法可读取的格式
-def date_to_num(dates):
-    num_time = []
-    for date in dates:
-        # 日期字符串转日期对象
-        date_time = datetime.datetime.strptime(date, '%Y-%m-%d')
-        # 日期对象转数字
-        num_date = date2num(date_time)
-        num_time.append(num_date)
-    return num_time
-
 
 # dataframe转换为二维数组
 mat = df.as_matrix()
-num_time = date_to_num(mat[:, 0])
+num_time = datecm.date_list_to_num(mat[:, 0])
 mat[:, 0] = num_time
 logcm.print_obj(mat, 'mat')
 

@@ -5,11 +5,10 @@
 绘制函数直线图。
 """
 
-from common import logcm
-from common import plotcm
-
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
+from common import logcm
 
 # 随机生成一个标准正态分布形状是600*2的数组
 data = np.random.standard_normal((600, 2))

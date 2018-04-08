@@ -12,13 +12,13 @@ PACF ：偏自相关系数
 
 import matplotlib.pyplot as plt
 import numpy as np
-import tushare as ts
 
-from common import statcm
+from common import loadtscm
 from common import logcm
+from common import statcm
 
 # 取得K线数据
-df = ts.get_k_data('000001', '2015-01-01', '2016-12-31')
+df = loadtscm.get_k_data('000001', '2015-01-01', '2016-12-31')
 logcm.print_obj(df, 'df')
 
 # 设置差分天数列表

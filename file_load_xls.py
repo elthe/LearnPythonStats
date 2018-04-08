@@ -5,10 +5,10 @@
 EXCEL数据加载
 """
 
-from common import logcm
-from common import filecm
 from common import datecm
+from common import filecm
 from common import loadcfgcm
+from common import logcm
 
 # 根目录
 root_dir = "/Users/xxxx/Downloads"

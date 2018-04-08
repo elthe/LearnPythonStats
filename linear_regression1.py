@@ -12,13 +12,14 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn import linear_model
-from sklearn.metrics import mean_squared_error, r2_score
 
+from common import loadskcm
+from common import logcm
 from common import plotcm
 from common import statcm
-from common import logcm
-from common import loadskcm
+
+from sklearn import linear_model
+from sklearn.metrics import mean_squared_error, r2_score
 
 # Load the diabetes dataset
 # 加载线性回归的样本数据
