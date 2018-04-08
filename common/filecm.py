@@ -72,7 +72,7 @@ def save_data(data, path, file_name):
         print("Create folder: " + path)
         os.makedirs(path)
     # 文件完整路径
-    file_path = str(path + "/" + file_name)
+    file_path = os.path.join(path, file_name)
     with open(file_path, "wb") as file:
         file.write(data)
 

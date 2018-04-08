@@ -8,6 +8,7 @@ EXCEL数据加载
 from common import logcm
 from common import filecm
 from common import datecm
+from common import loadcfgcm
 
 # 根目录
 root_dir = "/Users/xxxx/Downloads"
@@ -15,7 +16,7 @@ out_file = "output" + datecm.now_time_str() + ".csv"
 
 # 配置
 # Excel文件名，可以对应到多个Sheet，每个Sheet有一个标题行。
-config_map = {
+default_config = {
     'XXXXXX': [{
         'sheet_name': '明细',
         'title_line': 0,
@@ -27,6 +28,8 @@ config_map = {
         'col_titles': ['????', '客户名称', '客户类型', '证件类型', '证件号码', '持有份额']
     }],
 }
+# 加载配置文件
+config_map = loadcfgcm.load("file_load_xls.json", default_config)
 
 # 取得指定目录下的文件列表
 path_list = filecm.search_files(root_dir, '.xlsx,.xls', r'^[^~]+')
@@ -63,5 +66,3 @@ for path in path_list:
 # 总结报告
 print("\n\n处理完成！ 总共读取文件：%d个 读取记录：%d条" % (read_file_cnt, read_line_cnt))
 print(out_file)
-
-

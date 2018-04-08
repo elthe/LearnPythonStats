@@ -9,6 +9,25 @@ Log common api
 from numpy import *
 
 
+def print_info(obj, blank_first=True):
+    """
+    print输出信息
+    @param obj: 输出信息
+    @param blank_first: 开头是否输出空行
+    @:return 无
+    """
+    # 输出新的空行
+    if blank_first:
+        print('\n')
+    # 开始线
+    print('-' * 100)
+    # 输出信息
+    print('----\t', end='')
+    print(obj)
+    # 结束线
+    print('-' * 100)
+
+
 def print_obj(obj, title, full_show=False):
     """
     print输出对象内容，同时输出描述，类型
