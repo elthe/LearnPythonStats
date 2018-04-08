@@ -7,6 +7,7 @@ Crawl common api
 """
 
 from common import htmlcm
+from common import logcm
 from common import webcm
 
 
@@ -23,9 +24,9 @@ def crawl_from_url(page_url, next_page_select,
     @param page_no: 网页页码号
     @return: 无
     """
-    print("\n\n......crawl_from_url Page." + str(page_no) + "......")
+    logcm.print_info("crawl_from_url Page.%d start..." % page_no)
     html = webcm.read_url(page_url, encoding)
-    print(html)
+    # print(html)
     soup = htmlcm.to_soup(html)
     # 下载当前网页中的所有图片
     webcm.down_img(soup, page_url, img_select, tag_select, local_path, page_no)
@@ -33,11 +34,11 @@ def crawl_from_url(page_url, next_page_select,
     next_page_url = htmlcm.next_page(soup, page_url, next_page_select)
     # 只要下一个页面存在，继续递归下载
     if next_page_url is not None:
-        print("NextPageUrl is " + next_page_url)
+        logcm.print_info("NextPageUrl is " + next_page_url)
         crawl_from_url(next_page_url, next_page_select,
                        img_select, tag_select, local_path, encoding, page_no + 1)
     else:
-        print("End\n")
+        logcm.print_info("End\n")
 
 
 def crawl_with_format(page_url, next_page_format,
@@ -53,7 +54,7 @@ def crawl_with_format(page_url, next_page_format,
     @param page_no: 网页页码号
     @return: 无
     """
-    print("\n\n......crawl_with_format Page." + str(page_no) + "......")
+    logcm.print_info("......crawl_with_format Page." + str(page_no) + "......")
     html = webcm.read_url(page_url, encoding)
     # print(html)
     soup = htmlcm.to_soup(html)
@@ -62,11 +63,11 @@ def crawl_with_format(page_url, next_page_format,
                            tag_select, local_path, page_no)
     if count == 0:
         # 如果下载不到文件，或者是已存在的文件，则结束下载。
-        print("Not found image End\n")
+        logcm.print_info("Not found image End\n")
         return
 
     # 取得下一个页面的URL地址
     next_page_url = next_page_format.replace('[page_no]', str(page_no + 1))
-    print("NextPageUrl is " + next_page_url)
+    logcm.print_info("NextPageUrl is " + next_page_url)
     crawl_with_format(next_page_url, next_page_format,
                       img_select, tag_select, local_path, encoding, page_no + 1, )

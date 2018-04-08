@@ -14,6 +14,8 @@ import csv
 import xlrd
 import shutil
 
+from common import logcm
+
 
 def extension(path):
     """
@@ -49,13 +51,14 @@ def save_str(content, encoding, path, file_name):
 
     # 本地文件路径如果不存在，自动创建
     if not os.path.exists(path):
-        print("Create folder: " + path)
+        logcm.print_info("Create folder: %d" % path)
         os.makedirs(path)
     # 文件完整路径
     file_path = str(path + '/' + file_name)
     f = codecs.open(file_path, 'w', encoding)
     f.write(content)
     f.close()
+    logcm.print_info("Save str file finished. --> %s/%s" % (path, file_name))
 
 
 def save_data(data, path, file_name):
@@ -69,12 +72,13 @@ def save_data(data, path, file_name):
 
     # 本地文件路径如果不存在，自动创建
     if not os.path.exists(path):
-        print("Create folder: " + path)
+        logcm.print_info("Create folder: %d" % path)
         os.makedirs(path)
     # 文件完整路径
     file_path = os.path.join(path, file_name)
     with open(file_path, "wb") as file:
         file.write(data)
+    logcm.print_info("Save data file finished. --> %s/%s" % (path, file_name))
 
 
 def append_csv(csv_path, data_list):
@@ -93,6 +97,7 @@ def append_csv(csv_path, data_list):
     for row in data_list:
         csv_writer.writerow(row)
 
+    logcm.print_info("Append csv file finished. --> %s" % csv_path)
     return None
 
 
@@ -153,7 +158,7 @@ def search_files(search_path, ext=None, match=None):
 
     # 判断路径是否cun在
     if not os.path.exists(search_path):
-        print("File path not exist! %s" % search_path)
+        logcm.print_info("File path not exist! %s" % search_path)
         return None
 
     # 后缀名如果有指定，生成允许列表
@@ -201,7 +206,7 @@ def load_excel_data(file_path, short_name, sheet_name, title_line, col_titles):
     sheets = workbook.sheet_names()
     if not sheet_name in sheets:
         # 如果没有这个Sheet，则跳过
-        print("Sheet不存在 %s - %s" % (short_name, sheet_name))
+        logcm.print_info("Sheet不存在 %s - %s" % (short_name, sheet_name))
         return None
 
     # 读取Sheet
@@ -209,12 +214,12 @@ def load_excel_data(file_path, short_name, sheet_name, title_line, col_titles):
 
     # 判断标题行是否在合理范围
     if title_line < 0 or title_line >= worksheet.nrows:
-        print("标题行不合理 %d" % title_line)
+        logcm.print_info("标题行不合理 %d" % title_line)
         return None
 
     # 标题列
     if not col_titles or len(col_titles) == 0:
-        print("标题列未设置 %s" % str(col_titles))
+        logcm.print_info("标题列未设置 %s" % str(col_titles))
         return None
 
     # 取得标题行索引
@@ -272,14 +277,14 @@ def move_files(path_list, dest_path):
     # 移动文件
     for src_file in path_list:
         if not os.path.isfile(src_file):
-            print("%s not exist!" % src_file)
+            logcm.print_info("%s not exist!" % src_file)
         else:
             # 分离文件名和路径
             src_path, src_name = os.path.split(src_file)
             # 目标路径
             dest_file = os.path.join(dest_path, src_name)
             # 移动文件
-            print("move %s -> %s" % (src_file, dest_file))
+            logcm.print_info("move %s -> %s" % (src_file, dest_file))
             shutil.move(src_file, dest_file)
 
 
@@ -297,12 +302,12 @@ def copy_files(path_list, dest_path):
     # 复制文件
     for src_file in path_list:
         if not os.path.isfile(src_file):
-            print("%s not exist!" % src_file)
+            logcm.print_info("%s not exist!" % src_file)
         else:
             # 分离文件名和路径
             src_path, src_name = os.path.split(src_file)
             # 目标路径
             dest_file = os.path.join(dest_path, src_name)
             # 复制文件
-            print("copy %s -> %s" % (src_file, dest_file))
+            logcm.print_info("copy %s -> %s" % (src_file, dest_file))
             shutil.copyfile(src_file, dest_file)

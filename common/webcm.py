@@ -6,11 +6,37 @@ web common api
 WEB连接相关共通函数
 """
 
+import random
+
 from common import filecm
-from common import urlcm
 from common import htmlcm
+from common import logcm
+from common import urlcm
+
 import urllib
 from urllib import request
+
+
+def random_agent():
+    # agent列表
+    agent_list = [
+        # Firefox
+        "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:34.0) Gecko/20100101 Firefox/34.0",
+        "Mozilla/5.0 (X11; U; Linux x86_64; zh-CN; rv:1.9.2.10) Gecko/20100922 Ubuntu/10.10 (maverick) Firefox/3.6.10",
+        # Safari
+        "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/534.57.2 (KHTML, like Gecko) Version/5.1.7 Safari/534.57.2",
+        # Chrome
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11",
+        "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36",
+        "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"
+        "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/534.16 (KHTML, like Gecko) Chrome/10.0.648.133 Safari/534.16",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36",
+        # IE
+        "Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)",
+    ]
+    # 随机返回一个
+    index = random.randint(0, len(agent_list))
+    return agent_list[index]
 
 
 def read_url(page_url, encoding):
@@ -21,9 +47,13 @@ def read_url(page_url, encoding):
     @return: 网页文本
     """
 
-    headers = {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
+    headers = {'User-Agent': random_agent()}
     req = urllib.request.Request(url=page_url, headers=headers)
+    logcm.print_obj(req, 'req')
+
     response = urllib.request.urlopen(req)
+    logcm.print_obj(response, 'response')
+
     html = response.read().decode(encoding, 'ignore')
     return html
 
@@ -69,6 +99,7 @@ def save_file_url(file_url, ref_url, local_path, file_name):
     @return:无
     """
 
+    logcm.print_info("Saved url as file. %s --> %s/%s" % (file_url, local_path, file_name))
     # 取得文件Response对象
     response = response_file(file_url, ref_url)
     # 把数据保存到本地文件
@@ -85,6 +116,7 @@ def save_html_url(page_url, encoding, local_path, file_name):
     @return:无
     """
 
+    logcm.print_info("Saved url as html. %s --> %s/%s" % (page_url, local_path, file_name))
     # 读取HTML内容到文本
     html = read_url(page_url, encoding)
     # 保存HTML内容到本地文件
@@ -104,13 +136,15 @@ def down_img(soup, page_url, img_select, tag_select, local_path, page_no=1):
     """
 
     src_list = htmlcm.img_src_list(soup, page_url, img_select)
-    print("Page." + str(page_no) + " find " + str(len(src_list)) + " images.")
+    logcm.print_info("Page.%d find %d images." % (page_no, len(src_list)))
+
     count = 0
     for img_src in src_list:
         # 从链接取得文件名
         file_path = urlcm.file_path(img_src)
         file_name = urlcm.file_name(img_src)
-        print("Page." + str(page_no) + " No." + str(count + 1) + " " + file_path + "/" + file_name)
+        logcm.print_info("Page.%d No.%d %s/%s" % (page_no, count + 1, file_path, file_name))
+
         names = htmlcm.tag_name_list(soup, tag_select)
         if len(names) > 0:
             local_save_path = local_path + "/" + "_".join(names)

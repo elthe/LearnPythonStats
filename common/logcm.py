@@ -99,6 +99,16 @@ def print_obj_prop(obj, type_name):
         print('    shape : ', end='')
         print(obj.shape)
 
+    if type_name == 'urllib.request.Request':
+        print('      url : %s' % obj.full_url)
+        print('     type : %s' % obj.type)
+        print('  headers : %s' % obj.headers)
+        print('     data : %s' % obj.data)
+
+    if type_name == 'http.client.HTTPResponse':
+        print('   status : %d' % obj.status)
+        print('  headers : %s' % obj.getheaders())
+
     return None
 
 
