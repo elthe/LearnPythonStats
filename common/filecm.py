@@ -51,7 +51,7 @@ def save_str(content, encoding, path, file_name):
 
     # 本地文件路径如果不存在，自动创建
     if not os.path.exists(path):
-        logcm.print_info("Create folder: %d" % path)
+        logcm.print_info("Create folder: %s" % path)
         os.makedirs(path)
     # 文件完整路径
     file_path = os.path.join(path, file_name)

@@ -60,7 +60,7 @@ def get_digits_knn():
     return knn
 
 
-def find_rois(img, thresh_value, min_width=10, min_height=10):
+def find_rois(img, thresh_value, min_width=20, min_height=20):
     """
     从图片中获取外边框在指定大小以上的感兴趣区域（ROI）。
     @:param img 图片
@@ -146,17 +146,20 @@ def find_digit_knn(knn, roi, thresh_value, id, tmp_path):
     @return: 结果数字，最终判断用的矩阵
     """
 
-    # 重新设置为标准的比较尺寸
-    resize_roi = cv2.resize(roi, (20, 20))
-    cv2.imwrite(tmp_path + '/find_digit_knn_resize-%s.jpg' % str(id), resize_roi)
+    cv2.imwrite(tmp_path + '/find_digit_knn-%s-roi.jpg' % str(id), roi)
 
     # 阈值处理
-    ret, th = cv2.threshold(resize_roi, thresh_value, 255, cv2.THRESH_BINARY)
-    # th = cv2.adaptiveThreshold(resize_roi, 255, 1, 1, 11, 2)
-    cv2.imwrite(tmp_path + '/find_digit_knn_threshold-%s.jpg' % str(id), th)
+    ret, th = cv2.threshold(roi, thresh_value, 255, cv2.THRESH_BINARY)
+    cv2.imwrite(tmp_path + '/find_digit_knn-%s-threshold.jpg' % str(id), th)
+
+
+    # 重新设置为标准的比较尺寸
+    resize_th = cv2.resize(th, (20, 20))
+    cv2.imwrite(tmp_path + '/find_digit_knn-%s_resize.jpg' % str(id), resize_th)
+
 
     # 矩阵展开成一维并转换为浮点数
-    out = th.reshape(-1, 400).astype(np.float32)
+    out = resize_th.reshape(-1, 400).astype(np.float32)
     # 通过KNN对象查找最符合的数字
     ret, result, neighbours, dist = knn.findNearest(out, k=5)
 

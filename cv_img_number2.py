@@ -22,7 +22,7 @@ id = 0
 for r in rois:
     x, y, w, h = r
     id += 1
-    digit, th = opencvcm.find_digit_knn(knn, edges[y:y + h, x:x + w], 5, id, tmp_path)
+    digit, th = opencvcm.find_digit_knn(knn, edges[y:y + h, x:x + w], 21, id, tmp_path)
     digits.append(cv2.resize(th, (20, 20)))
     cv2.rectangle(frame, (x, y), (x + w, y + h), (153, 153, 0), 2)
     txt = '%d-%d' % (id, digit)
