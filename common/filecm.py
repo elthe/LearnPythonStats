@@ -54,7 +54,7 @@ def save_str(content, encoding, path, file_name):
         logcm.print_info("Create folder: %d" % path)
         os.makedirs(path)
     # 文件完整路径
-    file_path = str(path + '/' + file_name)
+    file_path = os.path.join(path, file_name)
     f = codecs.open(file_path, 'w', encoding)
     f.write(content)
     f.close()
@@ -115,6 +115,23 @@ def exists(path, file_name):
     # 文件完整路径
     file_path = os.path.join(path, file_name)
     return os.path.exists(file_path)
+
+
+def makedir(path, by_file=False):
+    """
+    确保目标路径存在，不存在则创建。
+    @param path: 目标路径
+    @param by_file: 通过文件的路径创建
+    @return: 无
+    """
+
+    # 通过文件创建的时候，截取文件所在目录路径
+    if by_file:
+        (path, file_name) = os.path.split(path)
+
+    # 不存在则创建目标路径
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 
 def read_lines(path, file_name, encoding):

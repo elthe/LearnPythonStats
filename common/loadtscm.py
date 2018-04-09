@@ -25,7 +25,7 @@ def get_cpi(start_month, end_month):
     # 日期格式
     date_format = '%Y.%m'
     # 文件路径
-    file_path = './cache/ts_cpi.csv'
+    file_path = './cache/ts/ts_cpi.csv'
     # 如果存在数据文件，则直接读取
     if os.path.exists(file_path):
         logcm.print_info('读取缓存数据...')
@@ -62,7 +62,7 @@ def month_boxoffice(month):
     """
 
     # 文件路径
-    file_path = './cache/ts_month_boxoffice_%s.csv' % month
+    file_path = './cache/ts/ts_month_boxoffice_%s.csv' % month
     # 如果存在数据文件，则直接读取
     if os.path.exists(file_path):
         logcm.print_info('读取缓存数据...')
@@ -87,7 +87,7 @@ def get_k_data(code, start_date, end_date):
     """
 
     # 文件路径
-    file_path = './cache/ts_k_data_%s_%s_%s.csv' % (code, start_date, end_date)
+    file_path = './cache/ts/ts_k_data_%s_%s_%s.csv' % (code, start_date, end_date)
     # 如果存在数据文件，则直接读取
     if os.path.exists(file_path):
         logcm.print_info('读取缓存数据...')
@@ -111,7 +111,7 @@ def get_hist_data(code, start_date, end_date):
     """
 
     # 文件路径
-    file_path = './cache/ts_hist_data_%s_%s_%s.csv' % (code, start_date, end_date)
+    file_path = './cache/ts/ts_hist_data_%s_%s_%s.csv' % (code, start_date, end_date)
     # 如果存在数据文件，则直接读取
     if os.path.exists(file_path):
         logcm.print_info('读取缓存数据...')

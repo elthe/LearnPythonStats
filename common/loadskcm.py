@@ -22,8 +22,8 @@ def load_diabetes():
     """
 
     # 文件路径
-    file_path_data = './cache/sk_diabete_data.csv'
-    file_path_target = './cache/sk_diabete_target.csv'
+    file_path_data = './cache/sk/sk_diabete_data.csv'
+    file_path_target = './cache/sk/sk_diabete_target.csv'
     # 如果存在数据文件，则直接读取
     if os.path.exists(file_path_data):
         # 读取文件
