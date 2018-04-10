@@ -12,7 +12,7 @@ import numpy as np
 import os
 
 from common import filecm
-from common import datecm
+from common import logcm
 
 
 def get_digits_knn():
@@ -25,6 +25,7 @@ def get_digits_knn():
     path = './cache/cv'
     file_train = 'digits_knn_train.npy'
     file_label = 'digits_knn_label.npy'
+    filecm.makedir(path)
 
     if filecm.exists(path, file_train):
         # 从缓存文件中加载训练样本和结果
@@ -39,15 +40,24 @@ def get_digits_knn():
         # 把图片切割为50*100个Cell
         cells = [np.hsplit(row, 100) for row in np.vsplit(gray, 50)]
 
-        # 计算训练数据，对每个Cell，进行reshape处理，
-        # 把图片展开成400列，行数不确定
-        train = np.array(cells).reshape(-1, 400).astype(np.float32)
+        train = []
+        # 删除图片边界空白
+        for i in range(50):
+            for j in range(100):
+                cell_img = cells[i][j]
+                cell_img2 = resize_by_max_contours(cell_img, 50, 20, 20, 1, 1)
+                if j == 0:
+                    cv2.imwrite('%s/digits_cell_%d_%d.jpg' % (path, i, j), cell_img2)
+                # 计算训练数据，对每个Cell，进行reshape处理，
+                # 把图片展开成400列，行数不确定
+                train.append(cell_img2.reshape((1, 400)))
 
+        # 训练数据整理为np.array格式
+        train = np.array(train).reshape(-1, 400).astype(np.float32)
         # 每个数字500遍
         label = np.repeat(np.arange(10), 500)
 
         # 保存缓存文件
-        filecm.makedir(path)
         np.save(os.path.join(path, file_train), train)
         np.save(os.path.join(path, file_label), label)
 
@@ -60,34 +70,95 @@ def get_digits_knn():
     return knn
 
 
-def find_rois(img, thresh_value, min_width=20, min_height=20):
+def resize_by_max_contours(img, target_width, target_height, min_width=10, min_height=10):
     """
-    从图片中获取外边框在指定大小以上的感兴趣区域（ROI）。
+    按照图片中最大轮廓，截取图片并按目标大小返回。
     @:param img 图片
-    @:param thresh_value 阈值处理的阈值值
-    @return: 感兴趣区域列表，边框数据
+    @:param target_width 目标宽度
+    @:param target_height 目标高度
+    @:param min_width 轮廓最小宽度
+    @:param min_height 轮廓最小高度
+    @return: 目标大小的图片
     """
 
-    img_width = img.shape[0]
+    # 查找图片中的轮廓列表
+    rois = find_rois(img, min_width, min_height)
 
-    tmp_path = './temp/cv/digits/' + datecm.now_time_str()
-    filecm.makedir(tmp_path)
+    # 取得面积最大的轮廓
+    max_roi = get_max_roi(rois)
+    if max_roi is None:
+        return None
 
-    rois = []
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    cv2.imwrite(tmp_path + '/find_rois_gray.jpg', gray)
+    # 截取最大轮廓图片
+    (x, y, w, h) = max_roi
+    img_sub = img[y:y + h, x:x + w]
+
+    # 重置为目标尺寸
+    img_target = cv2.resize(img_sub, (target_width, target_height), interpolation=cv2.INTER_AREA)
+
+    return img_target
+
+
+def get_max_roi(rois):
+    """
+    取得指定区域列表中面积最大的一个。
+    @:param rois 区域列表
+    @return:
+    """
+
+    # 为空判断
+    if rois is None or len(rois) == 0:
+        logcm.print_info("Rois is None or Empty!")
+        return None
+
+    # 计算最大面积
+    max_area = 0
+    max_roi = rois[0]
+    for roi in rois:
+        x, y, w, h = roi
+        # 面积 = 宽度 * 高度
+        area = w * h
+        if area > max_area:
+            max_area = area
+            max_roi = roi
+    return max_roi
+
+
+def get_edges(img, tmp_path, is_color=True):
+    """
+    从图片中获取边界图片。
+    @:param img 图片
+    @:param tmp_path 临时目录
+    @:param is_color 是否彩色图片
+    @return: 边界图片
+    """
+
+    # 灰度图
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) if is_color else img
+    cv2.imwrite(tmp_path + '/get_edges_gray.jpg', gray)
 
     # 膨胀图像
     dilate = cv2.dilate(gray, None, iterations=2)
-    cv2.imwrite(tmp_path + '/find_rois_dilate.jpg', dilate)
+    cv2.imwrite(tmp_path + '/get_edges_dilate.jpg', dilate)
 
     # 腐蚀图像
     erode = cv2.erode(gray, None, iterations=2)
-    cv2.imwrite(tmp_path + '/find_rois_erode.jpg', erode)
+    cv2.imwrite(tmp_path + '/get_edges_erode.jpg', erode)
 
     # 将两幅图像相减获得边，第一个参数是膨胀后的图像，第二个参数是腐蚀后的图像
     edges = cv2.absdiff(dilate, erode)
-    cv2.imwrite(tmp_path + '/find_rois_edges.jpg', edges)
+    cv2.imwrite(tmp_path + '/get_edges_edges.jpg', edges)
+    return edges
+
+
+def get_thresh(img, tmp_path, thresh_value):
+    """
+    从图片中阈值图片（黑白图）
+    @:param img 图片
+    @:param tmp_path 临时目录
+    @:param thresh_value 阈值处理的阈值值
+    @return: 阈值图片
+    """
 
     # Sobel算子:是一种带有方向性的滤波器，
     #   cv2.CV_16S -- Sobel 函数求完导数后会有负值和大于255的值，
@@ -102,8 +173,8 @@ def find_rois(img, thresh_value, min_width=20, min_height=20):
     #   scale   - - 缩放导数的比例常数，默认情况下没有伸缩系数
     #   delta   - - 一个可选的增量，将会加到最终的dst中，同样，默认情况下没有额外的值加到dst中
     # borderType - - 判断图像边界的模式。这个参数默认值为cv2.BORDER_DEFAULT。
-    x = cv2.Sobel(edges, cv2.CV_16S, 1, 0)
-    y = cv2.Sobel(edges, cv2.CV_16S, 0, 1)
+    x = cv2.Sobel(img, cv2.CV_16S, 1, 0)
+    y = cv2.Sobel(img, cv2.CV_16S, 0, 1)
 
     # convertScaleAbs()--转回uint8形式，否则将无法显示图像，而只是一副灰色图像
     # dst = cv2.convertScaleAbs(src[, dst[, alpha[, beta]]])
@@ -115,14 +186,28 @@ def find_rois(img, thresh_value, min_width=20, min_height=20):
     #   beta   --  第二个权重
     #   gamma  --  累加到结果上的一个值
     dst = cv2.addWeighted(absX, 0.5, absY, 0.5, 0)
-    cv2.imwrite(tmp_path + '/find_rois_dst.jpg', dst)
+    cv2.imwrite(tmp_path + '/get_thresh_dst.jpg', dst)
 
     # 简单阈值
     ret, thresh = cv2.threshold(dst, thresh_value, 255, cv2.THRESH_BINARY)
-    cv2.imwrite(tmp_path + '/find_rois_thresh.jpg', thresh)
+    cv2.imwrite(tmp_path + '/get_thresh_thresh.jpg', thresh)
+    return thresh
 
+
+def find_rois(img, min_width=20, min_height=20):
+    """
+    从图片中获取外边框在指定大小以上的感兴趣区域（ROI）。
+    @:param img 图片
+    @:param thresh_value 阈值处理的阈值值
+    @:param min_width 最小宽度
+    @:param min_height 最小高度
+    @return: 感兴趣区域列表，边框数据
+    """
+
+    img_width = img.shape[0]
+    rois = []
     # 查找检测物体的轮廓
-    im, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    im, contours, hierarchy = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     for c in contours:
         # 取得轮廓的直边界矩形
         x, y, w, h = cv2.boundingRect(c)
@@ -133,7 +218,7 @@ def find_rois(img, thresh_value, min_width=20, min_height=20):
     # 对区域排序，先上线，再左右。
     sorted_rois = sorted(rois, key=lambda t: t[1] * img_width + t[0])
 
-    return sorted_rois, edges, tmp_path
+    return sorted_rois
 
 
 def find_digit_knn(knn, roi, thresh_value, id, tmp_path):
@@ -152,11 +237,17 @@ def find_digit_knn(knn, roi, thresh_value, id, tmp_path):
     ret, th = cv2.threshold(roi, thresh_value, 255, cv2.THRESH_BINARY)
     cv2.imwrite(tmp_path + '/find_digit_knn-%s-threshold.jpg' % str(id), th)
 
-
     # 重新设置为标准的比较尺寸
-    resize_th = cv2.resize(th, (20, 20))
+    # interpolation - 插值方法。共有5种：
+    #   １）INTER_NEAREST - 最近邻插值法
+    #   ２）INTER_LINEAR  - 双线性插值法（默认）
+    #   ３）INTER_AREA    - 基于局部像素的重采样（resampling using pixel area relation）。
+    #       对于图像抽取（image decimation）来说，这可能是一个更好的方法。
+    #       但如果是放大图像时，它和最近邻法的效果类似。
+    #   ４）INTER_CUBIC   - 基于4x4像素邻域的3次插值法
+    #   ５）INTER_LANCZOS4- 基于8x8像素邻域的Lanczos插值
+    resize_th = cv2.resize(th, (20, 20), interpolation=cv2.INTER_AREA)
     cv2.imwrite(tmp_path + '/find_digit_knn-%s_resize.jpg' % str(id), resize_th)
-
 
     # 矩阵展开成一维并转换为浮点数
     out = resize_th.reshape(-1, 400).astype(np.float32)

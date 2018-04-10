@@ -12,11 +12,17 @@ import numpy as np
 
 from common import filecm
 from common import opencvcm
+from common import datecm
 
+tmp_path = './temp/cv/digits/' + datecm.now_time_str()
+filecm.makedir(tmp_path)
 
 knn = opencvcm.get_digits_knn()
 frame = cv2.imread('./images/cv_number_test2.jpg')
-rois, edges, tmp_path = opencvcm.find_rois(frame, 50)
+
+edges = opencvcm.get_edges(frame, tmp_path)
+thresh = opencvcm.get_thresh(edges, tmp_path, 21)
+rois = opencvcm.find_rois(thresh)
 digits = []
 id = 0
 for r in rois:
