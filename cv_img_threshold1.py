@@ -23,23 +23,54 @@
 import cv2
 import matplotlib.pyplot as plt
 
-# 直接读为灰度图像
-img = cv2.imread('./images/cv_flower.jpg', 0)
+# 读取图像
+img = cv2.imread('./images/cv_flower2.jpg')
 
-ret, thresh1 = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
-ret, thresh2 = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY_INV)
-ret, thresh3 = cv2.threshold(img, 127, 255, cv2.THRESH_TRUNC)
-ret, thresh4 = cv2.threshold(img, 127, 255, cv2.THRESH_TOZERO)
-ret, thresh5 = cv2.threshold(img, 127, 255, cv2.THRESH_TOZERO_INV)
+# 灰度转换
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-titles = ['img', 'BINARY', 'BINARY_INV', 'TRUNC', 'TOZERO', 'TOZERO_INV']
-images = [img, thresh1, thresh2, thresh3, thresh4, thresh5]
-for i in range(6):
-    plt.subplot(2, 3, i + 1), plt.imshow(images[i], 'gray')
-    plt.title(titles[i])
-    plt.xticks([]), plt.yticks([])
+# 阈值列表
+thresh_list = range(10, 250, 10)
+# 参数列表
+param_list = [cv2.THRESH_BINARY, cv2.THRESH_BINARY_INV, cv2.THRESH_TRUNC, cv2.THRESH_TOZERO, cv2.THRESH_TOZERO_INV]
+# 标题列表
+title_list = ['BINARY', 'BINARY_INV', 'TRUNC', 'TOZERO', 'TOZERO_INV']
 
+# 多子图绘制
+fig, axes = plt.subplots(len(thresh_list), len(param_list) + 2, sharey=False, sharex=False)
+# 设置图片尺寸
+fig.set_size_inches(12, len(thresh_list) * 12 // 7)
+# 总标题
+fig.suptitle('')
+# 设置标题(中文字体)
+plt.rcParams['font.sans-serif'] = ['SimHei']  # 用来正常显示中文标签
+plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
 
+for i in range(len(thresh_list)):
+    for j in range(len(param_list) + 2):
+        if j == 0:
+            show = img
+            title = '原图'
+        elif j == 1:
+            show = gray
+            title = '灰度图'
+        else:
+            param = param_list[j - 2]
+            # 简单阈值
+            ret, show = cv2.threshold(gray, thresh_list[i], 255, param)
+            title = "%s-阈值:%d" % (title_list[j - 2], thresh_list[i])
+
+        ax = axes[i][j]
+        # 显示图片
+        ax.imshow(show, 'gray')
+        # 显示标题
+        ax.set_title(title)
+        # 隐藏坐标轴
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+# 调整每隔子图之间的距离
+plt.tight_layout()
 # 保存图片
 plt.savefig('images/cv_img_threshold1_result.jpg')
 # 显示绘制后的图片
