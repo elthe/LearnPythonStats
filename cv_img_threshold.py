@@ -53,7 +53,7 @@ for i in range(len(thresh_list)):
             title = '原图'
         elif j == 1:
             show = gray
-            title = '灰度图'
+            title = '灰度+噪声'
         else:
             param = param_list[j - 2]
             # 简单阈值

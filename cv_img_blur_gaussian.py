@@ -9,12 +9,14 @@
 对于2D图像可以进行低通或者高通滤波操作，
 低通滤波（LPF）有利于去噪，模糊图像，高通滤波（HPF）有利于找到图像边界。
 
-均值滤波
-而opencv有一个专门的平均滤波模板供使用–归一化卷积模板，
-所有的滤波模板都是使卷积框覆盖区域所有像素点与模板相乘后得到的值作为中心像素的值。
-Opencv中均值模板可以用cv2.blur和cv2.boxFilter,
-模板大小是m*n是可以设置的。如果你不想要前面的1/9,可以使用非归一化的模板cv2.boxFilter。
-模板大小3*5
+# 高斯模糊模板
+# 现在把卷积模板中的值换一下，不是全1了，换成一组符合高斯分布的数值放在模板里面，
+# 比如这时中间的数值最大，往两边走越来越小，构造一个小的高斯包。
+# 实现的函数为cv2.GaussianBlur()。
+# 对于高斯模板，我们需要制定的是高斯核的高和宽（奇数），
+# 沿x与y方向的标准差(如果只给x，y=x，如果都给0，那么函数会自己计算)。
+# 高斯核可以有效的出去图像的高斯噪声。
+# 当然也可以自己构造高斯核，相关函数：cv2.GaussianKernel().
 
 """
 
@@ -27,6 +29,12 @@ img = cv2.imread('./images/cv_flower2.jpg')
 
 # 灰度转换
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+# 添加点噪声
+for i in range(2000):
+    temp_x = np.random.randint(0, img.shape[0])
+    temp_y = np.random.randint(0, img.shape[1])
+    gray[temp_x][temp_y] = 255
 
 # 转化数值类型
 img1 = np.float32(img)
@@ -54,10 +62,10 @@ for i in range(len(x_list)):
             title = '原图'
         elif j == 1:
             show = gray
-            title = '灰度图'
+            title = '灰度+噪声'
         else:
-            # 均值滤波
-            show = cv2.blur(gray, (x_list[i], y_list[j - 2]))
+            # 高斯模糊
+            show = cv2.GaussianBlur(gray, (x_list[i], y_list[j - 2]), 0)
             title = "模版(%d,%d)" % (x_list[i], y_list[j - 2])
 
         ax = axes[i][j]
@@ -72,6 +80,6 @@ for i in range(len(x_list)):
 # 调整每隔子图之间的距离
 plt.tight_layout()
 # 保存图片
-plt.savefig('./images/cv_img_blur_result.jpg')
+plt.savefig('./images/cv_img_blur_gaussian_result.jpg')
 # 显示绘制后的图片
 plt.show()

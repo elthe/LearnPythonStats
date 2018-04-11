@@ -255,5 +255,5 @@ for j in range(len(boxes)):
         cv2.imshow("img", img)
         cv2.waitKey(30)
 
-print("\n生成的数独\n")
+cv2.imwrite('./images/cv_img_number1_result.jpg', img)
 print(soduko)
