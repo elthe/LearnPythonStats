@@ -1,13 +1,13 @@
 # 图像处理和识别专辑
 
 
-## [cv_img_threshold1.py](cv_img_threshold1.py)
-### 图像简单阈值处理
-![Image text](images/cv_img_threshold1_result.jpg)
+## [cv_img_threshold.py](cv_img_threshold.py)
+### 简单阈值，阈值在10～250间变化，五种参数的对比效果。
+![Image text](images/cv_img_threshold_result.jpg)
 
-## [cv_img_threshold2.py](cv_img_threshold2.py)
-### 图像自适应阈值处理
-![Image text](images/cv_img_threshold2_result.jpg)
+## [cv_img_threshold2.py](cv_img_threshold_adpt.py)
+### 自适应阈值变化，块大小在5～126间变化，四种参数的对比效果。
+![Image text](images/cv_img_threshold_adpt_result.jpg)
 
 ## [cv_img_filter1.py](cv_img_filter1.py)
 ### 图像滤波处理

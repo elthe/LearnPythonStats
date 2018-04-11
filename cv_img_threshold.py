@@ -72,6 +72,6 @@ for i in range(len(thresh_list)):
 # 调整每隔子图之间的距离
 plt.tight_layout()
 # 保存图片
-plt.savefig('images/cv_img_threshold1_result.jpg')
+plt.savefig('./images/cv_img_threshold_result.jpg')
 # 显示绘制后的图片
 plt.show()
