@@ -19,8 +19,8 @@ save_path = './temp/draw_box_result_thumb.jpg'
 imagecm.resize(img_path, 500, 500, save_path, keep_ratio=True)
 
 # 检索图片列表
-search_path = './images/'
-path_list = filecm.search_files(search_path, ext='.jpg')
+search_path = '/Volumes/Transcend/data/down/aaa/photo/makeH'
+path_list = filecm.search_files(search_path, '.jpg', r'^[^\.]+')
 logcm.print_obj(path_list, 'path_list')
 
 # 横版图片路径列表
@@ -31,5 +31,5 @@ for path in path_list:
 logcm.print_obj(copy_list, 'copy_list')
 
 # 复制图片
-copy_path = './temp/'
-filecm.copy_files(copy_list, copy_path)
+copy_path = '/Volumes/Transcend/data/down/aaa/photo/makeW'
+filecm.move_files(copy_list, copy_path)
