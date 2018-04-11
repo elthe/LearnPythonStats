@@ -5,14 +5,22 @@
 ### 简单阈值，阈值在10～250间变化，五种参数的对比效果。
 ![Image text](images/cv_img_threshold_result.jpg)
 
-## [cv_img_threshold2.py](cv_img_threshold_adpt.py)
+## [cv_img_threshold_adpt.py](cv_img_threshold_adpt.py)
 ### 自适应阈值变化，块大小在5～126间变化，四种参数的对比效果。
 ![Image text](images/cv_img_threshold_adpt_result.jpg)
 
-## [cv_img_filter1.py](cv_img_filter1.py)
-### 图像滤波处理
-![Image text](images/cv_img_filter1_result.jpg)
+## [cv_img_filter2d.py](cv_img_filter2d.py)
+### 统一的2D滤波器cv2.filter2D
+![Image text](images/cv_img_filter2d_result.jpg)
+
+## [cv_img_blur.py](cv_img_blur.py)
+### 均值滤波cv2.blur
+![Image text](images/cv_img_blur_result.jpg)
 
 ## [cv_img_number1.py](cv_img_number1.py)
-### 通过数字图片训练，然后识别图片中数字。
+### KNN数字图片训练识别(印刷体)
 ![Image text](images/cv_img_number1_result.jpg)
+
+## [cv_img_number2.py](cv_img_number2.py)
+### KNN数字图片训练识别(手写体)
+![Image text](images/cv_img_number2_result.jpg)
