@@ -194,13 +194,16 @@ def get_thresh(img, tmp_path, thresh_value):
     return thresh
 
 
-def find_rois(img, min_width=20, min_height=20):
+def find_rois(img, min_width=20, min_height=20, min_area=None, min_wh_ratio=None, max_wh_ratio=None):
     """
     从图片中获取外边框在指定大小以上的感兴趣区域（ROI）。
     @:param img 图片
     @:param thresh_value 阈值处理的阈值值
     @:param min_width 最小宽度
     @:param min_height 最小高度
+    @:param min_area 最小面积
+    @:param min_wh_ratio 最小宽高比
+    @:param max_wh_ratio 最大宽高比
     @return: 感兴趣区域列表，边框数据
     """
 
@@ -209,17 +212,34 @@ def find_rois(img, min_width=20, min_height=20):
     # 查找检测物体的轮廓
     im, contours, hierarchy = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     for c in contours:
+
+        # 最小面积限制
+        if min_area is not None:
+            # 计算该轮廓的面积
+            area = cv2.contourArea(c)
+            # 面积小的都筛选掉
+            if area < min_area:
+                continue
+
         # 取得轮廓的直边界矩形
         x, y, w, h = cv2.boundingRect(c)
         # 判断最小宽度和高度
         if w > min_width and h > min_height:
             rois.append((x, y, w, h))
 
+        # 最小和最大宽高比限制
+        ratio = float(w) / float(h)
+        if max_wh_ratio is not None:
+            if ratio > max_wh_ratio:
+                continue
+        if min_wh_ratio is not None:
+            if ratio < min_wh_ratio:
+                continue
+
     # 对区域排序，先上线，再左右。
     sorted_rois = sorted(rois, key=lambda t: t[1] * img_width + t[0])
 
     return sorted_rois
-
 
 def find_digit_knn(knn, roi, thresh_value, id, tmp_path):
     """
@@ -255,3 +275,33 @@ def find_digit_knn(knn, roi, thresh_value, id, tmp_path):
     ret, result, neighbours, dist = knn.findNearest(out, k=5)
 
     return int(result[0][0]), th
+
+
+def preprocess(gray):
+    """
+    图片预处理。
+    @:param gray 灰度图
+    @return: 预处理后的图
+    """
+
+    # # 直方图均衡化
+    # equ = cv2.equalizeHist(gray)
+    # 高斯平滑
+    gaussian = cv2.GaussianBlur(gray, (3, 3), 0, 0, cv2.BORDER_DEFAULT)
+    # 中值滤波
+    median = cv2.medianBlur(gaussian, 5)
+    # Sobel算子，X方向求梯度
+    sobel = cv2.Sobel(median, cv2.CV_8U, 1, 0, ksize=3)
+    # 二值化
+    ret, binary = cv2.threshold(sobel, 170, 255, cv2.THRESH_BINARY)
+    # 膨胀和腐蚀操作的核函数
+    element1 = cv2.getStructuringElement(cv2.MORPH_RECT, (9, 1))
+    element2 = cv2.getStructuringElement(cv2.MORPH_RECT, (9, 7))
+    # 膨胀一次，让轮廓突出
+    dilation = cv2.dilate(binary, element2, iterations=1)
+    # 腐蚀一次，去掉细节
+    erosion = cv2.erode(dilation, element1, iterations=1)
+    # 再次膨胀，让轮廓明显一些
+    dilation2 = cv2.dilate(erosion, element2, iterations=3)
+
+    return dilation2

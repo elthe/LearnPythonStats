@@ -36,3 +36,7 @@
 ## [cv_img_number2.py](cv_img_number2.py)
 ### KNN数字图片训练识别(手写体)
 ![Image text](images/cv_img_number2_result.jpg)
+
+## [cv_img_plate1.py](cv_img_plate1.py)
+### 车牌识别第一步，从照片中找到车牌号码
+![Image text](images/cv_img_plate1_result.jpg)
