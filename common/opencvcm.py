@@ -7,6 +7,7 @@ OpenCV common api
 """
 
 import cv2
+import glob as gb
 import math
 import numpy as np
 import os
@@ -15,9 +16,9 @@ from common import filecm
 from common import logcm
 
 
-def get_digits_knn():
+def get_hand_digits_knn():
     """
-    取得训练好的数字识别的KNN对象，如果有缓存文件，优先读取缓存。
+    取得训练好的手写数字识别的KNN对象，如果有缓存文件，优先读取缓存。
     @return: KNN对象
     """
 
@@ -45,9 +46,9 @@ def get_digits_knn():
         for i in range(50):
             for j in range(100):
                 cell_img = cells[i][j]
-                cell_img2 = resize_by_max_contours(cell_img, 50, 20, 20, 1, 1)
-                if j == 0:
-                    cv2.imwrite('%s/digits_cell_%d_%d.jpg' % (path, i, j), cell_img2)
+                cell_img2 = resize_by_max_contours(cell_img, 20, 20, 1, 1)
+                # if j == 0:
+                #    cv2.imwrite('%s/digits_cell_%d_%d.jpg' % (path, i, j), cell_img2)
                 # 计算训练数据，对每个Cell，进行reshape处理，
                 # 把图片展开成400列，行数不确定
                 train.append(cell_img2.reshape((1, 400)))
@@ -56,6 +57,124 @@ def get_digits_knn():
         train = np.array(train).reshape(-1, 400).astype(np.float32)
         # 每个数字500遍
         label = np.repeat(np.arange(10), 500)
+
+        # 保存缓存文件
+        np.save(os.path.join(path, file_train), train)
+        np.save(os.path.join(path, file_label), label)
+
+    # KNN算法
+    knn = cv2.ml.KNearest_create()
+
+    # 训练数据
+    knn.train(train, cv2.ml.ROW_SAMPLE, label)
+
+    return knn
+
+
+def get_print_number_knn():
+    """
+    取得训练好的打印数字识别的KNN对象，如果有缓存文件，优先读取缓存。
+    @return: KNN对象
+    """
+
+    # 缓存路径及文件设定
+    path = './cache/cv'
+    file_train = 'number_knn_train.npy'
+    file_label = 'number_knn_label.npy'
+    filecm.makedir(path)
+
+    if filecm.exists(path, file_train):
+        # 从缓存文件中加载训练样本和结果
+        train = np.load(os.path.join(path, file_train))
+        label = np.load(os.path.join(path, file_label))
+    else:
+        # 从图片中获取训练样本和结果
+        # 获取numbers文件夹下所有文件路径
+        img_path = gb.glob("./images/numbers/*")
+        # 定义并创建临时目录
+        tmp_path = './temp/cv/number'
+        filecm.makedir(tmp_path)
+
+        label = []
+        train = []
+
+        func_key = "get_print_number_knn"
+        ## 对每一张图片进行处理
+        for file_path in img_path:
+            # 文件短名称
+            name = filecm.short_name(file_path)
+            # 读取图片
+            img = cv2.imread(file_path)
+
+            # 颜色空间转换（转换成灰度图）
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            save_tmp(gray, func_key, "gray", tmp_path, name)
+
+            # 高斯模糊
+            blur = cv2.GaussianBlur(gray, (5, 5), 0)
+            save_tmp(blur, func_key, "GaussianBlur", tmp_path, name)
+
+            # 自适应阈值可以看成一种局部性的阈值，通过规定一个区域大小，
+            thresh = cv2.adaptiveThreshold(blur, 255, 1, 1, 11, 2)
+            save_tmp(thresh, func_key, "adaptiveThreshold", tmp_path, name)
+
+            # 查找检测物体的轮廓。
+            image, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            height, width = img.shape[:2]
+            ## 图片第一行和第二行数字
+            list1 = []
+            list2 = []
+            for cnt in contours:
+                # 直边界矩形
+                [x, y, w, h] = cv2.boundingRect(cnt)
+
+                # 根据轮廓矩形的宽度和高度筛识别出数字所在区域
+                if w > 30 and h > (height / 4):
+                    ## 按y坐标分行
+                    if y < (height / 2):
+                        list1.append([x, y, w, h])  ## 第一行
+                    else:
+                        list2.append([x, y, w, h])  ## 第二行
+
+            ## 按x坐标排序，上面已经按y坐标分行
+            list1_sorted = sorted(list1, key=lambda t: t[0])
+            list2_sorted = sorted(list2, key=lambda t: t[0])
+
+            for i in range(5):
+                [x1, y1, w1, h1] = list1_sorted[i]
+                [x2, y2, w2, h2] = list2_sorted[i]
+                ## 切割出每一个数字
+                number_roi1 = gray[y1:y1 + h1, x1:x1 + w1]  # Cut the img_test to size
+                number_roi2 = gray[y2:y2 + h2, x2:x2 + w2]  # Cut the img_test to size
+
+                ## 对图片进行大小统一和预处理
+                resized_roi1 = cv2.resize(number_roi1, (20, 40))
+                thresh1 = cv2.adaptiveThreshold(resized_roi1, 255, 1, 1, 11, 2)
+                resized_roi2 = cv2.resize(number_roi2, (20, 40))
+                thresh2 = cv2.adaptiveThreshold(resized_roi2, 255, 1, 1, 11, 2)
+
+                j = i + 6
+                if j == 10:
+                    j = 0
+
+                # 保存数字图片
+                save_tmp(thresh1, func_key, "adaptiveThreshold", tmp_path, name + "-" + str(i + 1))
+                save_tmp(thresh2, func_key, "adaptiveThreshold", tmp_path, name + "-" + str(j))
+
+                ## 归一化
+                normalized_roi1 = thresh1 / 255.
+                normalized_roi2 = thresh2 / 255.
+
+                ## 把图片展开成一行，然后保存到samples
+                ## 保存一个图片信息，保存一个对应的标签
+                train.append(normalized_roi1.reshape((1, 800)))
+                label.append(float(i + 1))
+                train.append(normalized_roi2.reshape((1, 800)))
+                label.append(j)
+
+        # 训练数据整理为np.array格式
+        train = np.array(train).reshape(-1, 800).astype(np.float32)
+        label = np.array(label).astype(np.float32)
 
         # 保存缓存文件
         np.save(os.path.join(path, file_train), train)
@@ -124,41 +243,166 @@ def get_max_roi(rois):
     return max_roi
 
 
-def get_edges(img, tmp_path, is_color=True):
+def find_rois(img, min_width=20, min_height=20, min_area=None, min_wh_ratio=None, max_wh_ratio=None):
     """
-    从图片中获取边界图片。
+    从图片中获取外边框在指定大小以上的感兴趣区域（ROI）。
     @:param img 图片
-    @:param tmp_path 临时目录
-    @:param is_color 是否彩色图片
-    @return: 边界图片
+    @:param min_width 最小宽度
+    @:param min_height 最小高度
+    @:param min_area 最小面积
+    @:param min_wh_ratio 最小宽高比
+    @:param max_wh_ratio 最大宽高比
+    @return: 感兴趣区域列表，边框数据
     """
 
-    # 灰度图
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) if is_color else img
-    cv2.imwrite(tmp_path + '/get_edges_gray.jpg', gray)
+    img_width = img.shape[0]
+    rois = []
 
-    # 膨胀图像
-    dilate = cv2.dilate(gray, None, iterations=2)
-    cv2.imwrite(tmp_path + '/get_edges_dilate.jpg', dilate)
+    # 查找检测物体的轮廓
+    # 使用cv2.findContours()函数来查找检测物体的轮廓。
+    # 参数
+    #   第一个参数是寻找轮廓的图像；
+    #   第二个参数表示轮廓的检索模式，有四种（本文介绍的都是新的cv2接口）：
+    #     cv2.RETR_EXTERNAL 表示只检测外轮廓
+    #     cv2.RETR_LIST     检测的轮廓不建立等级关系
+    #     cv2.RETR_CCOMP    建立两个等级的轮廓，上面的一层为外边界，里面的一层为内孔的边界信息。
+    #                       如果内孔内还有一个连通物体，这个物体的边界也在顶层。
+    #     cv2.RETR_TREE     建立一个等级树结构的轮廓。
+    #
+    #   第三个参数method为轮廓的近似办法
+    #     cv2.CHAIN_APPROX_NONE     存储所有的轮廓点，相邻的两个点的像素位置差不超过1，即max（abs（x1 - x2），abs（y2 - y1）） == 1
+    #     cv2.CHAIN_APPROX_SIMPLE   压缩水平方向，垂直方向，对角线方向的元素，只保留该方向的终点坐标，例如一个矩形轮廓只需4个点来保存轮廓信息
+    #     cv2.CHAIN_APPROX_TC89_L1，CV_CHAIN_APPROX_TC89_KCOS使用teh - Chinl chain近似算法
+    # 返回值
+    # cv2.findContours()
+    # 函数返回两个值，一个是轮廓本身，还有一个是每条轮廓对应的属性。
+    # hierarchy返回值
+    # 此外，该函数还可返回一个可选的hiararchy结果，这是一个ndarray，其中的元素个数和轮廓个数相同，每个轮廓contours[i]
+    # 对应4个hierarchy元素hierarchy[i][0]
+    # ~hierarchy[i][3]，分别表示后一个轮廓、前一个轮廓、父轮廓、内嵌轮廓的索引编号，如果没有对应项，则该值为负数。
+    im, contours, hierarchy = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    for c in contours:
 
-    # 腐蚀图像
-    erode = cv2.erode(gray, None, iterations=2)
-    cv2.imwrite(tmp_path + '/get_edges_erode.jpg', erode)
+        # 最小面积限制
+        if min_area is not None:
+            # 计算该轮廓的面积
+            area = cv2.contourArea(c)
+            # 面积小的都筛选掉
+            if area < min_area:
+                continue
 
-    # 将两幅图像相减获得边，第一个参数是膨胀后的图像，第二个参数是腐蚀后的图像
-    edges = cv2.absdiff(dilate, erode)
-    cv2.imwrite(tmp_path + '/get_edges_edges.jpg', edges)
-    return edges
+        # 取得轮廓的直边界矩形
+        x, y, w, h = cv2.boundingRect(c)
+
+        # 最小和最大宽高比限制
+        ratio = float(w) / float(h)
+        if max_wh_ratio is not None:
+            if ratio > max_wh_ratio:
+                continue
+        if min_wh_ratio is not None:
+            if ratio < min_wh_ratio:
+                continue
+
+        # 判断最小宽度和高度
+        if w > min_width and h > min_height:
+            rois.append((x, y, w, h))
+
+    # 对区域排序，先上线，再左右。
+    sorted_rois = sorted(rois, key=lambda t: t[1] * img_width + t[0])
+
+    return sorted_rois
 
 
-def get_thresh(img, tmp_path, thresh_value):
+def find_digit_knn(knn, roi, thresh_value, tmp_path=None, tmp_key=None):
     """
-    从图片中阈值图片（黑白图）
-    @:param img 图片
-    @:param tmp_path 临时目录
+    使用KNN算法，判断感兴趣区域（ROI）中的数字。
+    @:param knn KNN对象（已训练过）
+    @:param roi 感兴趣区域
     @:param thresh_value 阈值处理的阈值值
+    @:param tmp_path 临时目录
+    @:param tmp_key 临时关键词
+    @return: 结果数字，最终判断用的矩阵
+    """
+
+    # 函数名
+    func_key = "find_digit_knn"
+    save_tmp(roi, func_key, "roi", tmp_path, tmp_key)
+
+    # 阈值处理
+    ret, th = cv2.threshold(roi, thresh_value, 255, cv2.THRESH_BINARY)
+    save_tmp(th, func_key, "threshold", tmp_path, tmp_key)
+
+    # 重新设置为标准的比较尺寸
+    # interpolation - 插值方法。共有5种：
+    #   １）INTER_NEAREST - 最近邻插值法
+    #   ２）INTER_LINEAR  - 双线性插值法（默认）
+    #   ３）INTER_AREA    - 基于局部像素的重采样（resampling using pixel area relation）。
+    #       对于图像抽取（image decimation）来说，这可能是一个更好的方法。
+    #       但如果是放大图像时，它和最近邻法的效果类似。
+    #   ４）INTER_CUBIC   - 基于4x4像素邻域的3次插值法
+    #   ５）INTER_LANCZOS4- 基于8x8像素邻域的Lanczos插值
+    resize_th = cv2.resize(th, (20, 20), interpolation=cv2.INTER_AREA)
+    save_tmp(resize_th, func_key, "resize", tmp_path, tmp_key)
+
+    # 矩阵展开成一维并转换为浮点数
+    out = resize_th.reshape(-1, 400).astype(np.float32)
+    # 通过KNN对象查找最符合的数字
+    ret, result, neighbours, dist = knn.findNearest(out, k=5)
+
+    return int(result[0][0]), th
+
+
+def get_blur(gray, is_gaussian=False, blur_block=(3, 3), median_val=None, tmp_path=None, tmp_key=None, img_list=None,
+             title_list=None):
+    """
+    取得图片平滑处理后的图片。
+    @:param gray 灰度图片
+    @:param is_gaussian 是否使用高斯
+    @:param blur_block 平滑块大小
+    @:param median_val 中值滤波的中值
+    @:param tmp_path 临时目录
+    @:param tmp_key 临时关键词
+    @:param img_list 图片列表
+    @:param title_list 标题列表
+    @return: 平滑图片
+    """
+
+    # 函数名
+    func_key = "get_blur"
+
+    if is_gaussian:
+        # 高斯平滑
+        blur = cv2.GaussianBlur(gray, blur_block, 0, 0, cv2.BORDER_DEFAULT)
+        save_tmp(blur, func_key, "GaussianBlur", tmp_path, tmp_key, img_list, title_list)
+    else:
+        # 均值滤波
+        blur = cv2.blur(gray, blur_block)
+        save_tmp(blur, func_key, "blur", tmp_path, tmp_key, img_list, title_list)
+
+    if median_val is None:
+        return blur
+
+    # 中值滤波
+    median = cv2.medianBlur(blur, median_val)
+    save_tmp(median, func_key, "medianBlur", tmp_path, tmp_key, img_list, title_list)
+    return median
+
+
+def add_weighted(gray, weight_x=0.5, weight_y=0.5, tmp_path=None, tmp_key=None, img_list=None, title_list=None):
+    """
+    X轴和Y轴按权重组合图像
+    @:param gray 图片
+    @:param weight_x X轴权重
+    @:param weight_y Y轴权重
+    @:param tmp_path 临时目录
+    @:param tmp_key 临时关键词
+    @:param img_list 图片列表
+    @:param title_list 标题列表
     @return: 阈值图片
     """
+
+    # 函数名
+    func_key = "add_weighted"
 
     # Sobel算子:是一种带有方向性的滤波器，
     #   cv2.CV_16S -- Sobel 函数求完导数后会有负值和大于255的值，
@@ -173,135 +417,162 @@ def get_thresh(img, tmp_path, thresh_value):
     #   scale   - - 缩放导数的比例常数，默认情况下没有伸缩系数
     #   delta   - - 一个可选的增量，将会加到最终的dst中，同样，默认情况下没有额外的值加到dst中
     # borderType - - 判断图像边界的模式。这个参数默认值为cv2.BORDER_DEFAULT。
-    x = cv2.Sobel(img, cv2.CV_16S, 1, 0)
-    y = cv2.Sobel(img, cv2.CV_16S, 0, 1)
+    x = cv2.Sobel(gray, cv2.CV_16S, 1, 0)
+    y = cv2.Sobel(gray, cv2.CV_16S, 0, 1)
 
     # convertScaleAbs()--转回uint8形式，否则将无法显示图像，而只是一副灰色图像
-    # dst = cv2.convertScaleAbs(src[, dst[, alpha[, beta]]])
+    # dst = cv2.convertScaleAbs(src[, dst[, weight_x[, weight_y]]])
     absX = cv2.convertScaleAbs(x)
     absY = cv2.convertScaleAbs(y)
 
-    # 组合图像 dst = cv2.addWeighted(src1, alpha, src2, beta, gamma[, dst[, dtype]])
-    #   alpha  --  第一幅图片中元素的权重
-    #   beta   --  第二个权重
+    # 组合图像 dst = cv2.addWeighted(src1, weight_x, src2, weight_y, gamma[, dst[, dtype]])
+    #   weight_x  --  第一幅图片中元素的权重
+    #   weight_y   --  第二个权重
     #   gamma  --  累加到结果上的一个值
-    dst = cv2.addWeighted(absX, 0.5, absY, 0.5, 0)
-    cv2.imwrite(tmp_path + '/get_thresh_dst.jpg', dst)
+    dst = cv2.addWeighted(absX, weight_x, absY, weight_y, 0)
+    save_tmp(dst, func_key, "addWeighted", tmp_path, tmp_key, img_list, title_list)
+
+    return dst
+
+
+def get_sobel(gray, dx, dy, ksize=3, ddepth=-1, tmp_path=None, tmp_key=None, img_list=None, title_list=None):
+    """
+    从图片中阈值图片（黑白图）
+    @:param gray 灰度图片
+    @:param dx dy 表示的是示导的阶数，0表示这个方向上没有求导，一般为0，1，2。
+    @:param ksize Sobel算子的大小，必须为1、3、5、7。
+    @:param ddepth 图像的深度，-1表示采用的是与原图像相同的深度。目标图像的深度必须大于等于原图像的深度。
+    @:param tmp_key 临时关键词
+    @:param img_list 图片列表
+    @:param title_list 标题列表
+    @return: 阈值图片
+    """
+
+    # 函数名
+    func_key = "get_sobel"
+
+    # Sobel算子
+    sobel = cv2.Sobel(gray, ddepth, dx, dy, ksize=ksize)
+    save_tmp(sobel, func_key, "Sobel(%d,%d)" % (dx, dy), tmp_path, tmp_key, img_list, title_list)
+
+    return sobel
+
+
+def get_thresh(gray, thresh_value, thresh_type=cv2.THRESH_BINARY, tmp_path=None, tmp_key=None, img_list=None, title_list=None):
+    """
+    从图片中阈值图片（黑白图）
+    @:param gray 灰度图片
+    @:param thresh_value 阈值处理的阈值值
+    @:param thresh_type 阈值处理方式
+    @:param tmp_path 临时目录
+    @:param tmp_key 临时关键词
+    @:param img_list 图片列表
+    @:param title_list 标题列表
+    @return: 阈值图片
+    """
+
+    # 函数名
+    func_key = "get_thresh"
 
     # 简单阈值
-    ret, thresh = cv2.threshold(dst, thresh_value, 255, cv2.THRESH_BINARY)
-    cv2.imwrite(tmp_path + '/get_thresh_thresh.jpg', thresh)
+    ret, thresh = cv2.threshold(gray, thresh_value, 255, thresh_type)
+    save_tmp(thresh, func_key, "threshold", tmp_path, tmp_key, img_list, title_list)
+
     return thresh
 
 
-def find_rois(img, min_width=20, min_height=20, min_area=None, min_wh_ratio=None, max_wh_ratio=None):
+def get_gray(img, tmp_path=None, tmp_key=None, img_list=None, title_list=None):
     """
-    从图片中获取外边框在指定大小以上的感兴趣区域（ROI）。
+    从图片中获取灰度图片。
     @:param img 图片
-    @:param thresh_value 阈值处理的阈值值
-    @:param min_width 最小宽度
-    @:param min_height 最小高度
-    @:param min_area 最小面积
-    @:param min_wh_ratio 最小宽高比
-    @:param max_wh_ratio 最大宽高比
-    @return: 感兴趣区域列表，边框数据
+    @:param tmp_path 临时目录
+    @:param tmp_key 临时关键词
+    @:param img_list 图片列表
+    @:param title_list 标题列表
+    @return: 灰度图片
     """
 
-    img_width = img.shape[0]
-    rois = []
-    # 查找检测物体的轮廓
-    im, contours, hierarchy = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    for c in contours:
+    # 灰度图
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    save_tmp(gray, "get_gray", "Gray", tmp_path, tmp_key, img_list, title_list)
 
-        # 最小面积限制
-        if min_area is not None:
-            # 计算该轮廓的面积
-            area = cv2.contourArea(c)
-            # 面积小的都筛选掉
-            if area < min_area:
-                continue
+    return gray
 
-        # 取得轮廓的直边界矩形
-        x, y, w, h = cv2.boundingRect(c)
-        # 判断最小宽度和高度
-        if w > min_width and h > min_height:
-            rois.append((x, y, w, h))
 
-        # 最小和最大宽高比限制
-        ratio = float(w) / float(h)
-        if max_wh_ratio is not None:
-            if ratio > max_wh_ratio:
-                continue
-        if min_wh_ratio is not None:
-            if ratio < min_wh_ratio:
-                continue
-
-    # 对区域排序，先上线，再左右。
-    sorted_rois = sorted(rois, key=lambda t: t[1] * img_width + t[0])
-
-    return sorted_rois
-
-def find_digit_knn(knn, roi, thresh_value, id, tmp_path):
+def get_edges(gray, diff_type, kernel_dilate=None, kernel_erode=None, tmp_path=None, tmp_key=None, img_list=None,
+              title_list=None):
     """
-    使用KNN算法，判断感兴趣区域（ROI）中的数字。
-    @:param knn KNN对象（已训练过）
-    @:param roi 感兴趣区域
-    @:param thresh_value 阈值处理的阈值值
-    @:param id 当前图片ID
-    @return: 结果数字，最终判断用的矩阵
+    从图片中获取边界图片。
+    @:param gray 灰度图片
+    @:param diff_type 相减方式（D-E, DED-DE）
+    @:param kernel_dilate 膨胀核参数
+    @:param kernel_erode 腐蚀核参数
+    @:param tmp_path 临时目录
+    @:param tmp_key 临时关键词
+    @:param img_list 图片列表
+    @:param title_list 标题列表
+    @return: 边界图片
     """
 
-    cv2.imwrite(tmp_path + '/find_digit_knn-%s-roi.jpg' % str(id), roi)
+    # 函数名
+    func_key = "get_edges"
+    # 根据相减方式处理
+    if diff_type == 'D-E':
+        # 膨胀一次，让轮廓突出
+        dilation = cv2.dilate(gray, kernel_dilate, iterations=1)
+        save_tmp(dilation, func_key, "dilate-D", tmp_path, tmp_key, img_list, title_list)
 
-    # 阈值处理
-    ret, th = cv2.threshold(roi, thresh_value, 255, cv2.THRESH_BINARY)
-    cv2.imwrite(tmp_path + '/find_digit_knn-%s-threshold.jpg' % str(id), th)
+        # 腐蚀一次，去掉细节
+        erosion = cv2.erode(gray, kernel_erode, iterations=1)
+        save_tmp(erosion, func_key, "erode-E", tmp_path, tmp_key, img_list, title_list)
 
-    # 重新设置为标准的比较尺寸
-    # interpolation - 插值方法。共有5种：
-    #   １）INTER_NEAREST - 最近邻插值法
-    #   ２）INTER_LINEAR  - 双线性插值法（默认）
-    #   ３）INTER_AREA    - 基于局部像素的重采样（resampling using pixel area relation）。
-    #       对于图像抽取（image decimation）来说，这可能是一个更好的方法。
-    #       但如果是放大图像时，它和最近邻法的效果类似。
-    #   ４）INTER_CUBIC   - 基于4x4像素邻域的3次插值法
-    #   ５）INTER_LANCZOS4- 基于8x8像素邻域的Lanczos插值
-    resize_th = cv2.resize(th, (20, 20), interpolation=cv2.INTER_AREA)
-    cv2.imwrite(tmp_path + '/find_digit_knn-%s_resize.jpg' % str(id), resize_th)
+        # 将两幅图像相减获得边，第一个参数是膨胀后的图像，第二个参数是腐蚀后的图像
+        edges = cv2.absdiff(dilation, erosion)
+        save_tmp(edges, func_key, "absdiff(D-E)", tmp_path, tmp_key, img_list, title_list)
 
-    # 矩阵展开成一维并转换为浮点数
-    out = resize_th.reshape(-1, 400).astype(np.float32)
-    # 通过KNN对象查找最符合的数字
-    ret, result, neighbours, dist = knn.findNearest(out, k=5)
+    elif diff_type == 'DED-DE':
+        # 膨胀一次，让轮廓突出
+        dilation1 = cv2.dilate(gray, kernel_dilate, iterations=1)
+        save_tmp(dilation1, func_key, "dilate-D", tmp_path, tmp_key, img_list, title_list)
 
-    return int(result[0][0]), th
+        # 腐蚀一次，去掉细节
+        erosion = cv2.erode(dilation1, kernel_erode, iterations=1)
+        save_tmp(erosion, func_key, "erode-DE", tmp_path, tmp_key, img_list, title_list)
+
+        # 再次膨胀，让轮廓明显一些
+        dilation = cv2.dilate(erosion, kernel_dilate, iterations=3)
+        save_tmp(dilation, func_key, "dilate-DED", tmp_path, tmp_key, img_list, title_list)
+
+        # 将两幅图像相减获得边，第一个参数是膨胀后的图像，第二个参数是腐蚀后的图像
+        edges = cv2.absdiff(dilation, erosion)
+        save_tmp(edges, func_key, "absdiff(DED-DE)", tmp_path, tmp_key, img_list, title_list)
+
+    return edges
 
 
-def preprocess(gray):
+def save_tmp(img, func_key, deal_key, tmp_path=None, tmp_key="", img_list=None, title_list=None):
     """
-    图片预处理。
-    @:param gray 灰度图
-    @return: 预处理后的图
+    保存临时图片
+    @:param img 图片
+    @:param func_key 函数关键词
+    @:param deal_key 处理关键词
+    @:param tmp_path 临时目录
+    @:param tmp_key 临时关键词
+    @:param img_list 图片列表
+    @:param title_list 标题列表
+    @return: 无
     """
 
-    # # 直方图均衡化
-    # equ = cv2.equalizeHist(gray)
-    # 高斯平滑
-    gaussian = cv2.GaussianBlur(gray, (3, 3), 0, 0, cv2.BORDER_DEFAULT)
-    # 中值滤波
-    median = cv2.medianBlur(gaussian, 5)
-    # Sobel算子，X方向求梯度
-    sobel = cv2.Sobel(median, cv2.CV_8U, 1, 0, ksize=3)
-    # 二值化
-    ret, binary = cv2.threshold(sobel, 170, 255, cv2.THRESH_BINARY)
-    # 膨胀和腐蚀操作的核函数
-    element1 = cv2.getStructuringElement(cv2.MORPH_RECT, (9, 1))
-    element2 = cv2.getStructuringElement(cv2.MORPH_RECT, (9, 7))
-    # 膨胀一次，让轮廓突出
-    dilation = cv2.dilate(binary, element2, iterations=1)
-    # 腐蚀一次，去掉细节
-    erosion = cv2.erode(dilation, element1, iterations=1)
-    # 再次膨胀，让轮廓明显一些
-    dilation2 = cv2.dilate(erosion, element2, iterations=3)
+    # 保存路径
+    if tmp_path is not None:
+        save_path = "%s/%s-%s_%s.jpg" % (tmp_path, tmp_key, func_key, deal_key)
+        logcm.print_info("Temp file save to %s" % save_path)
+        cv2.imwrite(save_path, img)
 
-    return dilation2
+    # 图片加入列表
+    if img_list is not None:
+        img_list.append(img)
+
+    # 标题加入列表
+    if title_list is not None:
+        title_list.append(deal_key)
