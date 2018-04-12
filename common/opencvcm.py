@@ -223,9 +223,6 @@ def find_rois(img, min_width=20, min_height=20, min_area=None, min_wh_ratio=None
 
         # 取得轮廓的直边界矩形
         x, y, w, h = cv2.boundingRect(c)
-        # 判断最小宽度和高度
-        if w > min_width and h > min_height:
-            rois.append((x, y, w, h))
 
         # 最小和最大宽高比限制
         ratio = float(w) / float(h)
@@ -236,10 +233,15 @@ def find_rois(img, min_width=20, min_height=20, min_area=None, min_wh_ratio=None
             if ratio < min_wh_ratio:
                 continue
 
+        # 判断最小宽度和高度
+        if w > min_width and h > min_height:
+            rois.append((x, y, w, h))
+
     # 对区域排序，先上线，再左右。
     sorted_rois = sorted(rois, key=lambda t: t[1] * img_width + t[0])
 
     return sorted_rois
+
 
 def find_digit_knn(knn, roi, thresh_value, id, tmp_path):
     """
