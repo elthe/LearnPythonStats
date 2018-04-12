@@ -6,9 +6,11 @@
 """
 
 import cv2
+
+from common import cvknncm
+from common import datecm
 from common import filecm
 from common import opencvcm
-from common import datecm
 from common import plotcm
 
 # 临时目录
@@ -16,7 +18,7 @@ tmp_path = './temp/cv/digits/' + datecm.now_time_str()
 filecm.makedir(tmp_path)
 
 # KNN算法对象（初始化并训练好）
-knn = opencvcm.get_hand_digits_knn()
+knn = cvknncm.get_hand_digits_knn()
 # 载入测试图片
 img_test = cv2.imread('./images/cv_number_test2.jpg')
 
@@ -41,7 +43,7 @@ for roi in rois:
     (x, y, w, h) = roi
     id += 1
     # 查询兴趣区域对应的数字
-    digit, th = opencvcm.find_digit_knn(knn, edges[y:y + h, x:x + w], 21, tmp_path=tmp_path, tmp_key=id)
+    digit, th = cvknncm.find_hand_digit_knn(knn, edges[y:y + h, x:x + w], 21, tmp_path=tmp_path, tmp_key=id)
     digits.append(cv2.resize(th, (20, 20)))
 
     # 绘制边框到图片上

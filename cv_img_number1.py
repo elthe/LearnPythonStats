@@ -13,6 +13,7 @@ import numpy as np
 
 from common import filecm
 from common import opencvcm
+from common import cvknncm
 from common import plotcm
 from common import logcm
 
@@ -28,7 +29,7 @@ img_list = []
 title_list = []
 
 # KNN算法对象（初始化并训练好）
-knn = opencvcm.get_print_number_knn()
+knn = cvknncm.get_print_number_knn()
 
 # 载入测试图片
 img_test = cv2.imread('./images/cv_number_test1.jpg')
