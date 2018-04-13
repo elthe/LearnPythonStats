@@ -101,19 +101,19 @@ def append_csv(csv_path, data_list):
     return None
 
 
-def exists(path, file_name):
+def exists(path_check, file_name):
     """
     判断本地文件是否存在
-    @param path: 文件路径
+    @param path_check: 文件路径
     @param file_name: 文件名
     @return: True/False
     """
 
     # 本地文件路径如果不存在，返回False
-    if not os.path.exists(path):
+    if not os.path.exists(path_check):
         return False
     # 文件完整路径
-    file_path = os.path.join(path, file_name)
+    file_path = os.path.join(path_check, file_name)
     return os.path.exists(file_path)
 
 

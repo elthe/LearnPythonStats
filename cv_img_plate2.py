@@ -40,20 +40,8 @@ for path in img_path:
     logcm.print_info("%s --> %s" % (path, str(r)))
 
     img_list.append(roi)
-    title_list.append('车牌-%s' % filename)
-
-    if roi is not None:
-        result_img = roi.copy()
-        result_img = cv2.cvtColor(result_img, cv2.COLOR_BGR2GRAY)
-        result_img.fill(255)
-        result_img = cv2.cvtColor(result_img, cv2.COLOR_GRAY2BGR)
-
-        # 照片/添加的文字/左上角坐标/字体/字体大小/颜色/字体粗细
-        txt = "".join(r)
-        cv2.putText(result_img, txt, (0, 0), cv2.FONT_HERSHEY_PLAIN, 2.0, (200, 0, 0), 2, cv2.LINE_AA)
-
-        img_list.append(result_img)
-        title_list.append('结果-%s' % filename)
+    txt = "".join(r)
+    title_list.append('%s车牌-%s' % (color, txt))
 
     img_matrix.append(img_list)
     title_matrix.append(title_list)

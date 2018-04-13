@@ -330,14 +330,14 @@ class CardPredictor:
         if pic_width > MAX_WIDTH:
             resize_rate = MAX_WIDTH / pic_width
             img = cv2.resize(img, (MAX_WIDTH, int(pic_hight * resize_rate)), interpolation=cv2.INTER_AREA)
-            opencvcm.save_tmp(img, func_key, "resize", tmp_path, tmp_key, img_list, title_list)
+            #opencvcm.save_tmp(img, func_key, "resize", tmp_path, tmp_key, img_list, title_list)
 
         blur = self.cfg["blur"]
         # 高斯去噪
         if blur > 0:
             # 图片分辨率调整
             img = cv2.GaussianBlur(img, (blur, blur), 0)
-            opencvcm.save_tmp(img, func_key, "GaussianBlur", tmp_path, tmp_key, img_list, title_list)
+            #opencvcm.save_tmp(img, func_key, "GaussianBlur", tmp_path, tmp_key, img_list, title_list)
 
         oldimg = img
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -427,7 +427,7 @@ class CardPredictor:
                 point_limit(left_point)
 
                 card_img = dst[int(left_point[1]):int(heigth_point[1]), int(left_point[0]):int(new_right_point[0])]
-                opencvcm.save_tmp(card_img, func_key, "card_img", tmp_path, tmp_key, img_list, title_list)
+                #opencvcm.save_tmp(card_img, func_key, "card_img", tmp_path, tmp_key, img_list, title_list)
 
                 card_imgs.append(card_img)
             # cv2.imshow("card", card_img)
@@ -443,7 +443,7 @@ class CardPredictor:
                 point_limit(heigth_point)
                 point_limit(new_left_point)
                 card_img = dst[int(right_point[1]):int(heigth_point[1]), int(new_left_point[0]):int(right_point[0])]
-                opencvcm.save_tmp(card_img, func_key, "card_img", tmp_path, tmp_key, img_list, title_list)
+                #opencvcm.save_tmp(card_img, func_key, "card_img", tmp_path, tmp_key, img_list, title_list)
 
                 card_imgs.append(card_img)
                 # cv2.imshow("card", card_img)
