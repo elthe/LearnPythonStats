@@ -20,7 +20,7 @@ filecm.makedir(tmp_path)
 # KNN算法对象（初始化并训练好）
 knn = cvknncm.get_hand_digits_knn()
 # 载入测试图片
-img_test = cv2.imread('./images/cv_number_test2.jpg')
+img_test = cv2.imread('./images/cv_img_number2_test.jpg')
 
 # 图片列表
 img_list = []

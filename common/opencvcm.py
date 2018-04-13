@@ -7,12 +7,7 @@ OpenCV common api
 """
 
 import cv2
-import glob as gb
-import math
 import numpy as np
-import os
-
-from common import filecm
 from common import logcm
 
 
@@ -138,6 +133,68 @@ def find_rois(img, min_width=20, min_height=20, min_area=None, min_wh_ratio=None
     sorted_rois = sorted(rois, key=lambda t: t[1] * img_width + t[0])
 
     return sorted_rois
+
+
+def get_color(key, map_clr):
+    """
+    根据关键词，取得颜色，如果不存在，则生成随机颜色。
+    @:param key 关键词
+    @:param map_clr 颜色字典
+    @return: 颜色
+    """
+
+    # 初始化
+    map_clr = {} if map_clr is None else map_clr
+    if key not in map_clr:
+        # 生成随机颜色
+        map_clr[key] = np.random.randint(0, high=256, size=(3,)).tolist()
+    return map_clr[key]
+
+
+def rect_contours(img, contours, hierarchy, tmp_path=None, tmp_key=None, img_list=None, title_list=None):
+    """
+    在图片上绘制指定轮廓列表。
+    @:param img 图片
+    @:param contours 边界列表
+    @:param hierarchy 层次信息
+    @:param tmp_path 临时目录
+    @:param tmp_key 临时关键词
+    @:param img_list 图片列表
+    @:param title_list 标题列表
+    @return: 平滑图片
+    """
+
+    # 灰度转彩图，便于查看边框
+    img_rect = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    img_white = img.copy()
+    img_white.fill(255)
+    img_white = cv2.cvtColor(img_white, cv2.COLOR_GRAY2BGR)
+
+    # 颜色Map
+    map_clr = {}
+
+    # 循环轮廓
+    for i in range(len(contours)):
+        c = contours[i]
+        # 取得颜色
+        key = str(hierarchy[i][3])
+        color = get_color(key, map_clr)
+
+        # 取得轮廓的直边界矩形
+        x, y, w, h = cv2.boundingRect(c)
+
+        # 绘制边框到图片上
+        cv2.rectangle(img_rect, (x, y), (x + w, y + h), color, 3)
+        # 绘制边框到图片上
+        cv2.rectangle(img_white, (x, y), (x + w, y + h), color, 2)
+        # 识别结果展示
+        txt = '%d' % i
+        # 照片/添加的文字/左上角坐标/字体/字体大小/颜色/字体粗细
+        cv2.putText(img_white, txt, (x + 2, y + 25), cv2.FONT_HERSHEY_PLAIN, 2.0, (200, 0, 0), 2, cv2.LINE_AA)
+
+    save_tmp(img_rect, "rect_contours", "rect-" + tmp_key, tmp_path, tmp_key, img_list, title_list)
+    save_tmp(img_white, "rect_contours", "white-" + tmp_key, tmp_path, tmp_key, img_list, title_list)
+    return img_rect
 
 
 def get_blur(gray, is_gaussian=False, blur_block=(3, 3), median_val=None, tmp_path=None, tmp_key=None, img_list=None,
