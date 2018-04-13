@@ -48,4 +48,4 @@ for path in img_path:
 
 # 把图片一览网格显示并保存
 save_path = './images/cv_img_plate2_result.jpg'
-plotcm.grid_by_matrix(img_matrix, title_matrix, 6, save_path, cell_width=2.5, cell_height=2)
+plotcm.grid_by_matrix(img_matrix, title_matrix, 5, save_path, cell_width=2.5, cell_height=2)

@@ -40,3 +40,7 @@
 ## [cv_img_plate1.py](cv_img_plate1.py)
 ### 车牌识别第一步，从照片中找到车牌号码
 ![Image text](images/cv_img_plate1_result.jpg)
+
+## [cv_img_plate2.py](cv_img_plate2.py)
+### 车牌识别第2步，从照片中找到并识别车牌号码
+![Image text](images/cv_img_plate2_result.jpg)
