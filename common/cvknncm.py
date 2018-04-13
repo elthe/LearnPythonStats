@@ -2,8 +2,8 @@
 # !/usr/bin/python
 
 """
-OpenCV common api
-图像识别相关共通函数
+OpenCV KNN common api
+图像识别KNN算法相关共通函数
 """
 
 import cv2

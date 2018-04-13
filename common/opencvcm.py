@@ -9,6 +9,7 @@ OpenCV common api
 import cv2
 import numpy as np
 from common import logcm
+from numpy.linalg import norm
 
 
 def resize_by_max_contours(img, target_width, target_height, min_width=10, min_height=10):
@@ -422,3 +423,5 @@ def save_tmp(img, func_key, deal_key, tmp_path=None, tmp_key="", img_list=None, 
     # 标题加入列表
     if title_list is not None:
         title_list.append(deal_key)
+
+
