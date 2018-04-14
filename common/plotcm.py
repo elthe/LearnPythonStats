@@ -258,8 +258,13 @@ def grid_by_matrix(img_matrix, title_matrix, col_num, save_path, cell_width=2.5,
 
     # 矩阵行数
     line_num = len(img_matrix)
+    # 计算最大列数
+    max_col_num = len(img_matrix[0])
+    for line in img_matrix:
+        if len(line) > max_col_num:
+            max_col_num = len(line)
     # 计算矩阵一行需要的行数
-    line_row_num = math.ceil(len(img_matrix[0]) / col_num)
+    line_row_num = math.ceil(max_col_num / col_num)
     # 总行数
     row_num = line_num * line_row_num
     # 多子图绘制

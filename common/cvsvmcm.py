@@ -330,14 +330,14 @@ class CardPredictor:
         if pic_width > MAX_WIDTH:
             resize_rate = MAX_WIDTH / pic_width
             img = cv2.resize(img, (MAX_WIDTH, int(pic_hight * resize_rate)), interpolation=cv2.INTER_AREA)
-            #opencvcm.save_tmp(img, func_key, "resize", tmp_path, tmp_key, img_list, title_list)
+            # opencvcm.save_tmp(img, func_key, "resize", tmp_path, tmp_key, img_list, title_list)
 
         blur = self.cfg["blur"]
         # 高斯去噪
         if blur > 0:
             # 图片分辨率调整
             img = cv2.GaussianBlur(img, (blur, blur), 0)
-            #opencvcm.save_tmp(img, func_key, "GaussianBlur", tmp_path, tmp_key, img_list, title_list)
+            # opencvcm.save_tmp(img, func_key, "GaussianBlur", tmp_path, tmp_key, img_list, title_list)
 
         oldimg = img
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -427,7 +427,7 @@ class CardPredictor:
                 point_limit(left_point)
 
                 card_img = dst[int(left_point[1]):int(heigth_point[1]), int(left_point[0]):int(new_right_point[0])]
-                #opencvcm.save_tmp(card_img, func_key, "card_img", tmp_path, tmp_key, img_list, title_list)
+                # opencvcm.save_tmp(card_img, func_key, "card_img", tmp_path, tmp_key, img_list, title_list)
 
                 card_imgs.append(card_img)
             # cv2.imshow("card", card_img)
@@ -443,16 +443,21 @@ class CardPredictor:
                 point_limit(heigth_point)
                 point_limit(new_left_point)
                 card_img = dst[int(right_point[1]):int(heigth_point[1]), int(new_left_point[0]):int(right_point[0])]
-                #opencvcm.save_tmp(card_img, func_key, "card_img", tmp_path, tmp_key, img_list, title_list)
+                # opencvcm.save_tmp(card_img, func_key, "card_img", tmp_path, tmp_key, img_list, title_list)
 
                 card_imgs.append(card_img)
                 # cv2.imshow("card", card_img)
                 # cv2.waitKey(0)
+
         # 开始使用颜色定位，排除不是车牌的矩形，目前只识别蓝、绿、黄车牌
         colors = []
         for card_index, card_img in enumerate(card_imgs):
             green = yello = blue = black = white = 0
+
+            opencvcm.save_tmp(card_img, func_key, "card_img", tmp_path, tmp_key, img_list, title_list)
             card_img_hsv = cv2.cvtColor(card_img, cv2.COLOR_BGR2HSV)
+            opencvcm.save_tmp(card_img_hsv, func_key, "card_img_hsv", tmp_path, tmp_key, img_list, title_list)
+
             # 有转换失败的可能，原因来自于上面矫正矩形出错
             if card_img_hsv is None:
                 continue
@@ -542,10 +547,14 @@ class CardPredictor:
             if color in ("blue", "yello", "green"):
                 card_img = card_imgs[i]
                 gray_img = cv2.cvtColor(card_img, cv2.COLOR_BGR2GRAY)
+                opencvcm.save_tmp(gray_img, func_key, "card_img_gray", tmp_path, tmp_key, img_list, title_list)
+
                 # 黄、绿车牌字符比背景暗、与蓝车牌刚好相反，所以黄、绿车牌需要反向
                 if color == "green" or color == "yello":
                     gray_img = cv2.bitwise_not(gray_img)
                 ret, gray_img = cv2.threshold(gray_img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+                opencvcm.save_tmp(gray_img, func_key, "card_img_threshold", tmp_path, tmp_key, img_list, title_list)
+
                 # 查找水平直方图波峰
                 x_histogram = np.sum(gray_img, axis=1)
                 x_min = np.min(x_histogram)
@@ -558,10 +567,15 @@ class CardPredictor:
                 # 认为水平方向，最大的波峰为车牌区域
                 wave = max(wave_peaks, key=lambda x: x[1] - x[0])
                 gray_img = gray_img[wave[0]:wave[1]]
+                opencvcm.save_tmp(gray_img, func_key, "gray_img-wave(%d,%d)" % (wave[0], wave[1]), tmp_path, tmp_key,
+                                  img_list, title_list)
+
                 # 查找垂直直方图波峰
                 row_num, col_num = gray_img.shape[:2]
-                # 去掉车牌上下边缘1个像素，避免白边影响阈值判断
-                gray_img = gray_img[1:row_num - 1]
+                # 去掉车牌上下左右边缘1个像素，避免白边影响阈值判断
+                gray_img = gray_img[1:row_num - 1, 1:col_num - 1]
+                opencvcm.save_tmp(gray_img, func_key, "del-frame", tmp_path, tmp_key, img_list, title_list)
+
                 y_histogram = np.sum(gray_img, axis=0)
                 y_min = np.min(y_histogram)
                 y_average = np.sum(y_histogram) / y_histogram.shape[0]
@@ -606,6 +620,8 @@ class CardPredictor:
                     continue
                 part_cards = seperate_card(gray_img, wave_peaks)
                 for i, part_card in enumerate(part_cards):
+                    opencvcm.save_tmp(part_card, func_key, "part_card-%d" % i, tmp_path, tmp_key, img_list, title_list)
+
                     # 可能是固定车牌的铆钉
                     if np.mean(part_card) < 255 / 5:
                         print("a point")
@@ -614,7 +630,12 @@ class CardPredictor:
                     w = abs(part_card.shape[1] - SZ) // 2
 
                     part_card = cv2.copyMakeBorder(part_card, 0, 0, w, w, cv2.BORDER_CONSTANT, value=[0, 0, 0])
+                    opencvcm.save_tmp(part_card, func_key, "copyMakeBorder-%d" % i, tmp_path, tmp_key, img_list,
+                                      title_list)
+
                     part_card = cv2.resize(part_card, (SZ, SZ), interpolation=cv2.INTER_AREA)
+                    opencvcm.save_tmp(part_card, func_key, "resize-%d" % i, tmp_path, tmp_key, img_list,
+                                      title_list)
 
                     # part_card = deskew(part_card)
                     part_card = preprocess_hog([part_card])

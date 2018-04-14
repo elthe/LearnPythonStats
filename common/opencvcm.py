@@ -410,6 +410,9 @@ def save_tmp(img, func_key, deal_key, tmp_path=None, tmp_key="", img_list=None, 
     @return: 无
     """
 
+    if img is None:
+        return None
+
     # 保存路径
     if tmp_path is not None:
         save_path = "%s/%s-%s_%s.jpg" % (tmp_path, tmp_key, func_key, deal_key)
@@ -422,6 +425,6 @@ def save_tmp(img, func_key, deal_key, tmp_path=None, tmp_key="", img_list=None, 
 
     # 标题加入列表
     if title_list is not None:
-        title_list.append(deal_key)
-
-
+        row_num, col_num = img.shape[:2]
+        title = '%s %dx%d' % (deal_key, col_num, row_num)
+        title_list.append(title)
