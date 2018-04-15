@@ -10,3 +10,6 @@
 ## [file_img_access.py](file_img_access.py)
 ### 图片文件的尺寸读取，尺寸压缩，文件复制移动。
 
+## [file_compare1.py](file_compare1.py)
+### 文件比较
+
