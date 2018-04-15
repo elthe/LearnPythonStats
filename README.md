@@ -20,7 +20,7 @@
 
 ### [正态分布专辑](RM_NORMAL.md)
 
-### [线性回归专辑](RM_LINEAR.md)
+### [SKLearn专辑](RM_SK.md)
 
 ## 实践
 

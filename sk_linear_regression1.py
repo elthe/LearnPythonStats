@@ -136,6 +136,6 @@ plt.xticks(())
 plt.yticks(())
 
 # 保存图片
-plt.savefig('images/linear_regression1_result.jpg')
+plt.savefig('images/sk_linear_regression1_result.jpg')
 # 显示绘制后的图片
 plt.show()

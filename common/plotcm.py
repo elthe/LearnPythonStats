@@ -220,6 +220,7 @@ def grid_by_list(img_list, title_list, col_num, save_path, cell_width=2.5, cell_
                 # 显示标题
                 ax.set_title(title_list[index])
             # 隐藏坐标轴
+            ax.axis("off")
             ax.set_xticks([])
             ax.set_yticks([])
 
@@ -293,6 +294,7 @@ def grid_by_matrix(img_matrix, title_matrix, col_num, save_path, cell_width=2.5,
                 # 显示标题
                 ax.set_title(title_matrix[row][col])
             # 隐藏坐标轴
+            ax.axis("off")
             ax.set_xticks([])
             ax.set_yticks([])
 

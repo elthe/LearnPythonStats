@@ -13,6 +13,7 @@ from pandas import DataFrame
 
 from sklearn import datasets
 from common import logcm
+from common import filecm
 
 
 def load_diabetes():
@@ -32,6 +33,7 @@ def load_diabetes():
         return df_data.as_matrix(), df_target.as_matrix()
 
     else:
+        filecm.makedir(file_path_data, by_file=True)
         # 取得数据
         diabetes = datasets.load_diabetes()
         logcm.print_obj(diabetes.DESCR, 'diabetes.DESCR')
