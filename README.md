@@ -12,9 +12,9 @@
 
 ### [图像处理基础](RM_CV_BASE.md)
 
-### [图像识别专辑](RM_CV.md)
+### [图像识别专辑](RM_CV_IMG.md)
 
-### [视频识别专辑](RM_VIDEO.md)
+### [视频识别专辑](RM_CV_VIDEO.md)
 
 ## 理论
 
