@@ -115,7 +115,7 @@ class FaceDetect(object):
                 result.append(vis[y1:y2, x1:x2])
         else:
             result.append(vis)
-        return result
+        return result, rects
 
 
 def get_face_detect():
@@ -137,9 +137,7 @@ def detect(face_model, img, tmp_path=None, tmp_key="", img_list=None, title_list
     @:param tmp_key 临时关键词
     @:param img_list 图片列表
     @:param title_list 标题列表
-    @return: 车牌信息
+    @return: 人脸信息,矩阵列表
     """
 
-    vis = face_model.detect(img, tmp_path, tmp_key, img_list, title_list)
-
-    return vis
+    return face_model.detect(img, tmp_path, tmp_key, img_list, title_list)

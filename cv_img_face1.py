@@ -1,20 +1,12 @@
 import cv2
 import glob as gb
-import numpy as np
-import sys
-import os
-import json
-
-from numpy.linalg import norm
 
 from common import cvfacecm
 from common import filecm
 from common import logcm
 from common import plotcm
-from common import plotcm
 
-
-# SVM模型
+# 模型
 face_model = cvfacecm.get_face_detect()
 
 # 获取plates文件夹下所有文件路径

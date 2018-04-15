@@ -8,3 +8,6 @@
 ## [cv_video_move1.py](cv_video_move1.py)
 ### 目标跟踪-实现基本的运动检测
 
+## [cv_video_face1.py](cv_video_face1.py)
+### 摄像头的人脸检测
+
