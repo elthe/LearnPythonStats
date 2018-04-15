@@ -1,26 +1,25 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# !/usr/bin/python
 
 """
-目标跟踪是对摄像头视频中的移动目标进行定位的过程，有着非常广泛的应用。
-实时目标跟踪是许多计算机视觉应用的重要任务，如监控、基于感知的用户界面、增强现实、基于对象的视频压缩以及辅助驾驶等。
-
-有很多实现视频目标跟踪的方法，当跟踪所有移动目标时，帧之间的差异会变的有用；
-当跟踪视频中移动的手时，基于皮肤颜色的均值漂移方法是最好的解决方案；当知道跟踪对象的一方面时，模板匹配是不错的技术。
-
-本代码是做一个基本的运动检测
-考虑的是“背景帧”与其它帧之间的差异
-这种方法检测结果还是挺不错的，但是需要提前设置背景帧，
-如果是在室外，光线的变化就会引起误检测，还是很有局限性的。
-
+OpenCV Face common api
+人脸识别相关共通函数
 """
+
 import cv2
-import cv2.cv as cv
-import numpy as np
 import math
+import glob as gb
+import json
+import numpy as np
+import os
+
+from numpy.linalg import norm
+from common import filecm
+from common import logcm
+from common import opencvcm
 
 
-def detect(img, cascade):
+def detect_face_rects(img, cascade):
     '''
     detectMultiScale函数中smallImg表示的是要检测的输入图像为smallImg，
     faces表示检测到的人脸目标序列，1.3表示每次图像尺寸减小的比例为1.3，
@@ -29,12 +28,11 @@ def detect(img, cascade):
     '''
 
     rects = cascade.detectMultiScale(img, scaleFactor=1.3,
-                                     minNeighbors=5, minSize=(30, 30), flags=cv.CV_HAAR_SCALE_IMAGE)
+                                     minNeighbors=5, minSize=(30, 30))
     if len(rects) == 0:
         return []
     rects[:, 2:] += rects[:, :2]
     print(rects)
-
     return rects
 
 
@@ -77,33 +75,41 @@ class FaceDetect(object):
         self.profileCascade = cv2.CascadeClassifier(self.profile_fn)
         return
 
-    def detect(self, img):
+    def detect(self, img, tmp_path=None, tmp_key="", img_list=None, title_list=None):
         """
         :param img:{numpy}
         :return:
         """
+
+        func_key = "detect"
+
         # vis为img副本
         vis = img.copy()
 
         # 转换为灰度图
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        opencvcm.save_tmp(gray, func_key, "gray", tmp_path, tmp_key, img_list, title_list)
+
         # 直方图均衡处理
         gray = cv2.equalizeHist(gray)
+        opencvcm.save_tmp(gray, func_key, "equalizeHist", tmp_path, tmp_key, img_list, title_list)
 
         # 通过分类器得到rects
-        rects = detect(gray, self.frontCascade)
+        rects = detect_face_rects(gray, self.frontCascade)
         if len(rects) == 0:
             # 侧脸检测
-            rects = detect(gray, self.profileCascade)
+            rects = detect_face_rects(gray, self.profileCascade)
             if len(rects) == 0:
                 # 镜像 在侧脸检测
                 gray = cv2.flip(gray, 1)
-                rects = detect(gray, self.profileCascade)
+                rects = detect_face_rects(gray, self.profileCascade)
                 vis = cv2.flip(vis, 1)
 
         result = []
         # 画矩形
         draw_rects(vis, rects, (0, 255, 0))
+        opencvcm.save_tmp(vis, func_key, "draw_rects", tmp_path, tmp_key, img_list, title_list)
+
         if len(rects) != 0:
             for x1, y1, x2, y2 in rects:
                 result.append(vis[y1:y2, x1:x2])
@@ -112,11 +118,28 @@ class FaceDetect(object):
         return result
 
 
-if __name__ == '__main__':
-    img = cv2.imread("face/1.jpg")
-    model = FaceDetect()
-    vis = model.detect(img)
+def get_face_detect():
+    """
+    取得训人脸识别对象
+    @return: 人脸识别对象
+    """
 
-    cv2.imshow('facedetect', vis[0])
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    face_model = FaceDetect()
+    return face_model
+
+
+def detect(face_model, img, tmp_path=None, tmp_key="", img_list=None, title_list=None):
+    """
+    人脸图片识别
+    @:param face_model 人脸识别对象
+    @:param img 图片
+    @:param tmp_path 临时目录
+    @:param tmp_key 临时关键词
+    @:param img_list 图片列表
+    @:param title_list 标题列表
+    @return: 车牌信息
+    """
+
+    vis = face_model.detect(img, tmp_path, tmp_key, img_list, title_list)
+
+    return vis
