@@ -6,6 +6,10 @@
 ## [net_thread_queue.py](net_thread_queue.py)
 ### 多线程，线程锁，任务队列的简单例子
 
+## [net_curl.py](net_curl.py)
+### 对指定链接测试访问时间的例子
 
+## [net_smtp.py](net_smtp.py)
+### 使用SMTP发送电子邮件的例子
 
 

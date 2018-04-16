@@ -6,14 +6,15 @@ web common api
 WEB连接相关共通函数
 """
 
+import os
+import pycurl
 import random
+import urllib
 
 from common import filecm
 from common import htmlcm
 from common import logcm
 from common import urlcm
-
-import urllib
 from urllib import request
 
 
@@ -156,3 +157,68 @@ def down_img(soup, page_url, img_select, tag_select, local_path, page_no=1):
             save_file_url(img_src, page_url, local_save_path, file_name)
             count = count + 1
     return count
+
+
+def curl(url, tmp_path, tmp_file='content.txt'):
+    """
+    访问指定URL，并生成临时文件
+    @param url: 网页URL
+    @param tmp_path: 临时路径
+    @param tmp_file: 临时文件名
+    @return:临时文件路径
+    """
+    c = pycurl.Curl()
+    c.setopt(pycurl.URL, url)
+
+    # 连接超时时间,5秒
+    c.setopt(pycurl.CONNECTTIMEOUT, 5)
+
+    # 下载超时时间,5秒
+    c.setopt(pycurl.TIMEOUT, 5)
+    c.setopt(pycurl.FORBID_REUSE, 1)
+    c.setopt(pycurl.MAXREDIRS, 1)
+    c.setopt(pycurl.NOPROGRESS, 1)
+    c.setopt(pycurl.DNS_CACHE_TIMEOUT, 30)
+    # 临时文件
+    file_path = os.path.join(tmp_path, tmp_file)
+    file_save = open(file_path, "wb")
+    c.setopt(pycurl.WRITEHEADER, file_save)
+    c.setopt(pycurl.WRITEDATA, file_save)
+
+    try:
+        c.perform()
+    except BaseException as err:
+        logcm.print_info("Exception:%s" % str(err))
+        file_save.close()
+        c.close()
+        return None
+
+    result = {}
+    result["NAMELOOKUP_TIME"] = c.getinfo(c.NAMELOOKUP_TIME)
+    result["CONNECT_TIME"] = c.getinfo(c.CONNECT_TIME)
+    result["PRETRANSFER_TIME"] = c.getinfo(c.PRETRANSFER_TIME)
+    result["STARTTRANSFER_TIME"] = c.getinfo(c.STARTTRANSFER_TIME)
+    result["TOTAL_TIME"] = c.getinfo(c.TOTAL_TIME)
+    result["HTTP_CODE"] = c.getinfo(c.HTTP_CODE)
+    result["SIZE_DOWNLOAD"] = c.getinfo(c.SIZE_DOWNLOAD)
+    result["HEADER_SIZE"] = c.getinfo(c.HEADER_SIZE)
+    result["SPEED_DOWNLOAD"] = c.getinfo(c.SPEED_DOWNLOAD)
+
+    print()
+    print("-" * 100)
+    print("curl %s --> %s" % (url, file_path))
+    print("HTTP状态码：%s" % (result["HTTP_CODE"]))
+    print("DNS解析时间：%.2f ms" % (result["NAMELOOKUP_TIME"] * 1000))
+    print("建立连接时间：%.2f ms" % (result["CONNECT_TIME"] * 1000))
+    print("准备传输时间：%.2f ms" % (result["PRETRANSFER_TIME"] * 1000))
+    print("传输开始时间：%.2f ms" % (result["STARTTRANSFER_TIME"] * 1000))
+    print("传输结束总时间：%.2f ms" % (result["TOTAL_TIME"] * 1000))
+    print("下载数据包大小：%d KB/s" % (result["SIZE_DOWNLOAD"] // 1024))
+    print("HTTP头部大小：%d byte" % (result["HEADER_SIZE"]))
+    print("平均下载速度：%d KB/s" % (result["SPEED_DOWNLOAD"] // 1024))
+
+    print("-" * 100)
+
+    file_save.close()
+    c.close()
+    return result
