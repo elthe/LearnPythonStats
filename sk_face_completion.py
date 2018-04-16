@@ -15,10 +15,19 @@ from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import RidgeCV
+from common import plotcm
+
 
 # Load the faces datasets
 data = fetch_olivetti_faces()
 targets = data.target
+
+# # 把图片一览网格显示并保存
+# save_path = './images/sk_face_all.jpg'
+#
+# img_list = data.images[:40]
+# title_list = [str(x) for x in range(len(img_list))]
+# plotcm.grid_by_list(img_list, title_list, 8, save_path, cell_width=2, cell_height=2)
 
 data = data.images.reshape((len(data.images), -1))
 train = data[targets < 30]
@@ -91,3 +100,4 @@ for i in range(n_faces):
 # 保存图片
 plt.savefig('images/sk_face_completion_result.jpg')
 plt.show()
+

@@ -7,5 +7,6 @@
 
 ## [sk_face_completion.py](sk_face_completion.py)
 ### 使用不同算法训练人脸库后，完成人脸对比
+![Image text](images/sk_face_all.jpg)
 ![Image text](images/sk_face_completion_result.jpg)
 

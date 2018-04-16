@@ -8,14 +8,8 @@ OpenCV Face common api
 
 import cv2
 import math
-import glob as gb
-import json
 import numpy as np
-import os
 
-from numpy.linalg import norm
-from common import filecm
-from common import logcm
 from common import opencvcm
 
 
@@ -65,10 +59,8 @@ class FaceDetect(object):
     def __init__(self):
         # 正脸
         self.front_fn = './data/face/haarcascades/haarcascade_frontalface_alt.xml'
-        # cascade_fn = 'lbpcascades/lbpcascade_frontalface.xml'
         # 侧脸
         self.profile_fn = './data/face/haarcascades/haarcascade_profileface.xml'
-        # cascade_fn = 'lbpcascades/lbpcascade_profileface.xml'
 
         # 读取分类器,CascadeClassifier下面有一个detectMultiScale方法来得到矩形
         self.frontCascade = cv2.CascadeClassifier(self.front_fn)

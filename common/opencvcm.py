@@ -8,8 +8,9 @@ OpenCV common api
 
 import cv2
 import numpy as np
+
 from common import logcm
-from numpy.linalg import norm
+from common import filecm
 
 
 def resize_by_max_contours(img, target_width, target_height, min_width=10, min_height=10):
@@ -428,3 +429,37 @@ def save_tmp(img, func_key, deal_key, tmp_path=None, tmp_key="", img_list=None, 
         row_num, col_num = img.shape[:2]
         title = '%s %dx%d' % (deal_key, col_num, row_num)
         title_list.append(title)
+
+
+def scale_img_file(file_path, scale_width, scale_height):
+    """
+    缩放指定图片文件到指定大小并覆盖原图
+    @:param file_path 图片路径
+    @:param scale_width 宽度
+    @:param scale_height 高度
+    @return: 缩放后的图片
+    """
+
+    # 读取图片
+    img = cv2.imread(file_path)
+    # 缩放图片
+    img = cv2.resize(img, (scale_width, scale_height), interpolation=cv2.INTER_CUBIC)
+    # 写入图片
+    cv2.imwrite(file_path, img)
+    return img
+
+
+def scale_img_folder(folder_path, scale_width, scale_height, ext=".png,.jpg,jpeg", match=None):
+    """
+    缩放指定图片文件目录下所有图片到指定大小并覆盖原图
+    @:param folder_path 指定图片目录
+    @:param scale_width 宽度
+    @:param scale_height 高度
+    @return: 无
+    """
+
+    # 对图片目录遍历
+    path_list = filecm.search_files(folder_path, ext=ext, match=match)
+    # 对所有文件进行缩放
+    for file_path in path_list:
+        scale_img_file(file_path, scale_width, scale_height)
