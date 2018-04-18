@@ -9,6 +9,9 @@
 ## [net_curl.py](net_curl.py)
 ### 对指定链接测试访问时间的例子
 
+## [net_redis.py](net_redis.py)
+### Redis缓存服务器读写的例子
+
 ## [net_smtp.py](net_smtp.py)
 ### 使用SMTP发送电子邮件的例子
 
