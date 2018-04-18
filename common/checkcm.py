@@ -22,7 +22,7 @@ def check_equal(obj1, obj2, title=""):
     if ok:
         logcm.print_info("Assert Ok for %s" % title)
     else:
-        logcm.print_info("Assert Equal Fail for %s" % title, high_light=True)
+        logcm.print_info("Assert Equal Fail for %s" % title, color='bold', fg='red')
         logcm.print_obj(obj1, title + "-1", show_header=False)
         logcm.print_obj(obj2, title + "-2", show_header=False)
     return ok

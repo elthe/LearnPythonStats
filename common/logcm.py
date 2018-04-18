@@ -96,9 +96,32 @@ def set_style(color=None, fg=None, bg=None):
 
     if has_style:
         # 输出格式
-        print('\033[%s;%s;%sm' % (clr_v, fg_v, bg_v))
+        print('\033[%s;%s;%sm' % (clr_v, fg_v, bg_v), end='')
 
     return has_style
+
+
+def print_style(obj, end='\n', color=None, fg=None, bg=None):
+    """
+    按照指定样式，print输出信息
+    @param obj: 输出信息
+    @param end: print结尾字符
+    @param color: 颜色
+    @param fg: 前景色
+    @param bg: 背景色
+    @:return 无
+    """
+
+    # 开始特殊显示
+    has_style = set_style(color, fg, bg)
+
+    # 输出对象
+    print(obj, end=end)
+
+    # 结束特殊显示
+    if has_style:
+        # 清除格式
+        print('\033[0m', end='')
 
 
 def print_info(obj, blank_first=True, show_header=True, color=None, fg=None, bg=None):
