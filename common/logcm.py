@@ -9,13 +9,18 @@ Log common api
 from numpy import *
 
 
-def print_info(obj, blank_first=True):
+def print_info(obj, blank_first=True, high_light=False):
     """
     print输出信息
     @param obj: 输出信息
     @param blank_first: 开头是否输出空行
+    @param high_light: 是否高亮显示
     @:return 无
     """
+
+    # 开始高亮显示
+    if high_light:
+        print('\033[1;31;m')
     # 输出新的空行
     if blank_first:
         print('\n')
@@ -26,22 +31,28 @@ def print_info(obj, blank_first=True):
     print(obj)
     # 结束线
     print('-' * 100)
+    # 结束高亮显示
+    if high_light:
+        print('\033[0m')
 
 
-def print_obj(obj, title, full_show=False):
+def print_obj(obj, title, full_show=False, show_header=True):
     """
     print输出对象内容，同时输出描述，类型
     @param obj: 输出对象
     @param title: 对象的标题
     @param full_show: 全部显示，默认否
+    @param show_header: 是否显示头部
     @:return 无
     """
 
     # 取得对象类型名称
     type_name = get_type_name(obj)
 
-    print('\n')
-    print('-' * 100)
+    # 显示头部
+    if show_header:
+        print('\n')
+        print('-' * 100)
     print('      obj : %s' % title)
     print('     type : %s' % type_name)
     # 属性输出
