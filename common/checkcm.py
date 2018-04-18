@@ -2,8 +2,8 @@
 # !/usr/bin/python
 
 """
-assert common api
-assert 相关共通函数
+check common api
+check 相关共通函数
 """
 
 from common import logcm
