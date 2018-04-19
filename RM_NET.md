@@ -15,4 +15,6 @@
 ## [net_smtp.py](net_smtp.py)
 ### 使用SMTP发送电子邮件的例子
 
+## [net_jenkins.py](net_jenkins.py)
+### 调用Jenkins的Job的示例
 
