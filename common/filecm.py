@@ -39,7 +39,7 @@ def short_name(path):
     return short_name
 
 
-def save_str(content, encoding, path, file_name):
+def save_str(content, encoding='utf-8', path=None, file_name=None):
     """
     保存字符串到文件
     @param content: 字符串内容
@@ -49,19 +49,27 @@ def save_str(content, encoding, path, file_name):
     @return: 无
     """
 
-    # 本地文件路径如果不存在，自动创建
-    if not os.path.exists(path):
-        logcm.print_info("Create folder: %s" % path)
-        os.makedirs(path)
+    # 文件名为空返回空
+    if file_name is None:
+        logcm.print_info("File name is empty.", fg='red')
+        return None
+
+    # 路径不为空，路径拼接
+    if path is not None:
+        makedir(path)
+        file_path = os.path.join(path, file_name)
+    else:
+        makedir(file_name, by_file=True)
+        file_path = file_name
+
     # 文件完整路径
-    file_path = os.path.join(path, file_name)
     f = codecs.open(file_path, 'w', encoding)
     f.write(content)
     f.close()
     logcm.print_info("Save str file finished. --> %s/%s" % (path, file_name))
 
 
-def save_data(data, path, file_name):
+def save_data(data, path=None, file_name=None):
     """
     保存数据到本地文件
     @param data: 数据内容
@@ -70,12 +78,20 @@ def save_data(data, path, file_name):
     @return: 无
     """
 
-    # 本地文件路径如果不存在，自动创建
-    if not os.path.exists(path):
-        logcm.print_info("Create folder: %d" % path)
-        os.makedirs(path)
+    # 文件名为空返回空
+    if file_name is None:
+        logcm.print_info("File name is empty.", fg='red')
+        return None
+
+    # 路径不为空，路径拼接
+    if path is not None:
+        makedir(path)
+        file_path = os.path.join(path, file_name)
+    else:
+        makedir(file_name, by_file=True)
+        file_path = file_name
+
     # 文件完整路径
-    file_path = os.path.join(path, file_name)
     with open(file_path, "wb") as file:
         file.write(data)
     logcm.print_info("Save data file finished. --> %s/%s" % (path, file_name))
@@ -112,6 +128,7 @@ def exists(path_check, file_name):
     # 本地文件路径如果不存在，返回False
     if not os.path.exists(path_check):
         return False
+
     # 文件完整路径
     file_path = os.path.join(path_check, file_name)
     return os.path.exists(file_path)
@@ -125,16 +142,21 @@ def makedir(path, by_file=False):
     @return: 无
     """
 
+    # 路径为空，返回
+    if path is None:
+        return
+
     # 通过文件创建的时候，截取文件所在目录路径
     if by_file:
         (path, file_name) = os.path.split(path)
 
     # 不存在则创建目标路径
     if not os.path.exists(path):
+        logcm.print_info("Create folder: %s" % path)
         os.makedirs(path)
 
 
-def read_lines(path, file_name, encoding):
+def read_lines(path=None, file_name=None, encoding="utf-8"):
     """
     读取文件到字符串数组
     @param path: 文件路径
@@ -143,14 +165,31 @@ def read_lines(path, file_name, encoding):
     @return: 字符串数组
     """
 
-    file_path = path + '/' + file_name
+    # 文件名为空返回空
+    if file_name is None:
+        logcm.print_info("File name is empty.", fg='red')
+        return None
+
+    # 路径不为空，路径拼接
+    if path is not None:
+        file_path = os.path.join(path, file_name)
+    else:
+        file_path = file_name
+
+    # 文件不存在，返回空
+    if not os.path.exists(file_path):
+        logcm.print_info("File not found. %s" % file_path, fg='red')
+        return None
+
+    # 读取文件
     file = codecs.open(file_path, 'r', encoding)
+    # 行字符串列表
     lines = [line.strip() for line in file]
     file.close()
     return lines
 
 
-def read_str(path, file_name, encoding):
+def read_str(path=None, file_name=None, encoding="utf-8"):
     """
     读取文件到字符串
     @param path: 文件路径
@@ -175,7 +214,7 @@ def search_files(search_path, ext=None, match=None):
 
     # 判断路径是否cun在
     if not os.path.exists(search_path):
-        logcm.print_info("File path not exist! %s" % search_path)
+        logcm.print_info("File path not exist! %s" % search_path, fg='red')
         return None
 
     # 后缀名如果有指定，生成允许列表
@@ -223,7 +262,7 @@ def load_excel_data(file_path, short_name, sheet_name, title_line, col_titles):
     sheets = workbook.sheet_names()
     if not sheet_name in sheets:
         # 如果没有这个Sheet，则跳过
-        logcm.print_info("Sheet不存在 %s - %s" % (short_name, sheet_name))
+        logcm.print_info("Sheet不存在 %s - %s" % (short_name, sheet_name), fg='red')
         return None
 
     # 读取Sheet
@@ -231,12 +270,12 @@ def load_excel_data(file_path, short_name, sheet_name, title_line, col_titles):
 
     # 判断标题行是否在合理范围
     if title_line < 0 or title_line >= worksheet.nrows:
-        logcm.print_info("标题行不合理 %d" % title_line)
+        logcm.print_info("标题行不合理 %d" % title_line, fg='red')
         return None
 
     # 标题列
     if not col_titles or len(col_titles) == 0:
-        logcm.print_info("标题列未设置 %s" % str(col_titles))
+        logcm.print_info("标题列未设置 %s" % str(col_titles), fg='red')
         return None
 
     # 取得标题行索引
@@ -294,7 +333,7 @@ def move_files(path_list, dest_path):
     # 移动文件
     for src_file in path_list:
         if not os.path.isfile(src_file):
-            logcm.print_info("%s not exist!" % src_file)
+            logcm.print_info("%s not exist!" % src_file, fg='red')
         else:
             # 分离文件名和路径
             src_path, src_name = os.path.split(src_file)
@@ -319,7 +358,7 @@ def copy_files(path_list, dest_path):
     # 复制文件
     for src_file in path_list:
         if not os.path.isfile(src_file):
-            logcm.print_info("%s not exist!" % src_file)
+            logcm.print_info("%s not exist!" % src_file, fg='red')
         else:
             # 分离文件名和路径
             src_path, src_name = os.path.split(src_file)

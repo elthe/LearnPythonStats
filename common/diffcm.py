@@ -7,7 +7,7 @@ diff 相关共通函数
 """
 
 from common import logcm
-from common import loadcfgcm
+from common import filecm
 
 import difflib
 
@@ -58,3 +58,32 @@ def diff_by_lines(lines1, lines2):
             # 左右侧行号+1
             line_left += 1
             line_right += 1
+
+
+def diff_by_text(text1, text2):
+    """
+    比较两个文本。
+    @param text1: 文本1
+    @param text2: 文本2
+    @return: None
+    """
+
+    text1_lines = text1.splitlines()
+    text2_lines = text2.splitlines()
+    logcm.print_info("diff_by_text text1[%d] vs text2[%d]" % (len(text1_lines), len(text2_lines)))
+    diff_by_lines(text1_lines, text2_lines)
+
+
+def diff_by_file(file_path1, file_path2, encoding='utf-8'):
+    """
+    比较两个文本文件。
+    @param file_path1: 文件路径1
+    @param file_path2: 文件路径2
+    @param encoding: 文本编码
+    @return: None
+    """
+
+    logcm.print_info("diff_by_file file1[%s] vs file2[%s]" % (file_path1, file_path2))
+    lines1 = filecm.read_lines(file_name=file_path1, encoding=encoding)
+    lines2 = filecm.read_lines(file_name=file_path2, encoding=encoding)
+    diff_by_lines(lines1, lines2)

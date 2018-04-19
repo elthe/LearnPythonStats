@@ -5,12 +5,10 @@
 字符串对比示例
 """
 
-from common import loadcfgcm
-from common import logcm
 from common import diffcm
+from common import filecm
 
-import difflib
-
+# 字符串比较
 text1 = """
 text1:
 This module provides classes and functions for comparing sequences.
@@ -20,9 +18,6 @@ add string
 kk
 pp
 """
-
-text1_lines = text1.splitlines()
-
 text2 = """
 text2:
 This module provides classes and functions for Comparing sequences.
@@ -33,7 +28,12 @@ add2
 pp
 dd...d..
 """
+diffcm.diff_by_text(text1, text2)
 
-text2_lines = text2.splitlines()
+# 文件对比
+text_path1 = './temp/file/file_diff1.txt'
+text_path2 = './temp/file/file_diff2.txt'
+filecm.save_str(text1, file_name=text_path1)
+filecm.save_str(text2, file_name=text_path2)
+diffcm.diff_by_file(text_path1, text_path2)
 
-diffcm.diff_by_lines(text1_lines, text2_lines)
