@@ -37,3 +37,7 @@ filecm.save_str(text1, file_name=text_path1)
 filecm.save_str(text2, file_name=text_path2)
 diffcm.diff_by_file(text_path1, text_path2)
 
+# 目录对比
+dir1 = './temp/file/dir1'
+dir2 = './temp/file/dir2'
+diffcm.diff_by_dir(dir1, dir2)

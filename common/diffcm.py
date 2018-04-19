@@ -6,10 +6,13 @@ diff common api
 diff 相关共通函数
 """
 
+import difflib
+import os
+
 from common import logcm
 from common import filecm
-
-import difflib
+from common import strcm
+from filecmp import dircmp
 
 
 def diff_by_lines(lines1, lines2):
@@ -87,3 +90,45 @@ def diff_by_file(file_path1, file_path2, encoding='utf-8'):
     lines1 = filecm.read_lines(file_name=file_path1, encoding=encoding)
     lines2 = filecm.read_lines(file_name=file_path2, encoding=encoding)
     diff_by_lines(lines1, lines2)
+
+
+def diff_by_dir(dir_path1, dir_path2, dcmp=None, column_size=80):
+    """
+    比较两个目录。
+    @param dir_path1: 文件目录1
+    @param dir_path2: 文件目录2
+    @param dcmp: 目录比较结果对象，为空则执行首层目录比较
+    @param column_size: 打印列宽度，用于补空对齐
+    @return: None
+    """
+
+    if dcmp is None:
+        logcm.print_info("diff_by_dir dir1[%s] vs dir2[%s]" % (dir_path1, dir_path2))
+        dcmp = dircmp(dir_path1, dir_path2)
+        diff_by_dir(dir_path1, dir_path2, dcmp, column_size)
+    else:
+        # 取得左右合集，去重，并排序
+        all_list = list(set(dcmp.left_list + dcmp.right_list))
+        all_list.sort()
+        empty_file = ' ' * column_size
+        for file_name in all_list:
+            # 显示的文件名
+            left_file = os.path.join(dir_path1, file_name)
+            right_file = os.path.join(dir_path2, file_name)
+            # 打印控制
+            if file_name in dcmp.left_only:
+                logcm.print_style('%s %s' % (left_file, empty_file), fg='green', bg='black')
+            elif file_name in dcmp.right_only:
+                logcm.print_style('%s %s' % (empty_file, right_file), fg='green', bg='black')
+            elif file_name in dcmp.diff_files:
+                logcm.print_style(
+                    '%s %s' % (strcm.pad_after(left_file, column_size), right_file),
+                    fg='red', bg='black')
+            elif file_name in dcmp.same_files:
+                logcm.print_style(
+                    '%s %s' % (strcm.pad_after(left_file, column_size), right_file),
+                    color='disable', fg='black', bg='lightgrey')
+
+        # 子目录递归
+        for sub_dcmp in dcmp.subdirs.values():
+            diff_by_dir(sub_dcmp.left, sub_dcmp.right, sub_dcmp, column_size)

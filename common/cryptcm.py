@@ -13,6 +13,7 @@ from Crypto.PublicKey import RSA as rsa
 from Crypto.Cipher import PKCS1_v1_5
 from Crypto.Cipher import AES
 from common import logcm
+from common import strcm
 
 
 def rsa_encrypt(pub_key_str, input_bytes):
@@ -73,20 +74,6 @@ def md5_encrypt(input_bytes):
     return result
 
 
-def pad_str(input_str, padding_size, padding_char="\0"):
-    """
-    字符串补齐
-    @param input_str: 输入字符串
-    @param padding_size: 对齐宽度
-    @param padding_char: 补齐字符
-    @return: 补齐后的字符串
-    """
-
-    adding_num = padding_size - len(input_str) % padding_size
-    suffix_str = padding_char * adding_num
-    return input_str + suffix_str
-
-
 def aes_encrypt(aes_key, aes_iv, input_str):
     """
     AES加密
@@ -101,7 +88,7 @@ def aes_encrypt(aes_key, aes_iv, input_str):
     logcm.print_info("AES encrypt bytes : %s" % input_str)
 
     # 加密后字节列表
-    padded_str = pad_str(input_str, 16)
+    padded_str = strcm.pad_after(input_str, 16, '\0')
     crypt_bytes = crypt_obj.encrypt(padded_str)
 
     # 因为AES加密时候得到的字符串不一定是ascii字符集的，输出到终端或者保存时候可能存在问题
