@@ -31,6 +31,7 @@ difflib document v7.522
 kk
 add2
 pp
+dd...d..
 """
 
 text2_lines = text2.splitlines()
