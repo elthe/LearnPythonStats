@@ -18,3 +18,5 @@
 ## [net_jenkins.py](net_jenkins.py)
 ### 调用Jenkins的Job的示例
 
+## [net_ssh.py](net_ssh.py)
+### 调用SSH的示例
