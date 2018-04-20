@@ -9,6 +9,7 @@ SSH相关共通函数
 import paramiko
 import datetime
 import os
+import sys
 import time
 
 from common import logcm
@@ -149,11 +150,12 @@ def get_new_lines(sftp, remote_filename, remote_file_size):
     remote_file.close()
 
 
-def tail_print(sftp, remote_filename):
+def tail_print(sftp, remote_filename, history_size=5000):
     """
     通过SSH监控远程文件新增文本行并输出到控制台
     @param sftp: SFTP连接
     @param remote_filename: 远程文件路径
+    @param history_size: 显示历史记录大小
     @return: 无
     """
 
@@ -163,13 +165,21 @@ def tail_print(sftp, remote_filename):
             # 文件统计
             stat_info = sftp.stat(remote_filename)
             # 上次文件大小非空时，输出新增行
-            if remote_file_size > 0:
+            if remote_file_size >= 0:
                 # if the file's grown
                 if remote_file_size < stat_info.st_size:
-                    for line in get_new_lines(remote_filename, remote_file_size):
+                    for line in get_new_lines(sftp, remote_filename, remote_file_size):
                         print(line)
+                        # 随时刷新到屏幕上
+                        # sys.stdout.flush()
+                remote_file_size = stat_info.st_size
+            else:
+                logcm.print_info("Found remote file (%s) size : %d " % (remote_filename, stat_info.st_size))
+                if history_size < stat_info.st_size:
+                    remote_file_size = stat_info.st_size - history_size
+                else:
+                    remote_file_size = 0
 
-            remote_file_size = stat_info.st_size
             # 休息1秒后再试
             time.sleep(1)
     except Exception as e:

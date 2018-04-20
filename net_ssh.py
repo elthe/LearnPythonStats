@@ -18,7 +18,7 @@ default_config = {
 }
 
 # 加载配置文件
-cfg = loadcfgcm.load("ssh_conn.json", default_config)
+cfg = loadcfgcm.load("net_ssh_tail.json", default_config)
 
 # SSH连接
 ssh, sftp = sshcm.get_ssh_conn(cfg['ip'], cfg['port'], cfg['username'], cfg['password'])

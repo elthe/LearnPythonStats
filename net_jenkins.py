@@ -19,7 +19,7 @@ default_config = {
 }
 
 # 加载配置文件
-cfg = loadcfgcm.load("jenkins_job.json", default_config)
+cfg = loadcfgcm.load("net_jenkins_job.json", default_config)
 
 # 链接到服务器
 server = jenkinscm.get_jenkins_server(cfg['host'], cfg['user'], cfg['token'])
