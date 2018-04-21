@@ -2,93 +2,116 @@
 # !/usr/bin/python
 
 """
-check common api
-check 相关共通函数
+widget common class
+widget 相关共通类
 """
 
 from common import logcm
-from PyQt5.QtWidgets import QApplication, QWidget, QLineEdit, QInputDialog, QGridLayout, QLabel, QPushButton, QFrame
+from functools import partial
+from PyQt5.QtWidgets import QWidget, QLineEdit, QInputDialog, QGridLayout, QLabel, QPushButton, QFrame
 from PyQt5.QtWidgets import QFileDialog
 
 
-def make_input_ui(parent, input_list, layout):
-    """
-    做成输入画面
-    @param parent: 父对象
-    @param input_list: 输入列表
-    @param layout: Layout
-    @return: 无
-    """
+class MakeInputDialog(QWidget):
+    def __init__(self):
+        super(MakeInputDialog, self).__init__()
 
-    row_num = 0
-    for item in input_list:
-        title_label = QLabel(item["title"])
-        value_label = QLabel(item["init"])
-        value_label.setFrameStyle(QFrame.Panel | QFrame.Sunken)
-        set_button = QPushButton(item['button'])
-        set_button.clicked.connect(
-            lambda: do_input(parent, item=item, value_label=value_label))
-        layout.addWidget(title_label, row_num, 0)
-        layout.addWidget(value_label, row_num, 1)
-        layout.addWidget(set_button, row_num, 2)
-        row_num += 1
+    def make_input_ui(self, input_list):
+        """
+        做成输入画面
+        @param input_list: 输入列表
+        @return: 无
+        """
 
+        self.input_list = input_list
+        self.mainLayout = QGridLayout()
+        self.setLayout(self.mainLayout)
 
-def do_input(parent, item, value_label=None):
-    """
-    执行输入设定
-    @param parent: 父对象
-    @param type: 类型
-    @return: 无
-    """
+        row_num = 0
+        self.value_labels = []
+        for item in self.input_list:
+            title_label = QLabel(item["title"])
+            value_label = QLabel(item["init"])
+            value_label.setFrameStyle(QFrame.Panel | QFrame.Sunken)
+            self.value_labels.append(value_label)
 
-    title = item['title'] if 'title' in item else ''
-    desc = item['desc'] if 'desc' in item else ''
-    options = item['options'] if 'options' in item else ''
+            set_button = QPushButton(item['button'])
+            set_button.clicked.connect(partial(self.do_input, row_num))
 
-    if type == "text":
-        text, ok = QInputDialog.getText(parent, title, desc,
-                                        QLineEdit.Normal, value_label.text())
-        if ok and (len(text) != 0):
-            value_label.setText(text)
+            self.mainLayout.addWidget(title_label, row_num, 0)
+            self.mainLayout.addWidget(value_label, row_num, 1)
+            self.mainLayout.addWidget(set_button, row_num, 2)
+            row_num += 1
 
-    if type == "textarea":
-        text, ok = QInputDialog.getMultiLineText(parent, title, desc,
-                                                 value_label.text())
-        if ok and (len(text) != 0):
-            value_label.setText(text)
+    def do_input(self, row_num):
+        """
+        执行输入设定
+        @param row_num: 行号
+        @return: 无
+        """
 
-    elif type == "select":
-        text, ok = QInputDialog.getItem(parent, title, desc, item['sel_list'])
-        if ok:
-            value_label.setText(text)
+        item = self.input_list[row_num]
+        value_label = self.value_labels[row_num]
 
-    elif type == "int":
-        number, ok = QInputDialog.getInt(parent, title, desc, int(value_label.text()), item['min'], item['max'], item['step'])
-        if ok:
-            value_label.setText(str(number))
+        title = item['title'] if 'title' in item else ''
+        desc = item['desc'] if 'desc' in item else ''
+        options = item['options'] if 'options' in item else ''
+        item_type = item['type']
+        logcm.print_info("Do input row %d type %s for %s"%(row_num, item_type, title))
 
-    elif type == "double":
-        number, ok = QInputDialog.getDouble(parent, title, desc, float(value_label.text()), item['min'], item['max'], item['step'])
-        if ok:
-            value_label.setText(str(number))
+        # 文本类型
+        if item_type == "text":
+            text, ok = QInputDialog.getText(self, title, desc,
+                                            QLineEdit.Normal, value_label.text())
+            if ok and (len(text) != 0):
+                value_label.setText(text)
+        # 多行文本
+        if item_type == "textarea":
+            text, ok = QInputDialog.getMultiLineText(self, title, desc,
+                                                     value_label.text())
+            if ok and (len(text) != 0):
+                value_label.setText(text)
 
-    elif type == "dir":
-        dir_name = QFileDialog.getExistingDirectory(parent, title, filter)
-        if dir_name:
-            value_label.setText(dir_name)
+        # 选择
+        elif item_type == "select":
+            text, ok = QInputDialog.getItem(self, title, desc, item['sel_list'])
+            if ok:
+                value_label.setText(text)
 
-    elif type == "file":
-        file_name = QFileDialog.getOpenFileName(parent, title, filter, options)
-        if file_name:
-            value_label.setText(file_name)
+        # 整数
+        elif item_type == "int":
+            number, ok = QInputDialog.getInt(self, title, desc, int(value_label.text()), item['min'], item['max'],
+                                             item['step'])
+            if ok:
+                value_label.setText(str(number))
 
-    elif type == "files":
-        file_list = QFileDialog.getOpenFileNames(parent, title, filter, options)
-        if file_list:
-            value_label.setText(file_list)
+        # 浮点数
+        elif item_type == "double":
+            number, ok = QInputDialog.getDouble(self, title, desc, float(value_label.text()), item['min'], item['max'],
+                                                item['step'])
+            if ok:
+                value_label.setText(str(number))
 
-    elif type == "save_file":
-        file_name = QFileDialog.getSaveFileName(parent, title, filter, options)
-        if file_name:
-            value_label.setText(file_name)
+        # 打开目录
+        elif item_type == "dir":
+            dir_name = QFileDialog.getExistingDirectory(self, title, filter)
+            if dir_name:
+                value_label.setText(dir_name)
+
+        # 打开文件
+        elif item_type == "file":
+            file_name = QFileDialog.getOpenFileName(self, title, filter, options)
+            if file_name:
+                value_label.setText(file_name)
+
+        # 打开多个文件
+        elif item_type == "files":
+            file_list = QFileDialog.getOpenFileNames(self, title, filter, options)
+            if file_list:
+                value_label.setText(file_list)
+
+        # 保存文件
+        elif item_type == "save_file":
+            file_name = QFileDialog.getSaveFileName(self, title, filter, options)
+            if file_name:
+                value_label.setText(file_name)

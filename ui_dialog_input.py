@@ -5,9 +5,9 @@
 Dialog使用示例。
 """
 
-from PyQt5.QtWidgets import QApplication, QWidget, QLineEdit, QInputDialog, QGridLayout, QLabel, QPushButton, QFrame
+from PyQt5.QtWidgets import QApplication
 
-from common import widgetcm
+from common.widgetcm import MakeInputDialog
 
 input_list = [
     {
@@ -15,13 +15,7 @@ input_list = [
         "title": "项目名称",
         "desc": "输入项目名称:",
         "init": "PyQt5",
-        "button": "...",
-        "sel_list": [],
-        "min": 0,
-        "max": 100,
-        "step": 2,
-        "filter": "",
-        "options": "",
+        "button": "..."
     },
     {
         "type": "select",
@@ -29,7 +23,7 @@ input_list = [
         "desc": "请选择项目性质:",
         "init": "外包",
         "button": "...",
-        "list": ["外包", "自研"],
+        "sel_list": ["外包", "自研"],
     },
     {
         "type": "int",
@@ -61,25 +55,22 @@ input_list = [
 ]
 
 
-class InputDialog(QWidget):
+class TestInputDialog(MakeInputDialog):
     def __init__(self):
-        super(InputDialog, self).__init__()
+        super(TestInputDialog, self).__init__()
         self.initUi()
 
     def initUi(self):
         self.setWindowTitle("项目信息")
         self.setGeometry(400, 400, 300, 260)
-        mainLayout = QGridLayout()
 
-        widgetcm.make_input_ui(self, input_list, mainLayout)
-
-        self.setLayout(mainLayout)
+        self.make_input_ui(input_list)
 
 
 if __name__ == "__main__":
     import sys
 
     app = QApplication(sys.argv)
-    myshow = InputDialog()
+    myshow = TestInputDialog()
     myshow.show()
     sys.exit(app.exec_())

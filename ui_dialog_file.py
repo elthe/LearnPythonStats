@@ -5,46 +5,56 @@
 Dialog使用示例。
 """
 
-from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QApplication
+
+from common.widgetcm import MakeInputDialog
+
+input_list = [
+    {
+        "type": "dir",
+        "title": "打开目录",
+        "desc": "选择目录:",
+        "init": "./",
+        "button": "select"
+    },
+    {
+        "type": "file",
+        "title": "打开文件",
+        "desc": "请选择文件:",
+        "init": "",
+        "button": "...",
+    },
+    {
+        "type": "files",
+        "title": "一组文件",
+        "desc": "请选择多个文件:",
+        "init": "",
+    },
+    {
+        "type": "save_file",
+        "title": "保存文件",
+        "desc": "选择保存文件:",
+        "init": "",
+    },
+]
 
 
-class MyWindow(QtWidgets.QWidget):
+class TestFileInputDialog(MakeInputDialog):
     def __init__(self):
-        super(MyWindow, self).__init__()
-        self.myButton = QtWidgets.QPushButton(self)
-        self.myButton.setObjectName("myButton")
-        self.myButton.setText("Test")
-        self.myButton.clicked.connect(self.msg)
+        super(TestFileInputDialog, self).__init__()
+        self.initUi()
 
-    def msg(self):
-        directory1 = QFileDialog.getExistingDirectory(self,
-                                                      "选取文件夹",
-                                                      "./")  # 起始路径
-        print(directory1)
+    def initUi(self):
+        self.setWindowTitle("文件上传")
+        self.setGeometry(500, 400, 300, 260)
 
-        fileName1, filetype = QFileDialog.getOpenFileName(self,
-                                                          "选取文件",
-                                                          "./",
-                                                          "All Files (*);;Text Files (*.txt)")  # 设置文件扩展名过滤,注意用双分号间隔
-        print(fileName1, filetype)
-
-        files, ok1 = QFileDialog.getOpenFileNames(self,
-                                                  "多文件选择",
-                                                  "./",
-                                                  "All Files (*);;Text Files (*.txt)")
-        print(files, ok1)
-
-        fileName2, ok2 = QFileDialog.getSaveFileName(self,
-                                                     "文件保存",
-                                                     "./",
-                                                     "All Files (*);;Text Files (*.txt)")
+        self.make_input_ui(input_list)
 
 
 if __name__ == "__main__":
     import sys
 
-    app = QtWidgets.QApplication(sys.argv)
-    myshow = MyWindow()
+    app = QApplication(sys.argv)
+    myshow = TestFileInputDialog()
     myshow.show()
     sys.exit(app.exec_())
