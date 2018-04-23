@@ -23,7 +23,7 @@ img_matrix = []
 # 标题矩阵
 title_matrix = []
 
-## 对每一张图片进行处理
+# 对每一张图片进行处理
 for path in img_path:
     img_list = []
     title_list = []

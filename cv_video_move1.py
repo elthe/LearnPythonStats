@@ -58,7 +58,8 @@ while True:
     # 该函数计算一幅图像中目标的轮廓
     image, contours, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     for c in contours:
-        # 对于矩形区域，只显示大于给定阈值的轮廓，所以一些微小的变化不会显示。对于光照不变和噪声低的摄像头可不设定轮廓最小尺寸的阈值
+        # 对于矩形区域，只显示大于给定阈值的轮廓，所以一些微小的变化不会显示。
+        # 对于光照不变和噪声低的摄像头可不设定轮廓最小尺寸的阈值
         if cv2.contourArea(c) < 1500:
             continue
         # 该函数计算矩形的边界框
