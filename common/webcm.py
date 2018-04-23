@@ -36,11 +36,11 @@ def random_agent():
         "Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)",
     ]
     # 随机返回一个
-    index = random.randint(0, len(agent_list))
+    index = random.randint(0, len(agent_list)-1)
     return agent_list[index]
 
 
-def read_url(page_url, encoding):
+def read_url(page_url, encoding='utf-8'):
     """
     通过URL得到网页内容
     @param page_url: 请求的网页地址

@@ -20,3 +20,6 @@
 
 ## [net_ssh.py](net_ssh.py)
 ### 调用SSH的示例
+
+## [net_ops.py](net_ops.py)
+### 调用OPS的示例

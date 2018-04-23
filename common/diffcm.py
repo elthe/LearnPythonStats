@@ -7,6 +7,7 @@ diff 相关共通函数
 """
 
 import difflib
+import json
 import os
 
 from common import logcm
@@ -75,6 +76,19 @@ def diff_by_text(text1, text2):
     text2_lines = text2.splitlines()
     logcm.print_info("diff_by_text text1[%d] vs text2[%d]" % (len(text1_lines), len(text2_lines)))
     diff_by_lines(text1_lines, text2_lines)
+
+
+def diff_by_dict(dict1, dict2):
+    """
+    比较两个字典。
+    @param dict1: 字典1
+    @param dict2: 字典2
+    @return: None
+    """
+
+    json1 = json.dumps(dict1, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
+    json2 = json.dumps(dict2, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
+    diff_by_text(json1, json2)
 
 
 def diff_by_file(file_path1, file_path2, encoding='utf-8'):
