@@ -6,7 +6,7 @@ SSH使用示例。
 """
 
 from common import loadcfgcm
-from common import netsshcm
+from common.netsshcm import SshClient
 
 # 配置
 default_config = {
@@ -21,10 +21,8 @@ default_config = {
 cfg = loadcfgcm.load("net_ssh_tail.json", default_config)
 
 # SSH连接
-ssh, sftp = netsshcm.get_ssh_conn(cfg['ip'], cfg['port'], cfg['username'], cfg['password'])
-
-# 查看日志
-netsshcm.tail_print(sftp, cfg['remoteFile'])
+ssh = SshClient(cfg)
+ssh.tail_print(cfg['remoteFile'])
 
 # 关闭连接
 # sshcm.close_ssh_conn(ssh, sftp)

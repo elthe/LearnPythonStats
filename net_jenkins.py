@@ -6,7 +6,7 @@ Jenkins使用示例。
 """
 
 from common import loadcfgcm
-from common import jenkinscm
+from common.jenkinscm import JenkinsClient
 
 # 配置
 default_config = {
@@ -22,8 +22,7 @@ default_config = {
 cfg = loadcfgcm.load("net_jenkins_job.json", default_config)
 
 # 链接到服务器
-server = jenkinscm.get_jenkins_server(cfg['host'], cfg['user'], cfg['token'])
+jenkins = JenkinsClient(cfg)
 
 # 启动JOB
-jenkinscm.invoke_job(server, cfg['jobName'], cfg['svnUrl'], cfg['taskNo'])
-
+jenkins.invoke(cfg['jobName'], cfg['svnUrl'], cfg['taskNo'])
