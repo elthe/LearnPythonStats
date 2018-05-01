@@ -35,7 +35,7 @@ def load(config_name, default_config, config_path='./config', encoding='utf-8'):
     # 把对象转成JSON字符串，并格式化
     if type(default_config) == type(""):
         # 如果本身就是字符串直接使用
-        cfg_content = default_config
+        cfg_content = default_config.strip()
     else:
         cfg_content = json.dumps(default_config, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
     # 保存到json文件

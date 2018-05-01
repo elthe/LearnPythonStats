@@ -31,7 +31,7 @@ def cut_save(src_path, start, end, target_path=None, fps=24):
 
     # 生成目标视频文件
     if target_path is not None:
-        target_clip.to_videofile(target_path, fps=fps, remove_temp=False)
+        target_clip.to_videofile(target_path, fps=fps, remove_temp=True)
 
     return target_clip
 
@@ -50,6 +50,6 @@ def concat_save(src_clips, target_path=None, fps=24):
 
     # 生成目标视频文件
     if target_path is not None:
-        final_clip.to_videofile(target_path, fps=fps, remove_temp=False)
+        final_clip.to_videofile(target_path, fps=fps, remove_temp=True)
 
     return final_clip
