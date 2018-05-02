@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-DB使用示例。
+Mysql DB使用示例。
 # https://github.com/PyMySQL/PyMySQL/
 """
 
@@ -11,33 +11,34 @@ import traceback
 from contextlib import closing
 from common import loadcfgcm
 
-
 # 配置
-default_config = {
-    'user': 'root',
-    'passwd': 'root',
-    'host': 'localhost',
-    'port': 3306,
-    'db': 'test',
-    'charset':'utf8'
+default_config = """
+{
+    "host": "localhost",
+    "port": 3306,
+    "db": "test",
+    "charset":"utf8",
+    "user": "root",
+    "passwd": "root"
 }
+"""
 
 # 加载配置文件
 cfg = loadcfgcm.load("db_mysql_test1.json", default_config)
 
-
 try:
     # 获取一个数据库连接,with关键字 表示退出时,conn自动关闭
     # with 嵌套上一层的with 要使用closing()
-    with closing(pymysql.connect(host=cfg['host'], user=cfg['user'], passwd=cfg['passwd'], db=cfg['db'], port=cfg['port'],
-                                 charset=cfg['charset'])) as conn:
+    with closing(
+            pymysql.connect(host=cfg['host'], user=cfg['user'], passwd=cfg['passwd'], db=cfg['db'], port=cfg['port'],
+                            charset=cfg['charset'])) as conn:
 
         print("connect database successfully")
 
         # 获取游标,with关键字 表示退出时,cur自动关闭
         with conn.cursor() as cur:
             # 删除表
-            #cur.execute("DROP TABLE IF EXISTS  COMPANY")
+            # cur.execute("DROP TABLE IF EXISTS  COMPANY")
             # 创建表
             sql = """
                      CREATE TABLE IF NOT EXISTS COMPANY

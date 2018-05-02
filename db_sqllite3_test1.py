@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-DB使用示例。
+Sqlite3 DB使用示例。
 """
 
 import sqlite3
