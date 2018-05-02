@@ -10,16 +10,18 @@ from common import checkcm
 from common import loadcfgcm
 
 # 配置
-default_config = {
-    'redis1': {
-        'host': 'localhost',
-        'port': 6379
+default_config = """
+{
+    "redis1": {
+        "host": "localhost",
+        "port": 6379
     },
-    'redis2': {
-        'host': 'localhost',
-        'port': 6379
+    "redis2": {
+        "host": "localhost",
+        "port": 6379
     }
 }
+"""
 
 # 加载配置文件
 cfg = loadcfgcm.load("net_redis_cfg.json", default_config)

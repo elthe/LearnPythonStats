@@ -16,18 +16,21 @@ out_file = "output" + datecm.now_time_str() + ".csv"
 
 # 配置
 # Excel文件名，可以对应到多个Sheet，每个Sheet有一个标题行。
-default_config = {
-    'XXXXXX': [{
-        'sheet_name': '明细',
-        'title_line': 0,
-        'col_titles': ['基金名称', '投资者名称', '客户类型', '证件类型', '证件号码', '????']
+default_config = """
+{
+    "XXXXXX": [{
+        "sheet_name": "明细",
+        "title_line": 0,
+        "col_titles": ["基金名称", "投资者名称", "客户类型", "证件类型", "证件号码", "????"]
     }],
-    'YYYYYY': [{
-        'sheet_name': '客户明细J',
-        'title_line': 0,
-        'col_titles': ['????', '客户名称', '客户类型', '证件类型', '证件号码', '持有份额']
-    }],
+    "YYYYYY": [{
+        "sheet_name": "客户明细J",
+        "title_line": 0,
+        "col_titles": ["????", "客户名称", "客户类型", "证件类型", "证件号码", "持有份额"]
+    }]
 }
+"""
+
 # 加载配置文件
 config_map = loadcfgcm.load("file_load_xls.json", default_config)
 

@@ -12,7 +12,8 @@ from common import logcm
 from common import webcm
 
 # 缺省配置及说明
-default_config = {
+default_config = """"
+{
     "site_list": [
         {
             "url": "http://www.baidu.com/",
@@ -21,9 +22,10 @@ default_config = {
         {
             "url": "http://www.163.com/",
             "name": "163.txt"
-        },
+        }
     ]
 }
+"""
 
 # 定义并创建临时目录
 tmp_path = './temp/net/curl/' + datecm.now_time_str()

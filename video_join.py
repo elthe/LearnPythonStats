@@ -9,7 +9,7 @@ from common import loadcfgcm
 from common import videocm
 
 # 缺省配置及说明
-default_config = '''
+default_config = """
 {
     "remark" : "视频组合",
     "src_clips": [
@@ -26,7 +26,7 @@ default_config = '''
     ],
     "target_path": "video_con.mp4"
 }
-'''
+"""
 
 # 加载配置文件
 config_map = loadcfgcm.load("video_join.json", default_config)

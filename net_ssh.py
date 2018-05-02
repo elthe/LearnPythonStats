@@ -9,13 +9,15 @@ from common import loadcfgcm
 from common.netsshcm import SshClient
 
 # 配置
-default_config = {
-    'ip': '10.1.1.101',
-    'port': 22,
-    'username': 'xxxxxxx',
-    'password': 'xxxx',
-    'remoteFile': '/usr/local/logs/xxx.log'
+default_config = """
+{
+    "ip": "10.1.1.101",
+    "port": 22,
+    "username": "xxxxxxx",
+    "password": "xxxx",
+    "remoteFile": "/usr/local/logs/xxx.log"
 }
+"""
 
 # 加载配置文件
 cfg = loadcfgcm.load("net_ssh_tail.json", default_config)

@@ -10,15 +10,18 @@ from common import logcm
 from common import mailcm
 
 # 缺省配置及说明
-default_server = {
+default_server = """
+{
     "host": "smtp.gmail.com",
     "port": 25,
     "user": "test@gmail.com",
     "pwd": "123456",
     "ssl": "True"
 }
+"""
 
-default_mails = {
+default_mails = """
+{
     "mail_list": [
         {
             "from": "test@gmail.com",
@@ -28,6 +31,7 @@ default_mails = {
         }
     ]
 }
+"""
 
 # 加载配置文件
 cfg = loadcfgcm.load("net_smtp_server.json", default_server)

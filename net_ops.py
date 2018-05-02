@@ -11,22 +11,24 @@ from common import diffcm
 from common.netopscm import OpsClient
 
 # 配置
-default_config = {
-    'dev': {
-        'ip': '10.1.1.101',
-        'port': 8080,
-        'sys_name': 'xxx',
-        'sys_env': 'dev',
-        'encoding': 'utf-8',
+default_config = """
+{
+    "dev": {
+        "ip": "10.1.1.101",
+        "port": 8080,
+        "sys_name": "xxx",
+        "sys_env": "dev",
+        "encoding": "utf-8",
     },
-    'test': {
-        'ip': '10.1.1.102',
-        'port': 8080,
-        'sys_name': 'xxx',
-        'sys_env': 'dev',
-        'encoding': 'utf-8',
+    "test": {
+        "ip": "10.1.1.102",
+        "port": 8080,
+        "sys_name": "xxx",
+        "sys_env": "dev",
+        "encoding": "utf-8",
     }
 }
+"""
 
 # 加载配置文件
 cfg = loadcfgcm.load("net_ops_cfg.json", default_config)
@@ -66,4 +68,3 @@ dict_dev4 = ops_dev.load()
 
 # 比较修改前后OPS设置
 diffcm.diff_by_dict(dict_dev3, dict_dev4)
-
