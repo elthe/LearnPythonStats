@@ -6,6 +6,7 @@ Log common api
 日志输出相关共通函数
 """
 
+import json
 from numpy import *
 
 colors_dict = {
@@ -162,12 +163,13 @@ def print_info(obj, blank_first=True, show_header=True, color=None, fg=None, bg=
     print('-' * 100)
 
 
-def print_obj(obj, title, full_show=False, show_header=True, color=None, fg=None, bg=None):
+def print_obj(obj, title, full_show=False, show_json=False, show_header=True, color=None, fg=None, bg=None):
     """
     print输出对象内容，同时输出描述，类型
     @param obj: 输出对象
     @param title: 对象的标题
     @param full_show: 全部显示，默认否
+    @param show_json: 显示为JSON
     @param show_header: 是否显示头部
     @param color: 颜色
     @param fg: 前景色
@@ -194,7 +196,7 @@ def print_obj(obj, title, full_show=False, show_header=True, color=None, fg=None
     # 开始线
     print('-' * 100)
     # 输出对象数据
-    print_obj_data(obj, type_name, full_show)
+    print_obj_data(obj, type_name, full_show, show_json)
 
     # 结束特殊显示
     if has_style:
@@ -222,6 +224,7 @@ def print_obj_prop(obj, type_name):
     """
     根据类型输出属性
     @param obj : 输出对象
+    @param type_name : 类型名
     @:return 无
     """
 
@@ -262,12 +265,13 @@ def print_obj_prop(obj, type_name):
     return None
 
 
-def print_obj_data(obj, type_name, full_show):
+def print_obj_data(obj, type_name, full_show, show_json):
     """
     print数据对象，根据类型进行特殊处理
     @param obj : 对象
     @param type_name : 类型名
     @param full_show : 是否全部显示
+    @param show_json : 显示为JSON
     @:return 无
     """
 
@@ -286,6 +290,16 @@ def print_obj_data(obj, type_name, full_show):
                 return print_list_data(obj.tolist(), 60)
 
     print(obj)
+
+    # 显示JSON
+    if show_json:
+        # 分隔线
+        print('-' * 45, end='')
+        print('Json Dumps', end='')
+        print('-' * 45)
+        obj_json = json.dumps(obj, sort_keys=True, indent=4, separators=(',', ': '),
+                              ensure_ascii=False)
+        print(obj_json)
     return None
 
 
