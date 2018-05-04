@@ -6,6 +6,8 @@ str common api
 字符串相关共通函数
 """
 
+import json
+
 
 def pad_after(input_str, padding_size, padding_char=" "):
     """
@@ -19,3 +21,17 @@ def pad_after(input_str, padding_size, padding_char=" "):
     adding_num = padding_size - len(input_str) % padding_size
     suffix_str = padding_char * adding_num
     return input_str + suffix_str
+
+
+def is_json(input_str):
+    """
+    判断字符串是否JSON格式
+    @param input_str: 输入字符串
+    @return: 是否JSON格式
+    """
+
+    try:
+        json.loads(input_str)
+    except ValueError:
+        return False
+    return True
