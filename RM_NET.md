@@ -24,5 +24,8 @@
 ## [net_ops.py](net_ops.py)
 ### 调用OPS的示例
 
+## [net_browser_chrome.py](net_browser_chrome.py)
+### 网络浏览器模拟的示例
+
 ## [net_test.py](net_test.py)
 ### 网络测试的示例

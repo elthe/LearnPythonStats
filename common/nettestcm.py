@@ -11,7 +11,7 @@ https://sites.google.com/a/chromium.org/chromedriver/getting-started
 
 import json
 
-from common import browsercm
+from common.browsercm import BrowserClient
 from common import cryptcm
 from common import datecm
 from common import filecm
@@ -24,6 +24,7 @@ class NetTestClient:
         # 公私钥字符串
         self.pub_key_str = filecm.read_str('./cache/crypt', 'public.key', "utf-8")
         self.token = None
+        self.client = BrowserClient("Chrome")
 
     def check_result(self, result):
         """
@@ -126,5 +127,5 @@ class NetTestClient:
         logcm.print_obj(web_url, "web_url")
 
         # 打开Browser浏览器
-        content = browsercm.open_by_chrome(web_url, "json")
+        content = self.client.open(web_url, "json")
         return content
