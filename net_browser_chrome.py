@@ -37,3 +37,5 @@ client = BrowserClient(cfg["browser_type"])
 client.open(cfg["url"])
 
 client.exe_actions(cfg["actionList"])
+
+
