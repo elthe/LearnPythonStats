@@ -344,11 +344,12 @@ def move_files(path_list, dest_path):
             shutil.move(src_file, dest_file)
 
 
-def copy_files(path_list, dest_path):
+def copy_files(path_list, dest_path, skeep_exist=False):
     """
     对指定文件列表，复制到指定目录。
     @param path_list: 文件路径列表
     @param dest_path: 目标路径
+    @param skeep_exist: 跳过已经存在的文件
     @return: 无
     """
     # 创建目标路径
@@ -364,6 +365,9 @@ def copy_files(path_list, dest_path):
             src_path, src_name = os.path.split(src_file)
             # 目标路径
             dest_file = os.path.join(dest_path, src_name)
+            # 跳过已经存在的文件
+            if skeep_exist and os.path.exists(dest_file):
+                continue
             # 复制文件
             logcm.print_info("copy %s -> %s" % (src_file, dest_file))
             shutil.copyfile(src_file, dest_file)
