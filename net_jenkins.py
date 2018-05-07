@@ -16,7 +16,7 @@ default_config = """
     "token": "xxxxxxx",
     "jobName": "xxxx",
     "svnUrl": "http://10.xx.x.xxx/svn/xxxxxxx",
-    "taskNo": "xxxxx",
+    "taskNo": "xxxxx"
 }
 """
 
