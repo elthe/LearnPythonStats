@@ -11,3 +11,8 @@
 ## [cv_video_face1.py](cv_video_face1.py)
 ### 摄像头的人脸检测
 
+## [cv_video_from_img.py](cv_video_from_img.py)
+### 图片转视频
+
+## [cv_video_to_img.py](cv_video_to_img.py)
+### 视频转图片
