@@ -4,6 +4,9 @@
 """
 PPT文件转PDF文件 示例
 
+comtypes allows to define, call, and implement custom and dispatch-based COM interfaces in pure Python.
+It works on Windows, 64-bit Windows, and Windows CE.
+
 """
 
 import comtypes.client
