@@ -9,6 +9,7 @@ import cv2
 import numpy as np
 import cv2
 from cv2 import VideoWriter, VideoWriter_fourcc, imread, resize
+from skimage import transform,data,io
 import os
 import math
 from common import loadcfgcm
@@ -22,7 +23,7 @@ default_config = """
 {
     "img_root": "./images/img",
     "max_count" : 10,
-    "fps": 1,
+    "fps": 5,
     "save_path": "./temp/output.avi",
     "width": 1024,
     "height": 683
@@ -92,6 +93,16 @@ for i in range(max_size):
     img = imagecm.flip(temp_path, flip_h=True, flip_v=False)
     videoWriter.write(opencvcm.image_to_array(img))
 
+    # 旋转动画
+    for i in range(10, 180, 10):
+        img2 = io.imread(temp_path)
+        img3 = transform.rotate(img2, i, resize=False)
+        io.imsave(temp_path, img3)
+        videoWriter.write(cv2.imread(temp_path))
+
+    # 缩小动画
+    # for i in range(1.0, 0.1, 0.1):
+    #     transform.rescale(img, 0.1)
 
 # 发布视频
 videoWriter.release()
