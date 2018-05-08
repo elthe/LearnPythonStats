@@ -8,9 +8,29 @@ OpenCV common api
 
 import cv2
 import numpy as np
-
+from PIL import Image
 from common import logcm
 from common import filecm
+
+
+def image_to_array(img):
+    """
+    RGB图片转成BGR数组
+    @:param img 图片
+    @return: BGR数组
+    """
+    array = cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
+    return array
+
+
+def array_to_image(array):
+    """
+    BGR数组转成RGB图片
+    @:param img BGR数组
+    @return: RGB图片
+    """
+    img = Image.fromarray(cv2.cvtColor(array, cv2.COLOR_BGR2RGB))
+    return img
 
 
 def resize_by_max_contours(img, target_width, target_height, min_width=10, min_height=10):

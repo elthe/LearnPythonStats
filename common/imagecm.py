@@ -67,3 +67,29 @@ def resize(img_path, dst_width, dst_height, save_path, keep_ratio=True):
     # 调整图片尺寸, 并保存
     print('dest size is (%d, %d)' % (dst_width, dst_height))
     img.resize((dst_width, dst_height), Image.ANTIALIAS).save(save_path, quality=100)
+
+
+def flip(img_path, flip_h=True, flip_v=False, save_path=None):
+    """
+    把图片左右上下互换并保存。
+    @param img_path: 图片路径
+    @param save_path: 保存路径
+    @param flip_h: 水平互换
+    @param flip_v: 垂直互换
+    @return: 处理后的图片对象
+    """
+
+    # 打开图片
+    img = Image.open(img_path)
+
+    if flip_h:
+        # 左右互换
+        img = img.transpose(Image.FLIP_LEFT_RIGHT)
+    if flip_v:
+        # 上下互换
+        img = img.transpose(Image.FLIP_TOP_BOTTOM)
+    # 保存图片
+    if save_path is not None:
+        img.save(save_path, quality=100)
+
+    return img
