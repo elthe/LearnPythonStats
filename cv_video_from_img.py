@@ -41,7 +41,7 @@ fourcc = VideoWriter_fourcc(*"MJPG")
 videoWriter = cv2.VideoWriter(cfg['save_path'], fourcc, cfg['fps'], (cfg['width'], cfg['height']))
 
 # 取得图片列表
-path_list = filecm.search_files(cfg["img_root"], '.jpeg', r'^[^\.]+')
+path_list = filecm.search_files(cfg["img_root"], '.jpg', r'^[^\.]+')
 # 取得处理数量
 max_size = cfg['max_count']
 if max_size > len(path_list):

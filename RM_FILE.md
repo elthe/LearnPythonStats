@@ -15,3 +15,9 @@
 
 ## [file_xml.py](file_xml.py)
 ### XML文件的写入和读取示例。
+
+## [file_pptx_make.py](file_pptx_make.py)
+### PPT文件的生成示例。
+
+## [file_ppt_to_pdf.py](file_ppt_to_pdf.py)
+### PPT文件->PDF文件示例。
