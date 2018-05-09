@@ -22,8 +22,9 @@ from common import opencvcm
 default_config = """
 {
     "img_root": "./images/img",
+    "img_ext": ".jpeg",
     "max_count" : 10,
-    "fps": 5,
+    "fps": 10,
     "save_path": "./temp/output.avi",
     "width": 1024,
     "height": 683
@@ -42,7 +43,7 @@ fourcc = VideoWriter_fourcc(*"MJPG")
 videoWriter = cv2.VideoWriter(cfg['save_path'], fourcc, cfg['fps'], (cfg['width'], cfg['height']))
 
 # 取得图片列表
-path_list = filecm.search_files(cfg["img_root"], '.jpg', r'^[^\.]+')
+path_list = filecm.search_files(cfg["img_root"], cfg['img_ext'], r'^[^\.]+')
 # 取得处理数量
 max_size = cfg['max_count']
 if max_size > len(path_list):
@@ -53,6 +54,7 @@ for i in range(max_size):
 
     # 调整图片尺寸为视频尺寸
     temp_path = './temp/cv/video-from-img/video_img_%d.jpg' % i
+    temp_path2 = './temp/cv/video-from-img/video_img_%d-2.jpg' % i
     imagecm.resize(path, cfg['width'], cfg['height'], temp_path, keep_ratio=False)
 
     # 写入图片到视频
@@ -68,21 +70,24 @@ for i in range(max_size):
 
     turn_green_hsv = img_hsv.copy()
     # H空间中，绿色比黄色的值高一点，所以给每个像素+15，黄色的树叶就会变绿
-    turn_green_hsv[:, :, 0] = (turn_green_hsv[:, :, 0] + 15) % 180
-    turn_green_img = cv2.cvtColor(turn_green_hsv, cv2.COLOR_HSV2BGR)
-    videoWriter.write(turn_green_img)
+    for i in range(1, 15, 1):
+        turn_green_hsv[:, :, 0] = (turn_green_hsv[:, :, 0] + i) % 180
+        turn_green_img = cv2.cvtColor(turn_green_hsv, cv2.COLOR_HSV2BGR)
+        videoWriter.write(turn_green_img)
 
     # 减小饱和度会让图像损失鲜艳，变得更灰
     colorless_hsv = img_hsv.copy()
-    colorless_hsv[:, :, 1] = 0.5 * colorless_hsv[:, :, 1]
-    colorless_img = cv2.cvtColor(colorless_hsv, cv2.COLOR_HSV2BGR)
-    videoWriter.write(colorless_img)
+    for i in range(10, 1, 1):
+        colorless_hsv[:, :, 1] = (i/10) * colorless_hsv[:, :, 1]
+        colorless_img = cv2.cvtColor(colorless_hsv, cv2.COLOR_HSV2BGR)
+        videoWriter.write(colorless_img)
 
     # 减小明度为原来一半
     darker_hsv = img_hsv.copy()
-    darker_hsv[:, :, 2] = 0.5 * darker_hsv[:, :, 2]
-    darker_img = cv2.cvtColor(darker_hsv, cv2.COLOR_HSV2BGR)
-    videoWriter.write(darker_img)
+    for j in range(10, 1, 1):
+        darker_hsv[:, :, 2] = (i/10) * darker_hsv[:, :, 2]
+        darker_img = cv2.cvtColor(darker_hsv, cv2.COLOR_HSV2BGR)
+        videoWriter.write(darker_img)
 
     # 灰度转换
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -94,11 +99,11 @@ for i in range(max_size):
     videoWriter.write(opencvcm.image_to_array(img))
 
     # 旋转动画
-    for i in range(10, 180, 10):
+    for i in range(12):
         img2 = io.imread(temp_path)
-        img3 = transform.rotate(img2, i, resize=False)
-        io.imsave(temp_path, img3)
-        videoWriter.write(cv2.imread(temp_path))
+        img3 = transform.rotate(img2, (i+1)*30, resize=False)
+        io.imsave(temp_path2, img3)
+        videoWriter.write(cv2.imread(temp_path2))
 
     # 缩小动画
     # for i in range(1.0, 0.1, 0.1):
