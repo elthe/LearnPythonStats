@@ -9,7 +9,8 @@ import cv2
 import numpy as np
 import cv2
 from cv2 import VideoWriter, VideoWriter_fourcc, imread, resize
-from skimage import transform,data,io
+from skimage import transform, data, io
+
 import os
 import math
 from common import loadcfgcm
@@ -78,14 +79,14 @@ for i in range(max_size):
     # 减小饱和度会让图像损失鲜艳，变得更灰
     colorless_hsv = img_hsv.copy()
     for i in range(10, 1, 1):
-        colorless_hsv[:, :, 1] = (i/10) * colorless_hsv[:, :, 1]
+        colorless_hsv[:, :, 1] = (i / 10) * colorless_hsv[:, :, 1]
         colorless_img = cv2.cvtColor(colorless_hsv, cv2.COLOR_HSV2BGR)
         videoWriter.write(colorless_img)
 
     # 减小明度为原来一半
     darker_hsv = img_hsv.copy()
     for j in range(10, 1, 1):
-        darker_hsv[:, :, 2] = (i/10) * darker_hsv[:, :, 2]
+        darker_hsv[:, :, 2] = (i / 10) * darker_hsv[:, :, 2]
         darker_img = cv2.cvtColor(darker_hsv, cv2.COLOR_HSV2BGR)
         videoWriter.write(darker_img)
 
@@ -94,20 +95,22 @@ for i in range(max_size):
     frame2 = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
     videoWriter.write(frame2)
 
-    # 翻转
-    img = imagecm.flip(temp_path, flip_h=True, flip_v=False)
-    videoWriter.write(opencvcm.image_to_array(img))
+    # 放大动画
+    for ratio in range(10, 20, 1):
+        img = imagecm.zoom_in(temp_path, ratio/10)
+        videoWriter.write(opencvcm.image_to_array(img))
+
+    # 缩小动画
+    for ratio in range(10, 1, 1):
+        img = imagecm.zoom_out(temp_path, ratio/10)
+        videoWriter.write(opencvcm.image_to_array(img))
 
     # 旋转动画
     for i in range(12):
         img2 = io.imread(temp_path)
-        img3 = transform.rotate(img2, (i+1)*30, resize=False)
-        io.imsave(temp_path2, img3)
-        videoWriter.write(cv2.imread(temp_path2))
-
-    # 缩小动画
-    # for i in range(1.0, 0.1, 0.1):
-    #     transform.rescale(img, 0.1)
+        img3 = transform.rotate(img2, (i + 1) * 30, resize=False)
+        cv_image = opencvcm.skimage_to_array(img3)
+        videoWriter.write(cv_image)
 
 # 发布视频
 videoWriter.release()

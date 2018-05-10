@@ -9,6 +9,8 @@ OpenCV common api
 import cv2
 import numpy as np
 from PIL import Image
+from skimage import img_as_ubyte
+
 from common import logcm
 from common import filecm
 
@@ -20,6 +22,16 @@ def image_to_array(img):
     @return: BGR数组
     """
     array = cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
+    return array
+
+
+def skimage_to_array(img):
+    """
+    skimage图片转成BGR数组
+    @:param img 图片
+    @return: BGR数组
+    """
+    array = img_as_ubyte(img)
     return array
 
 
