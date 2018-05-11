@@ -20,8 +20,10 @@ Rh = 0.035
 Rf = 0.03
 
 
-class QuantResult:
-    ## #综合类量化指标
+class QuantGeneralResult:
+    """
+    综合类量化指标结果类
+    """
     # 年化总收益率
     Annual_total_return = None
     # 基准年化总收益率
@@ -47,7 +49,11 @@ class QuantResult:
     # 收益率序列的峰度
     Kurt = None
 
-    ## 风险类量化指标
+
+class QuantRiskResult:
+    """
+    风险类量化指标结果类
+    """
     # 回测期间的收益波动率
     volatility = None
     # 最大回撤
@@ -67,6 +73,8 @@ class QuantResult:
     # 最大连续下跌天数
     Max_consecutive_down_days = None
     # 最大连续涨幅
+    Max_consecutive_up_peak = None
+    # 最大连续跌幅
     Max_consecutive_down_peak = None
     # 盈利期占比
     profit_period_ratio = None
@@ -101,64 +109,78 @@ class QuantCalculator:
         计算量化指标
         :return: 计算结果
         """
-        # 计算结果
-        self.result = QuantResult()
-        ## 综合类量化指标
+        # 综合类量化指标计算结果
+        gen_result = QuantGeneralResult()
         # 年化总收益率
-        result.Annual_total_return = formula.Annual_total_return(self.date_line, self.return_line)
+        gen_result.Annual_total_return = formula.Annual_total_return(self.date_line, self.return_line)
         # 基准年化收益
-        result.Annual_total_index_return = formula.Annual_total_return(self.date_line, self.index_return_line)
+        gen_result.Annual_total_index_return = formula.Annual_total_return(self.date_line, self.index_return_line)
         # 年化总风险
-        result.Annual_total_risk = formula.Annual_total_risk(self.date_line, self.return_line)
+        gen_result.Annual_total_risk = formula.Annual_total_risk(self.date_line, self.return_line)
         # 主动年化收益率（Aar） = 年化总收益率 – 基准年化总收益率
-        result.Annual_active_return = result.Annual_total_return - result.Annual_total_index_return
+        gen_result.Annual_active_return = gen_result.Annual_total_return - gen_result.Annual_total_index_return
         # 年化主动风险
-        result.Annual_active_risk = formula.Annual_active_risk(self.date_line, self.return_line, self.index_return_line)
+        gen_result.Annual_active_risk = formula.Annual_active_risk(self.date_line, self.return_line,
+                                                                   self.index_return_line)
         # 累计收益率
-        result.cumulative_return = formula.cumulative_return(self.date_line, self.return_line)
+        gen_result.cumulative_return = formula.cumulative_return(self.date_line, self.return_line)
         # alpha, beta
-        result.alpha, result.beta = formula.alphabetalinearRegression(self.return_line, self.index_return_line)
+        gen_result.alpha, gen_result.beta = formula.alphabetalinearRegression(self.return_line, self.index_return_line)
         # 残差余项风险
-        result.residual_term = formula.residual_term(self.return_line, self.index_return_line)
+        gen_result.residual_term = formula.residual_term(self.return_line, self.index_return_line)
         # 信息比率 = 主动收益 / 主动风险
-        result.IR = self.Annual_active_return / self.Annual_active_risk
+        gen_result.IR = self.Annual_active_return / self.Annual_active_risk
         # 收益率序列的偏度
-        result.Skew = formula.Skew(self.return_line)
+        gen_result.Skew = formula.Skew(self.return_line)
         # 收益率序列的峰度
-        result.Kurt = formula.Kurt(self.return_line)
+        gen_result.Kurt = formula.Kurt(self.return_line)
 
-        ## 风险类量化指标
+        # 风险类量化指标计算结果
+        risk_result = QuantRiskResult()
         # 回测期间的收益波动率
-        result.volatility = formula.volatility(self.date_line, self.return_line)
+        risk_result.volatility = formula.volatility(self.date_line, self.return_line)
+
         # 最大回撤
-        result.Max_Drawdown = None
+        maxdd, start_date, end_date, recover_period = formula.Max_Drawdown_withDate(self.date_line, self.return_line)
+        risk_result.Max_Drawdown = maxdd
         # 修复期数
-        result.Max_Drawdown_recover_period = None
+        risk_result.Max_Drawdown_recover_period = recover_period
+
         # 夏普比例
-        result.SharpRatio = None
+        risk_result.SharpRatio = formula.SharpRatio(self.date_line, self.return_line)
         # 日收益率的索提诺序列
-        result.SortinoRatio = None
+        risk_result.SortinoRatio = formula.SortinoRatio(self.date_line, self.return_line)
         # 下行风险概率
-        result.DownsideRisk_LMPN = None
+        risk_result.DownsideRisk_LMPN = formula.LMPN(self.date_line, self.return_line)
         # VAR最大在险价值
-        result.varHistory = None
+        risk_result.varHistory = formula.varHistory(self.capital_line, a=0.95)
+
         # 最大连续上涨天数
-        result.Max_consecutive_up_days = None
+        max_successive_up, max_successive_down = formula.Max_consecutive_up_days(self.date_line, self.return_line)
+        risk_result.Max_consecutive_up_days = max_successive_up
         # 最大连续下跌天数
-        result.Max_consecutive_down_days = None
+        risk_result.Max_consecutive_down_days = max_successive_down
+
         # 最大连续涨幅
-        result.Max_consecutive_down_peak = None
-        # 盈利期占比
-        result.profit_period_ratio = None
-        # 亏损期占比
-        result.loss_period_ratio = None
+        max_concecutive_up, max_concecutive_down = formula.Max_consecutive_up_peak(self.date_line, self.return_line)
+        risk_result.Max_consecutive_up_peak = max_concecutive_up
+        # 最大连续跌幅
+        risk_result.Max_consecutive_down_peak = max_concecutive_down
+
+        # 计算盈利亏损期数占比
+        profit_period_days, profit_period_ratio, loss_period_days, loss_period_ratio = formula.profit_period(
+            self.date_line, self.return_line)
         # 盈利天数
-        result.profit_period_days = None
+        risk_result.profit_period_days = profit_period_days
+        # 盈利期占比
+        risk_result.profit_period_ratio = profit_period_ratio
         # 亏损期天数
-        result.loss_period_days = None
+        risk_result.loss_period_days = loss_period_days
+        # 亏损期占比
+        risk_result.loss_period_ratio = loss_period_ratio
+
+        return (gen_result, risk_result)
 
 
 if __name__ == '__main__':
-    result = QuantResult()
-    result.Annual_active_return = 123
-    print(result.Annual_active_return)
+    pass
