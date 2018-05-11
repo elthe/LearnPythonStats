@@ -12,6 +12,7 @@ import numpy as np
 
 from common import logcm
 from common import datecm
+from common import imfiltercm
 from PIL import Image
 from skimage import img_as_ubyte, img_as_float, io, transform
 
@@ -36,23 +37,80 @@ class ImageType:
     IMG_GRAY = 'GRAY'
 
 
+class VideoActionOutput:
+    def __init__(self, im_output, img_path, img_no):
+        """
+        视频动画输出类
+        :param im_output: 视频图片输出
+        :param img_path: 原始图片路径
+        :param img_no: 原始图片编号
+        """
+        self.output = im_output
+        self.img_path = img_path
+        self.img_no = img_no
+        self.im_bgr = get_bgr_im(img_path, ImageType.IMG_FILE)
+
+    def out_action(self, action_type, val_list, val_ratio=1, **kwargs):
+        """
+        把指定动画写入视频
+        """
+        self.output.clear()
+        for val in val_list:
+            # 输出图片类型
+            out_img_type = ImageType.IMG_BGR
+            # 当前值
+            value = val * val_ratio
+
+            # 色调动画
+            if action_type == "add_hue":
+                img = add_img_HSV(self.im_bgr, add_h=value)
+            # 饱和度动画
+            elif action_type == "change_saturation":
+                img = imfiltercm.change_saturation(self.im_bgr, value)
+            # 饱和度动画
+            elif action_type == "change_darker":
+                img = imfiltercm.change_darker(self.im_bgr, value)
+            # 放大动画
+            elif action_type == "zoom_in":
+                img = zoom_in(self.img_path, value)
+                out_img_type = ImageType.IMG_PIL
+            # 缩小动画
+            elif action_type == "zoom_out":
+                img = zoom_out(self.img_path, value)
+                out_img_type = ImageType.IMG_PIL
+            # 旋转动画
+            elif action_type == "rotate":
+                img = rotate(self.img_path, value, resize=False)
+                out_img_type = ImageType.IMG_SK
+            # 水平移动动画
+            elif action_type == "move_h":
+                img = move(self.img_path, move_h=value)
+                out_img_type = ImageType.IMG_PIL
+            # 竖直移动动画
+            elif action_type == "move_v":
+                img = move(self.img_path, move_v=value)
+                out_img_type = ImageType.IMG_PIL
+
+            # 加入图片
+            self.output.out_im(img, out_img_type, action_type=action_type, img_no=self.img_no)
+
+
 class VideoImageOutput:
     def __init__(self, video_writer):
         """
-        根据DB类型和设置信息，取得DB连接
-        @param video_writer: 视频输出器
-        @return: 无
+        视频图片输出类
         """
         self.video = video_writer
         self.count = 0
         self.last_time = datecm.get_now_time("mini")
 
-    def write(self, img, img_type=ImageType.IMG_BGR):
+    def out_im(self, img, img_type=ImageType.IMG_BGR, action_type="", img_no=1):
         """
         把图片写入视频。
         :param video_writer: 视频输出器
         :param img: 原始图片或路径
         :param img_type 图片类型（ImageType）
+        :param action_type 动作类型
         @return: 无
         """
         # 转化成BGR图片
@@ -67,7 +125,9 @@ class VideoImageOutput:
         cost_time = now_time - self.last_time
         self.last_time = now_time
         # 日志
-        logcm.print_info("No.%d image(%s) write ok in %dms !" % (self.count, img_type, cost_time), show_header=False)
+        logcm.print_info(
+            "Img-%d : %s No.%d image(%s) write ok in %dms !" % (img_no, action_type, self.count, img_type, cost_time),
+            show_header=False)
 
     def clear(self):
         """
@@ -180,7 +240,7 @@ def im_convert(src_img, type_from=ImageType.IMG_FILE, type_to=ImageType.IMG_BGR,
         cv2.imwrite(save_path)
 
 
-def add_img_HSV(img, img_type, add_h=0, add_s=0, add_v=0,
+def add_img_HSV(img, img_type=ImageType.IMG_BGR, add_h=0, add_s=0, add_v=0,
                 ratio_h=1.0, ratio_s=1.0, ratio_v=1.0, dst_type=None, save_path=None):
     """
     修改图片的HSV值。
