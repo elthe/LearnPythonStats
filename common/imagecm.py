@@ -8,6 +8,7 @@ Image common api
 
 import math
 from PIL import Image
+from common import logcm
 
 
 def get_im(img):
@@ -63,7 +64,7 @@ def resize(img, dst_width, dst_height, save_path=None, keep_ratio=True):
     (width, height) = im.size
     # 如果目标大小
     if dst_width < 0 or dst_height < 0:
-        print('dest with or height is < 0!')
+        logcm.print_info('dest with or height is < 0!', fg='red')
         return im
 
     if keep_ratio:
@@ -78,7 +79,7 @@ def resize(img, dst_width, dst_height, save_path=None, keep_ratio=True):
             dst_width = round(width / ratio_height)
 
     # 调整图片尺寸
-    print('dest size is (%d, %d)' % (dst_width, dst_height))
+    # logcm.print_info('dest size is (%d, %d)' % (dst_width, dst_height))
     im_resize = im.resize((dst_width, dst_height), Image.ANTIALIAS)
     # 保存图片
     if save_path is not None:
@@ -139,6 +140,11 @@ def paste_center(img_bottom, img_top):
     @param img_top: 顶层图片
     @return: 无
     """
+    if img_bottom is None:
+        logcm.print_info("Bottom image is None!", fg='red')
+    if img_top is None:
+        logcm.print_info("Top image is None!", fg='red')
+
     top_width, top_height = img_top.size
     bottom_width, bottom_height = img_bottom.size
     # 计算居中粘贴时，左上角坐标
@@ -156,8 +162,11 @@ def resize_canvas(img, canvas_width, canvas_height, back_val=255, save_path=None
     @param canvas_height: 顶层图片
     @param back_val: 背景色值（0-255）
     @param save_path: 保存路径（可选）
-    @return: 无
+    @return: 重新设置画布后的图片
     """
+
+    if canvas_width < 0 or canvas_width < 0:
+        logcm.print_info('Canvas with or height is < 0!', fg='red')
     # 取得图片
     im = get_im(img)
     # 生成新图片
@@ -178,6 +187,8 @@ def zoom_in(img, ratio=1.1, save_path=None):
     @param save_path: 保存路径（可选）
     @return: 放大后的图片
     """
+    if ratio <= 1.0:
+        logcm.print_info('Zoom in ratio must > 1.0!', fg='red')
     # 取得图片
     im = get_im(img)
     # 图片原始尺寸
@@ -185,7 +196,7 @@ def zoom_in(img, ratio=1.1, save_path=None):
     # 放大图片
     new_width = int(width * ratio)
     new_height = int(height * ratio)
-    resize(im, new_width, new_height)
+    im = resize(im, new_width, new_height)
     # 计算居中剪切时，左上角坐标
     x = int(math.floor((new_width - width) / 2))
     y = int(math.floor((new_height - height) / 2))
@@ -205,6 +216,8 @@ def zoom_out(img, ratio=0.9, save_path=None):
     @param save_path: 保存路径（可选）
     @return: 放大后的图片
     """
+    if ratio >= 1.0:
+        logcm.print_info('Zoom out ratio must < 1.0!', fg='red')
     # 取得图片
     im = get_im(img)
     # 图片原始尺寸
@@ -212,7 +225,7 @@ def zoom_out(img, ratio=0.9, save_path=None):
     # 缩小图片
     new_width = int(width * ratio)
     new_height = int(height * ratio)
-    resize(im, new_width, new_height)
+    im = resize(im, new_width, new_height)
     # 重设画布大小
     im_zoom = resize_canvas(im, width, height, 0)
 
@@ -220,3 +233,40 @@ def zoom_out(img, ratio=0.9, save_path=None):
     if save_path is not None:
         im_zoom.save(save_path)
     return im_zoom
+
+
+def move(img, move_h=0, move_v=0, back_val=255, save_path=None):
+    """
+    对原始图片进行移动后画布仍为原始大小
+    @param img: 原始图片或路径
+    @param move_h: 水平移动值
+    @param move_v: 竖直移动值
+    @param back_val: 背景色值（0-255）
+    @param save_path: 保存路径（可选）
+    @return: 移动后的图片
+    """
+    if img is None:
+        logcm.print_info('Image is None!', fg='red')
+    # 取得图片
+    im = get_im(img)
+    # 图片原始尺寸
+    (width, height) = im.size
+    # 图片移动量范围限制
+    if move_h > width:
+        move_h = width
+    if move_h + width < 0:
+        move_h = -1 * width
+    if move_v > height:
+        move_v = height
+    if move_v + height < 0:
+        move_v = -1 * height
+
+    # 生成新图片
+    new_image = empty_img(im.mode, width, height, back_val)
+    # 粘贴图片到移动后的位置
+    new_image.paste(im, (move_h, move_v, move_h + width, move_v + height))
+
+    # 保存图片
+    if save_path is not None:
+        new_image.save(save_path)
+    return new_image

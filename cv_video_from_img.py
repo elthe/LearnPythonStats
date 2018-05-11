@@ -18,6 +18,7 @@ from common import filecm
 from common import imagecm
 from common import logcm
 from common import opencvcm
+from common.opencvcm import ImageType
 
 # 配置
 default_config = """
@@ -52,65 +53,56 @@ if max_size > len(path_list):
 
 for i in range(max_size):
     path = path_list[i]
+    logcm.print_info("processing photo %d/%d : %s" % (i+1, max_size, path))
 
     # 调整图片尺寸为视频尺寸
     temp_path = './temp/cv/video-from-img/video_img_%d.jpg' % i
-    temp_path2 = './temp/cv/video-from-img/video_img_%d-2.jpg' % i
     imagecm.resize(path, cfg['width'], cfg['height'], temp_path, keep_ratio=False)
 
     # 写入图片到视频
     frame = cv2.imread(temp_path)
     videoWriter.write(frame)
 
-    # 通过cv2.cvtColor把图像从BGR转换到HSV
-    img_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    # 色调动画
+    for i in range(1, 5, 1):
+        img = opencvcm.add_img_HSV(frame, ImageType.IMG_BGR, add_h=i)
+        videoWriter.write(img)
 
-    # HSV分别是色调（Hue），饱和度（Saturation）和明度（Value）。
-    # 在HSV空间中进行调节就避免了直接在RGB空间中调节是还需要考虑三个通道的相关性。
-    # OpenCV中H的取值是[0, 180)，其他两个通道的取值都是[0, 256)
-
-    turn_green_hsv = img_hsv.copy()
-    # H空间中，绿色比黄色的值高一点，所以给每个像素+15，黄色的树叶就会变绿
-    for i in range(1, 15, 1):
-        turn_green_hsv[:, :, 0] = (turn_green_hsv[:, :, 0] + i) % 180
-        turn_green_img = cv2.cvtColor(turn_green_hsv, cv2.COLOR_HSV2BGR)
-        videoWriter.write(turn_green_img)
-
-    # 减小饱和度会让图像损失鲜艳，变得更灰
-    colorless_hsv = img_hsv.copy()
-    for i in range(10, 1, 1):
-        colorless_hsv[:, :, 1] = (i / 10) * colorless_hsv[:, :, 1]
-        colorless_img = cv2.cvtColor(colorless_hsv, cv2.COLOR_HSV2BGR)
-        videoWriter.write(colorless_img)
-
-    # 减小明度为原来一半
-    darker_hsv = img_hsv.copy()
-    for j in range(10, 1, 1):
-        darker_hsv[:, :, 2] = (i / 10) * darker_hsv[:, :, 2]
-        darker_img = cv2.cvtColor(darker_hsv, cv2.COLOR_HSV2BGR)
-        videoWriter.write(darker_img)
-
-    # 灰度转换
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    frame2 = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
-    videoWriter.write(frame2)
+    # 饱和度动画
+    for i in range(5, 11, 1):
+        img = opencvcm.add_img_HSV(frame, ImageType.IMG_BGR, ratio_s=i / 10)
+        videoWriter.write(img)
+    # 明度动画
+    for i in range(70, 100, 10):
+        img = opencvcm.add_img_HSV(frame, ImageType.IMG_BGR, ratio_v=i / 100)
+        videoWriter.write(img)
 
     # 放大动画
-    for ratio in range(10, 20, 1):
-        img = imagecm.zoom_in(temp_path, ratio/10)
-        videoWriter.write(opencvcm.image_to_array(img))
+    for ratio in range(11, 20, 1):
+        img = imagecm.zoom_in(temp_path, ratio / 10)
+        videoWriter.write(opencvcm.image_convert(img, ImageType.IMG_PIL))
 
     # 缩小动画
-    for ratio in range(10, 1, 1):
-        img = imagecm.zoom_out(temp_path, ratio/10)
-        videoWriter.write(opencvcm.image_to_array(img))
+    for ratio in range(9, 1, -1):
+        img = imagecm.zoom_out(temp_path, ratio / 10)
+        videoWriter.write(opencvcm.image_convert(img, ImageType.IMG_PIL))
 
     # 旋转动画
     for i in range(12):
         img2 = io.imread(temp_path)
         img3 = transform.rotate(img2, (i + 1) * 30, resize=False)
-        cv_image = opencvcm.skimage_to_array(img3)
+        cv_image = opencvcm.image_convert(img3, ImageType.IMG_SK)
         videoWriter.write(cv_image)
+
+    # 移动图片
+    for i in range(-1*cfg['width'], cfg['width'], 50):
+        img = imagecm.move(temp_path, move_h=i)
+        videoWriter.write(opencvcm.image_convert(img, ImageType.IMG_PIL))
+
+    # 移动图片
+    for i in range(-1 * cfg['height'], cfg['height'], 50):
+        img = imagecm.move(temp_path, move_v=i)
+        videoWriter.write(opencvcm.image_convert(img, ImageType.IMG_PIL))
 
 # 发布视频
 videoWriter.release()
