@@ -9,9 +9,9 @@ OpenCV common api
 
 import cv2
 import numpy as np
+
 from PIL import Image
 from skimage import img_as_ubyte, img_as_float
-
 from common import logcm
 from common import filecm
 
@@ -152,6 +152,8 @@ def add_img_HSV(img, img_type, add_h=0, add_s=0, add_v=0,
     im_hsv_dst = im_hsv.copy()
 
     # 色调处理
+    img_hsv[:, :, 2] = np.log(img_hsv[:, :, 2] / 255 * (value - 1) + 1) / np.log(value + 1) * 255
+
     im_hsv_dst[:, :, 0] = (im_hsv_dst[:, :, 0] + add_h) * ratio_h
     # 饱和度处理
     im_hsv_dst[:, :, 1] = (im_hsv_dst[:, :, 1] + add_s) * ratio_s
