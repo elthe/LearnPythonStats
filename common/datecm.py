@@ -7,6 +7,8 @@ Date common api
 """
 
 import datetime
+import time
+
 from matplotlib.pylab import date2num
 
 
@@ -80,3 +82,22 @@ def get_now_num():
 
     now_time = datetime.datetime.now()
     return date2num(now_time)
+
+
+def get_now_time(time_type="second"):
+    """
+    取得当前时间的时间戳数值。
+    @param time_type: 时间类型(origin 原始，second 秒，mini 毫秒)
+    @return: 时间数值
+    """
+
+    t = time.time()
+    if time_type == "origin":
+        # 原始时间数据
+        return t
+    elif time_type == "second":
+        # 秒级时间戳
+        return int(t)
+    elif time_type == "mini":
+        # 毫秒级时间戳
+        return int(round(t * 1000))

@@ -11,6 +11,7 @@ import math
 import numpy as np
 
 from common import logcm
+from common import datecm
 from PIL import Image
 from skimage import img_as_ubyte, img_as_float, io, transform
 
@@ -33,6 +34,48 @@ class ImageType:
     IMG_HLS = 'HLS'
     # opencv的灰度图片
     IMG_GRAY = 'GRAY'
+
+
+class VideoImageOutput:
+    def __init__(self, video_writer):
+        """
+        根据DB类型和设置信息，取得DB连接
+        @param video_writer: 视频输出器
+        @return: 无
+        """
+        self.video = video_writer
+        self.count = 0
+        self.last_time = datecm.get_now_time("mini")
+
+    def write(self, img, img_type=ImageType.IMG_BGR):
+        """
+        把图片写入视频。
+        :param video_writer: 视频输出器
+        :param img: 原始图片或路径
+        :param img_type 图片类型（ImageType）
+        @return: 无
+        """
+        # 转化成BGR图片
+        im_bgr = get_bgr_im(img, img_type)
+        # 写入视频
+        self.video.write(im_bgr)
+        # 计数
+        self.count += 1
+        # 当前时间
+        now_time = datecm.get_now_time("mini")
+        # 花费时间
+        cost_time = now_time - self.last_time
+        self.last_time = now_time
+        # 日志
+        logcm.print_info("No.%d image(%s) write ok in %dms !" % (self.count, img_type, cost_time), show_header=False)
+
+    def clear(self):
+        """
+        清空计数器。
+        @return: 无
+        """
+        self.count = 0
+        self.last_time = datecm.get_now_time("mini")
 
 
 def get_bgr_im(src_img, img_type=ImageType.IMG_BGR):
