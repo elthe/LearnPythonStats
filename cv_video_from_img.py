@@ -6,19 +6,13 @@
 """
 
 import cv2
-import numpy as np
-import cv2
-from cv2 import VideoWriter, VideoWriter_fourcc, imread, resize
-from skimage import transform, data, io
 
-import os
-import math
-from common import loadcfgcm
 from common import filecm
 from common import imagecm
+from common import imfiltercm
+from common import loadcfgcm
 from common import logcm
-from common import opencvcm
-from common.opencvcm import ImageType
+from common.imagecm import ImageType
 
 # 配置
 default_config = """
@@ -41,7 +35,7 @@ filecm.makedir(cfg['save_path'], True)
 filecm.makedir('./temp/cv/video-from-img')
 
 # 新建视频写入类
-fourcc = VideoWriter_fourcc(*"MJPG")
+fourcc = cv2.VideoWriter_fourcc(*"MJPG")
 videoWriter = cv2.VideoWriter(cfg['save_path'], fourcc, cfg['fps'], (cfg['width'], cfg['height']))
 
 # 取得图片列表
@@ -53,7 +47,7 @@ if max_size > len(path_list):
 
 for i in range(max_size):
     path = path_list[i]
-    logcm.print_info("processing photo %d/%d : %s" % (i+1, max_size, path))
+    logcm.print_info("processing photo %d/%d : %s" % (i + 1, max_size, path))
 
     # 调整图片尺寸为视频尺寸
     temp_path = './temp/cv/video-from-img/video_img_%d.jpg' % i
@@ -65,44 +59,62 @@ for i in range(max_size):
 
     # 色调动画
     for i in range(1, 5, 1):
-        img = opencvcm.add_img_HSV(frame, ImageType.IMG_BGR, add_h=i)
+        img = imagecm.add_img_HSV(frame, ImageType.IMG_BGR, add_h=i)
         videoWriter.write(img)
 
     # 饱和度动画
-    for i in range(5, 11, 1):
-        img = opencvcm.add_img_HSV(frame, ImageType.IMG_BGR, ratio_s=i / 10)
+    for i in range(-50, 50, 10):
+        img = imfiltercm.change_saturation(frame, i)
         videoWriter.write(img)
+
     # 明度动画
-    for i in range(70, 100, 10):
-        img = opencvcm.add_img_HSV(frame, ImageType.IMG_BGR, ratio_v=i / 100)
+    for i in range(-100, 100, 20):
+        img = imfiltercm.change_saturation(frame, i)
         videoWriter.write(img)
 
     # 放大动画
     for ratio in range(11, 20, 1):
         img = imagecm.zoom_in(temp_path, ratio / 10)
-        videoWriter.write(opencvcm.image_convert(img, ImageType.IMG_PIL))
+        videoWriter.write(imagecm.im_convert(img, ImageType.IMG_PIL))
 
     # 缩小动画
     for ratio in range(9, 1, -1):
         img = imagecm.zoom_out(temp_path, ratio / 10)
-        videoWriter.write(opencvcm.image_convert(img, ImageType.IMG_PIL))
+        videoWriter.write(imagecm.im_convert(img, ImageType.IMG_PIL))
 
     # 旋转动画
     for i in range(12):
-        img2 = io.imread(temp_path)
-        img3 = transform.rotate(img2, (i + 1) * 30, resize=False)
-        cv_image = opencvcm.image_convert(img3, ImageType.IMG_SK)
-        videoWriter.write(cv_image)
+        im_sk = imagecm.rotate(temp_path, (i + 1) * 30, resize=False)
+        img = imagecm.im_convert(im_sk, ImageType.IMG_SK)
+        videoWriter.write(img)
 
     # 移动图片
-    for i in range(-1*cfg['width'], cfg['width'], 50):
+    for i in range(-1 * cfg['width'], cfg['width'], 100):
         img = imagecm.move(temp_path, move_h=i)
-        videoWriter.write(opencvcm.image_convert(img, ImageType.IMG_PIL))
+        videoWriter.write(imagecm.im_convert(img, ImageType.IMG_PIL))
 
     # 移动图片
-    for i in range(-1 * cfg['height'], cfg['height'], 50):
+    for i in range(-1 * cfg['height'], cfg['height'], 100):
         img = imagecm.move(temp_path, move_v=i)
-        videoWriter.write(opencvcm.image_convert(img, ImageType.IMG_PIL))
+        videoWriter.write(imagecm.im_convert(img, ImageType.IMG_PIL))
+
+    # 标记人脸
+    faces = imfiltercm.detect_face(frame)
+    img_face = imfiltercm.mark_face(frame, faces, border=2)
+    for i in range(5):
+        videoWriter.write(img_face)
+
+    # 人脸美白动画
+    for i in range(0, 50, 5):
+        img = imfiltercm.whitening_face(img_face, faces, i)
+        videoWriter.write(img)
+
+    # 皮肤
+    im_skin = imfiltercm.detect_skin(frame)
+    # 皮肤美白动画
+    for i in range(0, 50, 5):
+        img = imfiltercm.whitening_skin(frame, im_skin, i)
+        videoWriter.write(img)
 
 # 发布视频
 videoWriter.release()

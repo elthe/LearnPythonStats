@@ -6,9 +6,178 @@ Image common api
 图片相关共通函数
 """
 
+import cv2
 import math
-from PIL import Image
+import numpy as np
+
 from common import logcm
+from PIL import Image
+from skimage import img_as_ubyte, img_as_float, io, transform
+
+
+class ImageType:
+    """
+    图片类型定义
+    """
+    # 图片文件路径
+    IMG_FILE = 'FILE'
+    # PIL的图片对象
+    IMG_PIL = 'PIL'
+    # skimage的图片对象
+    IMG_SK = 'SK'
+    # opencv的BGR图片对象
+    IMG_BGR = 'BGR'
+    # opencv的HSV图片对象
+    IMG_HSV = 'HSV'
+    # opencv的HLS图片对象
+    IMG_HLS = 'HLS'
+    # opencv的灰度图片
+    IMG_GRAY = 'GRAY'
+
+
+def get_bgr_im(src_img, img_type=ImageType.IMG_BGR):
+    """
+    根据指定图片类型加载图片为BGR图片
+    @:param src_img 原始图片对象或路径
+    @:param img_type 图片类型（ImageType）
+    @return: BGR图片
+    """
+    if src_img is None:
+        logcm.print_info('Src Image is None!', fg='red')
+
+    im_bgr = None
+
+    # 图片文件
+    if img_type == ImageType.IMG_FILE:
+        im_bgr = cv2.imread(src_img)
+
+    # PIL图片
+    if img_type == ImageType.IMG_PIL:
+        im_bgr = cv2.cvtColor(np.asarray(src_img), cv2.COLOR_RGB2BGR)
+
+    # SK图片
+    if img_type == ImageType.IMG_SK:
+        im_rgb = img_as_ubyte(src_img)
+        im_bgr = cv2.cvtColor(im_rgb, cv2.COLOR_RGB2BGR)
+
+    # HSV图片
+    if img_type == ImageType.IMG_HSV:
+        im_bgr = cv2.cvtColor(src_img, cv2.COLOR_HSV2BGR)
+
+    # HLS图片
+    if img_type == ImageType.IMG_HLS:
+        im_bgr = cv2.cvtColor(src_img, cv2.COLOR_HLS2BGR)
+
+    # 灰度图片
+    if img_type == ImageType.IMG_GRAY:
+        im_bgr = cv2.cvtColor(src_img, cv2.COLOR_GRAY2BGR)
+
+    # BGR图片
+    if img_type == ImageType.IMG_BGR:
+        im_bgr = src_img
+
+    return im_bgr
+
+
+def im_convert(src_img, type_from=ImageType.IMG_FILE, type_to=ImageType.IMG_BGR, save_path=None):
+    """
+    图片类型转换方法
+    @:param src_img 原始图片对象或路径
+    @:param type_from 转换前类型（ImageType）
+    @:param type_to 转换后类型（ImageType）
+    @:param save_path: 保存路径（转换为文件类型时必须）
+    @return: 转换后的图片
+    """
+    if src_img is None:
+        logcm.print_info('Src Image is None!', fg='red')
+        return None
+
+    # 如果类型相同直接返回
+    if type_from == type_to:
+        return src_img
+
+    # 先把图片专为成BGR图片
+    im_bgr = get_bgr_im(src_img, type_from)
+    if im_bgr is None:
+        logcm.print_info('BGR Image Loading Fail!', fg='red')
+        return None
+
+    # BGR图片
+    if type_to == ImageType.IMG_BGR:
+        return im_bgr
+
+    # PIL图片
+    if type_to == ImageType.IMG_PIL:
+        im_rgb = Image.fromarray(cv2.cvtColor(im_bgr, cv2.COLOR_BGR2RGB))
+        return im_rgb
+
+    # SK图片
+    if type_to == ImageType.IMG_SK:
+        im_rgb = cv2.cvtColor(im_bgr, cv2.COLOR_BGR2RGB)
+        im_sk = img_as_float(im_rgb).astype(np.float64)
+        return im_sk
+
+    # HSV图片
+    if type_to == ImageType.IMG_HSV:
+        im_hsv = cv2.cvtColor(src_img, cv2.COLOR_BGR2HSV)
+        return im_hsv
+
+    # HLS图片
+    if type_to == ImageType.IMG_HLS:
+        im_hls = cv2.cvtColor(src_img, cv2.COLOR_BGR2HLS)
+        return im_hls
+
+    # 灰度图片
+    if type_to == ImageType.IMG_GRAY:
+        im_gray = cv2.cvtColor(src_img, cv2.COLOR_BGR2GRAY)
+        return im_gray
+
+    # 图片文件
+    if type_to == ImageType.IMG_FILE:
+        cv2.imwrite(save_path)
+
+
+def add_img_HSV(img, img_type, add_h=0, add_s=0, add_v=0,
+                ratio_h=1.0, ratio_s=1.0, ratio_v=1.0, dst_type=None, save_path=None):
+    """
+    修改图片的HSV值。
+    HSV分别是色调（Hue），饱和度（Saturation）和明度（Value）。
+    在HSV空间中进行调节就避免了直接在RGB空间中调节是还需要考虑三个通道的相关性。
+    @:param img 原始图片对象或路径
+    @:param img_type 图片类型（ImageType）
+    @:param add_h 色调增加量（注意：取值范围是[0, 180)）
+    @:param add_s 饱和度增加量（注意：取值范围是[0, 256)）
+    @:param add_v 明度增加量（注意：取值范围是[0, 256)）
+    @:param ratio_h 色调变化比例（注意：取值范围是[0, 180)）
+    @:param ratio_s 饱和度变化比例（注意：取值范围是[0, 256)）
+    @:param ratio_v 明度变化比例（注意：取值范围是[0, 256)）
+    @:param dst_type 目标图片类型（ImageType），为空则保持类型不变
+    @:param save_path: 保存路径（转换为文件类型时必须）
+    @return: 处理后的图片
+    """
+
+    # 取得HSV图片
+    im_hsv = im_convert(img, img_type, ImageType.IMG_HSV)
+    # 复制HSV
+    im_hsv_dst = im_hsv.copy()
+
+    # 色调处理
+    im_hsv_dst[:, :, 0] = (im_hsv_dst[:, :, 0] + add_h) * ratio_h
+    # 饱和度处理
+    im_hsv_dst[:, :, 1] = (im_hsv_dst[:, :, 1] + add_s) * ratio_s
+    # 明度处理
+    im_hsv_dst[:, :, 2] = (im_hsv_dst[:, :, 2] + add_v) * ratio_v
+
+    # 目标类型默认为原始类型
+    if dst_type is None:
+        dst_type = img_type
+    # 图片保存
+    if save_path is not None:
+        im_convert(im_hsv_dst, ImageType.IMG_HSV, ImageType.IMG_FILE, save_path)
+
+    # 目标类型转换
+    img_dst = im_convert(im_hsv_dst, ImageType.IMG_HSV, img_type)
+    return img_dst
 
 
 def get_im(img):
@@ -270,3 +439,29 @@ def move(img, move_h=0, move_v=0, back_val=255, save_path=None):
     if save_path is not None:
         new_image.save(save_path)
     return new_image
+
+
+def get_sk_im(img):
+    """
+    根据图片文件路径或图片
+    @param img: 图片或路径
+    @return: 图片对象
+    """
+    # 取得图片
+    im_sk = io.imread(img) if isinstance(img, str) else img
+    return im_sk
+
+
+def rotate(img, angle, resize=False, save_path=None):
+    """
+    对原始图片进行旋转后。
+    @param img: 原始SK图片或路径
+    @param angle: 逆时针角度
+    @param resize: 是否变更原来尺寸
+    @param save_path: 保存路径（可选）
+    @return: 旋转后的SK图片
+    """
+
+    im_sk = get_sk_im(img)
+    im_sk_new = transform.rotate(im_sk, angle, resize=resize)
+    return im_sk_new
