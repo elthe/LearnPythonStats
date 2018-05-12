@@ -59,7 +59,7 @@ def vortex(R=20.0, r=12.0):
             x = r * cos(n / nparts * PI2)
             y = r * sin(n / nparts * PI2)
             for o in (0.0, 1.0):
-                tm = o + m + move;
+                tm = o + m + move
                 mx = (x + R) * cos(tm / mparts * PI2)
                 mz = (x + R) * sin(tm / mparts * PI2)
                 glVertex3f(mx, y, mz)
@@ -153,14 +153,16 @@ def reshape(Width, Height):
 
 def hitkey(key, mousex, mousey):
     global winid, ANGX
-    if (str(key) == 'q'):
+    key = bytes.decode(key)
+    if (key == 'q'):
         # 关闭窗体和它包含的子窗体
         glutDestroyWindow(winid)
         # 退出软件
         sys.exit()
-    elif (str(key) == 'a'):
+    elif (key == 'a'):
         ANGX += 1.0
-
+    elif (key == 's'):
+        ANGX -= 1.0
 
 def main():
     global WIN_X, WIN_Y, winid
