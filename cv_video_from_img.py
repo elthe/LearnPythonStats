@@ -56,7 +56,7 @@ for i in range(max_size):
     imagecm.resize(path, cfg['width'], cfg['height'], temp_path, keep_ratio=False)
 
     # 动画输出器
-    action_output = VideoActionOutput(im_output, temp_path, (i+1))
+    action_output = VideoActionOutput(im_output, temp_path, (i + 1))
 
     # 色调动画
     action_output.out_action("add_hue", range(1, 5, 1))
@@ -80,24 +80,19 @@ for i in range(max_size):
     action_output.out_action("move_h", range(-1 * cfg['width'], cfg['width'], 100))
     action_output.out_action("move_v", range(-1 * cfg['height'], cfg['height'], 100))
 
-    #
-    # # 标记人脸
-    # faces = imfiltercm.detect_face(frame)
-    # img_face = imfiltercm.mark_face(frame, faces, border=2)
-    # for i in range(5):
-    #     im_output.out_im(img_face)
-    #
-    # # 人脸美白动画
-    # for i in range(0, 50, 2):
-    #     img = imfiltercm.whitening_face(img_face, faces, i)
-    #     im_output.out_im(img)
-    #
-    # # 皮肤
-    # im_skin = imfiltercm.detect_skin(frame)
-    # # 皮肤美白动画
-    # for i in range(0, 50, 2):
-    #     img = imfiltercm.whitening_skin(frame, im_skin, i)
-    #     im_output.out_im(img)
+    # 标记人脸
+    action_output.out_action("mark_face", range(10, 30, 4), 0.1)
+    # 人脸美白动画
+    action_output.out_action("whitening_face", range(0, 50, 2))
+    # 皮肤美白动画
+    action_output.out_action("whitening_skin", range(0, 50, 2))
+
+    # 滤镜名称列表
+    filter_list = ["pencil_gray", "pencil_color", "stylize", "detail_enhance", "edge_preserve"]
+    # 滤镜参数调节动画
+    for name in filter_list:
+        action_output.out_action("im_filter", range(0, 10, 1), filter_name=name)
+
 
 # 发布视频
 videoWriter.release()

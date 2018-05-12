@@ -50,6 +50,11 @@ class VideoActionOutput:
         self.img_no = img_no
         self.im_bgr = get_bgr_im(img_path, ImageType.IMG_FILE)
 
+        # 人脸侦测
+        self.faces = imfiltercm.detect_face(self.im_bgr)
+        # 皮肤侦测
+        self.im_skin = imfiltercm.detect_skin(self.im_bgr)
+
     def out_action(self, action_type, val_list, val_ratio=1, **kwargs):
         """
         把指定动画写入视频
@@ -60,6 +65,8 @@ class VideoActionOutput:
             out_img_type = ImageType.IMG_BGR
             # 当前值
             value = val * val_ratio
+            # 标题
+            title = action_type
 
             # 色调动画
             if action_type == "add_hue":
@@ -84,15 +91,28 @@ class VideoActionOutput:
                 out_img_type = ImageType.IMG_SK
             # 水平移动动画
             elif action_type == "move_h":
-                img = move(self.img_path, move_h=value)
+                img = move(self.img_path, move_h=value, back_val=0)
                 out_img_type = ImageType.IMG_PIL
             # 竖直移动动画
             elif action_type == "move_v":
-                img = move(self.img_path, move_v=value)
+                img = move(self.img_path, move_v=value, back_val=0)
                 out_img_type = ImageType.IMG_PIL
+            # 标记人脸
+            elif action_type == "mark_face":
+                img = imfiltercm.mark_face(self.im_bgr, self.faces, border=int(value))
+            # 人脸美白动画
+            elif action_type == "whitening_face":
+                img = imfiltercm.whitening_face(self.im_bgr, self.faces, value)
+            # 皮肤美白动画
+            elif action_type == "whitening_skin":
+                img = imfiltercm.whitening_skin(self.im_bgr, self.im_skin, value)
+            # 滤镜
+            elif action_type == "im_filter":
+                img = imfiltercm.im_filter(self.im_bgr, kwargs["filter_name"], value)
+                title += "-" + kwargs["filter_name"]
 
             # 加入图片
-            self.output.out_im(img, out_img_type, action_type=action_type, img_no=self.img_no)
+            self.output.out_im(img, out_img_type, title=title, img_no=self.img_no)
 
 
 class VideoImageOutput:
@@ -104,13 +124,13 @@ class VideoImageOutput:
         self.count = 0
         self.last_time = datecm.get_now_time("mini")
 
-    def out_im(self, img, img_type=ImageType.IMG_BGR, action_type="", img_no=1):
+    def out_im(self, img, img_type=ImageType.IMG_BGR, title="", img_no=1):
         """
         把图片写入视频。
         :param video_writer: 视频输出器
         :param img: 原始图片或路径
         :param img_type 图片类型（ImageType）
-        :param action_type 动作类型
+        :param title 标题
         @return: 无
         """
         # 转化成BGR图片
@@ -126,7 +146,7 @@ class VideoImageOutput:
         self.last_time = now_time
         # 日志
         logcm.print_info(
-            "Img-%d : %s No.%d image(%s) write ok in %dms !" % (img_no, action_type, self.count, img_type, cost_time),
+            "Img-%d : %s No.%d image(%s) write ok in %dms !" % (img_no, title, self.count, img_type, cost_time),
             show_header=False)
 
     def clear(self):
@@ -555,7 +575,7 @@ def get_sk_im(img):
     return im_sk
 
 
-def rotate(img, angle, resize=False, save_path=None):
+def rotate(img, angle, resize=False):
     """
     对原始图片进行旋转后。
     @param img: 原始SK图片或路径
