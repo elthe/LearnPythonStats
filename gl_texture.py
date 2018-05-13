@@ -24,8 +24,8 @@ cfg = loadcfgcm.load("gl_texture.json", default_config)
 
 class MyPyOpenGLTest:
     def __init__(self,
-                 width=640,
-                 height=480,
+                 width=1024,
+                 height=683,
                  title='MyPyOpenGLTest'.encode()):
         glutInit(sys.argv)
         glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
