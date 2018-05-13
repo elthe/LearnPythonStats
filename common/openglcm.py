@@ -7,7 +7,18 @@ OpenGL相关共通函数
 """
 
 import sys
+import random
 from OpenGL.GLUT import *
+from OpenGL.GLU import *
+from OpenGL.GL import *
+
+RGB_COLOR_LIST = [(1.0, 0.0, 0.0),  # red
+                  (1.0, 1.0, 1.0),  # white
+                  (0.0, 1.0, 0.0),  # green
+                  (1.0, 0.0, 1.0),  # magenta
+                  (1.0, 1.0, 0.0),  # yellow
+                  (0.0, 1.0, 1.0)  # cyan
+                  ]
 
 
 def on_key_down(key, win_id):
@@ -27,3 +38,11 @@ def on_key_down(key, win_id):
         # 退出软件
         sys.exit(0)
     return key
+
+
+def set_random_color():
+    """
+    设置随机颜色
+    """
+    red,green,blue = random.choice(RGB_COLOR_LIST)
+    glColor3f(red, green, blue)
