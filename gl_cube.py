@@ -81,7 +81,7 @@ def Cube():
     glEnd()
 
     # GL_QUADS 独立四边形
-    glPolygonMode(GL_FRONT, GL_LINE)
+    glPolygonMode(GL_FRONT, GL_FILL)
     glPolygonMode(GL_BACK, GL_FILL)
     glBegin(GL_QUADS)
     for i in range(len(surfaces)):
