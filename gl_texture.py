@@ -2,6 +2,10 @@
 # -*- coding: utf-8 -*-
 """
 对立方体进行贴图，并且每个面的纹理不相同。
+
+在用GL渲染的时候，纹理是很常见的东西。
+使用纹理之前，必须执行这句命令为你的texture分配一个ID，
+然后绑定这个纹理，加载纹理图像，这之后，这个纹理才可以使用。
 """
 
 import sys
@@ -151,6 +155,7 @@ class MyPyOpenGLTest:
             width, height = img.size
             img = img.tobytes('raw', 'RGBX', 0, -1)
 
+            # 根据纹理参数返回n个纹理索引。
             glGenTextures(2)
             glBindTexture(GL_TEXTURE_2D, i)
             glTexImage2D(GL_TEXTURE_2D, 0, 4,

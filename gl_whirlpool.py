@@ -17,6 +17,8 @@ from math import cos, sin, pi
 from time import sleep
 import sys
 
+from common import openglcm
+
 PI2 = pi * 2.0
 WIN_X = 300
 WIN_Y = 300
@@ -142,27 +144,40 @@ def reshape(Width, Height):
     else:
         glViewport(0, 0, Width, Width)
 
+    # 如果参数是GL_PROJECTION，这个是投影的意思，就是要对投影相关进行操作，
+    # 也就是把物体投影到一个平面上，就像我们照相一样，把3维物体投到2维的平面上。
+    # 这样，接下来的语句可以是跟透视相关的函数，比如glFrustum()或gluPerspective()；
     glMatrixMode(GL_PROJECTION)
+
+    # 恢复初始坐标系，对当前矩阵进行初始化
     glLoadIdentity()
+
     # glFrustum(-10.0,10.0,-10.0,10.0,3.0,60.0)
+    # 指定了观察的视景体（frustum为锥台的意思，通常译为视景体）在世界坐标系中的具体大小，
+    # 一般而言，其中的参数aspect应该与窗口的宽高比大小相同。
     gluPerspective(80.0, 1.0, 1.0, 80.0)
+
+    # 如果参数是GL_MODELVIEW，这个是对模型视景的操作，
+    # 接下来的语句描绘一个以模型为基础的适应，这样来设置参数，
+    # 接下来用到的就是像gluLookAt()这样的函数
     glMatrixMode(GL_MODELVIEW)
+
+    # 恢复初始坐标系，对当前矩阵进行初始化
     glLoadIdentity()
+
+    # gluLookAt()函数是通过移动照相机（使用视图变换）来观察
     gluLookAt(0.0, 0.0, far, 0.0, 0.0, 0.0, 0.0, 1.0, far)
 
 
 def hitkey(key, mousex, mousey):
     global winid, ANGX
-    key = bytes.decode(key)
-    if (key == 'q'):
-        # 关闭窗体和它包含的子窗体
-        glutDestroyWindow(winid)
-        # 退出软件
-        sys.exit()
-    elif (key == 'a'):
+    # 执行共通处理
+    key = openglcm.on_key_down(key, winid)
+    if (key == 'a'):
         ANGX += 1.0
     elif (key == 's'):
         ANGX -= 1.0
+
 
 def main():
     global WIN_X, WIN_Y, winid

@@ -13,6 +13,8 @@ from OpenGL.GL import *
 from math import *
 from random import random, choice, randint, getrandbits
 
+from common import openglcm
+
 # 全局变量
 M_PI = pi
 M_PI_2 = pi / 2.0
@@ -197,13 +199,13 @@ def visible(state):
 
 # ARGSUSED1 
 
-def keyboard(ch, x, y):
-    if (ch == ' '):
+def keyboard(key, x, y):
+    # 共通按键处理
+    key = openglcm.on_key_down(key)
+    if (key == ' '):
         if (not moving):
             tick()
             glutPostRedisplay()
-    elif (ch == chr(27)):
-        sys.exit(0)
     return 0
 
 

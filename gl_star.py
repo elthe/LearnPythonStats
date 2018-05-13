@@ -6,7 +6,7 @@ import OpenGL
 from OpenGL.GL import *
 
 import numpy, math, sys, os
-import glutils
+#import glutils
 
 import glfw
 
