@@ -2,19 +2,15 @@
 # -*- coding: utf-8 -*-
 
 """
-量化计算共通类
+量化计算公式
 """
 
 import pandas as pd
-import numpy as np
 import math
+import numpy as np
+
 from math import sqrt
 from sklearn import linear_model
-from scipy.stats import norm
-from scipy import stats
-from collections import Iterable
-from pandas import Series
-from math import sqrt
 
 # Q值(按日计算时)
 Q_DAY = 250

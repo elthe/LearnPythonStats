@@ -49,7 +49,9 @@ class VideoActionOutput:
         self.img_path = img_path
         self.img_no = img_no
         self.im_bgr = get_bgr_im(img_path, ImageType.IMG_FILE)
-
+        # 最近图片
+        self.last_im = self.im_bgr
+        self.last_img_type = ImageType.IMG_BGR
         # 人脸侦测
         self.faces = imfiltercm.detect_face(self.im_bgr)
         # 皮肤侦测
@@ -85,6 +87,14 @@ class VideoActionOutput:
             elif action_type == "zoom_out":
                 img = zoom_out(self.img_path, value)
                 out_img_type = ImageType.IMG_PIL
+            # 水平压缩动画
+            elif action_type == "zip_h":
+                img = zip(self.img_path, zip_h=value)
+                out_img_type = ImageType.IMG_PIL
+            # 竖直压缩动画
+            elif action_type == "zip_v":
+                img = zip(self.img_path, zip_v=value)
+                out_img_type = ImageType.IMG_PIL
             # 旋转动画
             elif action_type == "rotate":
                 img = rotate(self.img_path, value, resize=False)
@@ -110,9 +120,17 @@ class VideoActionOutput:
             elif action_type == "im_filter":
                 img = imfiltercm.im_filter(self.im_bgr, kwargs["filter_name"], value)
                 title += "-" + kwargs["filter_name"]
+            # Hold住最近一次图片
+            elif action_type == "hold":
+                img = self.last_im
+                out_img_type = self.last_img_type
 
             # 加入图片
             self.output.out_im(img, out_img_type, title=title, img_no=self.img_no)
+
+        # 记住上次图片
+        self.last_im = img
+        self.last_img_type = out_img_type
 
 
 class VideoImageOutput:
@@ -479,8 +497,8 @@ def zoom_in(img, ratio=1.1, save_path=None):
     @param save_path: 保存路径（可选）
     @return: 放大后的图片
     """
-    if ratio <= 1.0:
-        logcm.print_info('Zoom in ratio must > 1.0!', fg='red')
+    if ratio < 1.0:
+        logcm.print_info('Zoom in ratio must >= 1.0!', fg='red')
     # 取得图片
     im = get_im(img)
     # 图片原始尺寸
@@ -508,15 +526,15 @@ def zoom_out(img, ratio=0.9, save_path=None):
     @param save_path: 保存路径（可选）
     @return: 放大后的图片
     """
-    if ratio >= 1.0:
-        logcm.print_info('Zoom out ratio must < 1.0!', fg='red')
+    if ratio > 1.0:
+        logcm.print_info('Zoom out ratio must <= 1.0!', fg='red')
     # 取得图片
     im = get_im(img)
     # 图片原始尺寸
     (width, height) = im.size
     # 缩小图片
-    new_width = int(width * ratio)
-    new_height = int(height * ratio)
+    new_width = max(int(width * ratio), 2)
+    new_height = max(int(height * ratio), 2)
     im = resize(im, new_width, new_height)
     # 重设画布大小
     im_zoom = resize_canvas(im, width, height, 0)
@@ -525,6 +543,34 @@ def zoom_out(img, ratio=0.9, save_path=None):
     if save_path is not None:
         im_zoom.save(save_path)
     return im_zoom
+
+
+def zip(img, zip_h=1.0, zip_v=1.0, save_path=None):
+    """
+    对原始图片按照指定倍数压缩后画布仍为原始大小
+    @param img: 原始图片或路径
+    @param zip_h: 水平缩小比例
+    @param zip_v: 竖直缩小比例
+    @param save_path: 保存路径（可选）
+    @return: 压缩后的图片
+    """
+    if zip_h > 1.0 or zip_v > 1.0:
+        logcm.print_info('Zip ratio must <= 1.0!', fg='red')
+    # 取得图片
+    im = get_im(img)
+    # 图片原始尺寸
+    (width, height) = im.size
+    # 缩小图片
+    new_width = max(int(width * zip_h), 2)
+    new_height = max(int(height * zip_v), 2)
+    im = resize(im, new_width, new_height, keep_ratio=False)
+    # 重设画布大小
+    im_zip = resize_canvas(im, width, height, 0)
+
+    # 保存图片
+    if save_path is not None:
+        im_zip.save(save_path)
+    return im_zip
 
 
 def move(img, move_h=0, move_v=0, back_val=255, save_path=None):
@@ -543,6 +589,8 @@ def move(img, move_h=0, move_v=0, back_val=255, save_path=None):
     im = get_im(img)
     # 图片原始尺寸
     (width, height) = im.size
+    move_h = int(move_h)
+    move_v = int(move_v)
     # 图片移动量范围限制
     if move_h > width:
         move_h = width
@@ -588,3 +636,67 @@ def rotate(img, angle, resize=False):
     im_sk = get_sk_im(img)
     im_sk_new = transform.rotate(im_sk, angle, resize=resize)
     return im_sk_new
+
+
+def slow_down(pos_start, pos_end, duration):
+    """
+    取得减速移入位置列表。
+    @param pos_start: 开始位置
+    @param pos_end: 结束位置
+    @param duration: 分成几步走
+    @return: 缓动位置列表
+    """
+
+    # 间隔列表
+    pos_list = []
+    # 移动距离
+    distance = pos_end - pos_start
+    # 加速度a = 2x / t ^ 2（包含方向）
+    a = 2 * distance / (duration * duration)
+    # 距离
+    last_dist = 0
+    for i in range(duration):
+        # X = a * t ^ 2 / 2
+        now_dist = a * (i + 1) * (i + 1) / 2
+        offset_dist = now_dist - last_dist
+        last_dist = now_dist
+        # 间隔距离
+        pos_list.append(offset_dist)
+    # 反转
+    pos_list.reverse()
+    # 移动列表
+    last_pos = 0
+    for i in range(len(pos_list)):
+        last_pos += pos_list[i]
+        pos_list[i] = pos_start + last_pos
+    # 插入头部
+    pos_list.insert(0, pos_start)
+
+    return pos_list
+
+
+def speed_up(pos_start, pos_end, duration):
+    """
+    取得加速移除移动位置列表。
+    @param pos_start: 开始位置
+    @param pos_end: 结束位置
+    @param duration: 分成几步走
+    @return: 缓动位置列表
+    """
+
+    # 间隔列表
+    pos_list = []
+    # 插入头部
+    pos_list.append(pos_start)
+    # 移动距离
+    distance = pos_end - pos_start
+    # 加速度a = 2x / t ^ 2（包含方向）
+    a = 2 * distance / (duration * duration)
+    # 距离
+    for i in range(duration):
+        # X = a * t ^ 2 / 2
+        now_dist = a * (i + 1) * (i + 1) / 2
+        # 间隔距离
+        pos_list.append(pos_start + now_dist)
+
+    return pos_list
