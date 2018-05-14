@@ -5,22 +5,11 @@
 量化计算共通类
 """
 
-import pandas as pd
-import numpy as np
-import math
-from scipy.stats import norm
-from scipy import stats
-from collections import Iterable
-from pandas import Series
-from math import sqrt
+from common.classcm import BaseObject
 from quant import quant_formula as formula
 
-q = 250
-Rh = 0.035
-Rf = 0.03
 
-
-class QuantGeneralResult:
+class QuantGeneralResult(BaseObject):
     """
     综合类量化指标结果类
     """
@@ -50,7 +39,7 @@ class QuantGeneralResult:
     Kurt = None
 
 
-class QuantRiskResult:
+class QuantRiskResult(BaseObject):
     """
     风险类量化指标结果类
     """
@@ -129,7 +118,7 @@ class QuantCalculator:
         # 残差余项风险
         gen_result.residual_term = formula.residual_term(self.return_line, self.index_return_line)
         # 信息比率 = 主动收益 / 主动风险
-        gen_result.IR = self.Annual_active_return / self.Annual_active_risk
+        gen_result.IR = gen_result.Annual_active_return / gen_result.Annual_active_risk
         # 收益率序列的偏度
         gen_result.Skew = formula.Skew(self.return_line)
         # 收益率序列的峰度
@@ -162,7 +151,8 @@ class QuantCalculator:
         risk_result.Max_consecutive_down_days = max_successive_down
 
         # 最大连续涨幅
-        max_concecutive_up, max_concecutive_down = formula.Max_consecutive_up_peak(self.date_line, self.return_line)
+        max_concecutive_up, max_concecutive_down = formula.Max_consecutive_up_peak(self.date_line, self.return_line,
+                                                                                   self.capital_line)
         risk_result.Max_consecutive_up_peak = max_concecutive_up
         # 最大连续跌幅
         risk_result.Max_consecutive_down_peak = max_concecutive_down
@@ -180,7 +170,3 @@ class QuantCalculator:
         risk_result.loss_period_ratio = loss_period_ratio
 
         return (gen_result, risk_result)
-
-
-if __name__ == '__main__':
-    pass
