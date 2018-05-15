@@ -9,7 +9,7 @@ import cv2
 
 from common import filecm
 from common import imagecm
-from common import imfiltercm
+from common import imoptcm
 from common import loadcfgcm
 from common import logcm
 from common.imagecm import ImageType, VideoImageOutput, VideoActionOutput
@@ -62,6 +62,10 @@ slow_zoom = imagecm.slow_down(1.0, 0.01, 10)
 # 旋转
 slow_rotate = imagecm.slow_down(1, 360, 12)
 speed_rotate = imagecm.speed_up(1, 360, 12)
+# 匀速
+normal_10 = range(10)
+normal_5 = range(5)
+normal_1 = range(1)
 
 for i in range(max_size):
     path = path_list[i]
@@ -86,7 +90,7 @@ for i in range(max_size):
 
     # 放大动画
     action_output.out_action("zoom_in", speed_zoom)
-    action_output.out_action("hold", range(5))
+    action_output.out_action("hold", normal_5)
     # 缩小动画
     action_output.out_action("zoom_out", slow_zoom)
 
@@ -100,19 +104,22 @@ for i in range(max_size):
 
     # 旋转动画
     action_output.out_action("rotate", slow_rotate)
-    action_output.out_action("hold", range(5))
+    action_output.out_action("hold", normal_5)
     action_output.out_action("rotate", speed_rotate)
 
     # 移动图片(水平)
     action_output.out_action("move_h", slow_move_h)
-    action_output.out_action("hold", range(5))
+    action_output.out_action("hold", normal_5)
     action_output.out_action("move_h", speed_move_h)
 
     # 移动图片(竖直)
-
     action_output.out_action("move_v", slow_move_v)
-    action_output.out_action("hold", range(5))
+    action_output.out_action("hold", normal_5)
     action_output.out_action("move_v", speed_move_v)
+
+    # 卷积滤镜
+    # action_output.out_action("conv_filter", normal_1, filter_name="Motion_Blur")
+    # action_output.out_action("hold", normal_5)
 
     # # 标记人脸
     # action_output.out_action("mark_face", range(10, 30, 4), 0.1)

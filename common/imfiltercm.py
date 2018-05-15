@@ -6,328 +6,367 @@ Image Filter common api
 图片滤镜相关共通函数
 """
 
-import math
-from PIL import Image
-from common import logcm
-from common import imagecm
-
-import cv2
 import numpy as np
 
+support_filters = [
+    'Naive',  # Naive Filter  原图滤波（相当于无变化）
+    'Sharpness_Center',  # Sharpness_Center Filter  中心锐化 滤波
+    'Sharpness_Edge',  # Sharpness_Edge Filter  边缘锐化 滤波
+    'Edge_Detection_360_degree',  # Edge_Detection_360° Filter  360°边缘检测 滤波
+    'Edge_Detection_45_degree',  # Edge_Detection_45° Filter  45°边缘检测 滤波
+    'Embossing_45_degree',  # Embossing_45° Filter  45°浮雕 滤波
+    'Embossing_Asymmetric',  # Embossing_Asymmetric Filter  非对称浮雕 滤波
+    'Averaging_Blur',  # Averaging_Blur Filter  均值模糊 滤波
+    'Completed_Blur',  # Completed_Blur Filter  完全模糊 滤波
+    'Motion_Blur',  # Motion_Blur Filter  运动模糊 滤波
+    'Gaussian_Blur',  # Gaussian_Blur Filter  高斯模糊 滤波
+    'DIY'  # DIY Filter  自定义 滤波
+]
 
-def change_saturation(im_bgr, value):
+
+def exist_filter(filter_name):
     """
-    调整图片饱和度
-    :param im_bgr: BGR图片
-    :param value: 设定值（-50～50）
-    @return: 调整后的BGR图片
+    是否存在滤镜
+    :param filter_name 滤镜名
+    :return 是否存在
     """
+    return filter_name in support_filters
 
-    im_hls = cv2.cvtColor(im_bgr, cv2.COLOR_BGR2HLS)
-    if value > 2:
-        im_hls[:, :, 2] = np.log(im_hls[:, :, 2] / 255 * (value - 1) + 1) / np.log(value + 1) * 255
-    if value < 0:
-        im_hls[:, :, 2] = np.uint8(im_hls[:, :, 2] / np.log(- value + np.e))
-    im_bgr_new = cv2.cvtColor(im_hls, cv2.COLOR_HLS2BGR)
-    return im_bgr_new
+class Filter:
+    def __init__(self, filter_name):
+        """
+        Choose which filter to be returned
+        根据用户指定的 滤波器名称，挑选对应的 滤波器配置
+        """
+        if filter_name == 'Naive':
+            filter_0, filter_1, filter_2 = Naive_Filter()
+        elif filter_name == 'Sharpness_Center':
+            filter_0, filter_1, filter_2 = Sharpness_Center_Filter()
+        elif filter_name == 'Sharpness_Edge':
+            filter_0, filter_1, filter_2 = Sharpness_Edge_Filter()
+        elif filter_name == 'Edge_Detection_360_degree':
+            filter_0, filter_1, filter_2 = Edge_Detection_360_degree_Filter()
+        elif filter_name == 'Edge_Detection_45_degree':
+            filter_0, filter_1, filter_2 = Edge_Detection_45_degree_Filter()
+        elif filter_name == 'Embossing_45_degree':
+            filter_0, filter_1, filter_2 = Embossing_45_degree_Filter()
+        elif filter_name == 'Embossing_Asymmetric':
+            filter_0, filter_1, filter_2 = Embossing_Asymmetric_Filter()
+        elif filter_name == 'Averaging_Blur':
+            filter_0, filter_1, filter_2 = Averaging_Blur_Filter()
+        elif filter_name == 'Completed_Blur':
+            filter_0, filter_1, filter_2 = Completed_Blur_Filter()
+        elif filter_name == 'Motion_Blur':
+            filter_0, filter_1, filter_2 = Motion_Blur_Filter()
+        elif filter_name == 'Gaussian_Blur':
+            filter_0, filter_1, filter_2 = Gaussian_Blur_Filter()
+        elif filter_name == 'DIY':
+            filter_0, filter_1, filter_2 = DIY_Filter()
+        else:
+            print("\n No such Filter !")
+            exit(0)
+            filter_0, filter_1, filter_2 = No_Exist_Filter()
+
+        self.filter_name = filter_name
+        self.filters = [filter_0, filter_1, filter_2]
+
+    def do_filter(self, im_bgr):
+        """
+        执行滤镜
+        :param im_bgr 要处理的BGR图片
+        :return 处理后的BGR图片
+        """
+        h, w, c = im_bgr.shape
+        assert c == 3, "Error! Please use the picture of 3 color channels."
+
+        im_new = np.zeros((h, w, c), dtype=np.float)
+        for i in range(1, h - 1, 1):
+            for j in range(1, w - 1, 1):
+                for k in range(3):
+                    im_new[i][j][k] = self.conv(im_bgr, self.filters[k], i, j)
+        return im_new
+
+    def conv(self, image, filter, image_center_x, image_center_y):
+        """
+        卷积处理
+        :param image 要处理的BGR图片
+        :param filter 滤镜
+        :param image_center_x X中间点
+        :param image_center_y Y中间点
+        :return 卷积值
+        """
+        size = 3
+        radius = int((size - 1) / 2)
+        view = np.zeros((size, size, 3), dtype=np.float)
+        for i in range(size):
+            for j in range(size):
+                for z in range(3):
+                    view[i][j][z] = image[image_center_x - radius + i][image_center_y - radius + j][z] * filter[i][j][z]
+        return np.sum(view)
 
 
-def change_darker(im_bgr, value):
+def Naive_Filter():
     """
-    调整图片明度
-    :param im_bgr: BGR图片
-    :param value: 设定值（-100～100）
-    @return: 调整后的BGR图片
+    Naive Filter
+    原图 滤波
+    :return:
     """
+    filter_0 = np.array([[[0, 0, 0], [0, 0, 0], [0, 0, 0]],
+                         [[0, 0, 0], [1, 0, 0], [0, 0, 0]],
+                         [[0, 0, 0], [0, 0, 0], [0, 0, 0]]],
+                        dtype=np.int16)
+    filter_1 = np.array([[[0, 0, 0], [0, 0, 0], [0, 0, 0]],
+                         [[0, 0, 0], [0, 1, 0], [0, 0, 0]],
+                         [[0, 0, 0], [0, 0, 0], [0, 0, 0]]],
+                        dtype=np.int16)
+    filter_2 = np.array([[[0, 0, 0], [0, 0, 0], [0, 0, 0]],
+                         [[0, 0, 0], [0, 0, 1], [0, 0, 0]],
+                         [[0, 0, 0], [0, 0, 0], [0, 0, 0]]],
+                        dtype=np.int16)
+    return filter_0, filter_1, filter_2
 
-    img_hsv = cv2.cvtColor(im_bgr, cv2.COLOR_BGR2HLS)
-    if value > 3:
-        img_hsv[:, :, 1] = np.log(img_hsv[:, :, 1] / 255 * (value - 1) + 1) / np.log(value + 1) * 255
-    if value < 0:
-        img_hsv[:, :, 1] = np.uint8(img_hsv[:, :, 1] / np.log(- value + np.e))
-    im_bgr_new = cv2.cvtColor(img_hsv, cv2.COLOR_HLS2BGR)
-    return im_bgr_new
 
-
-def detect_face(im_bgr):
+def Sharpness_Center_Filter():
     """
-    人脸识别
-    :param im_bgr: BGR图片
-    @return: 人脸信息
+    Sharpness_Center Filter
+    中心锐化 滤波
+    :return:
     """
-    face_cascade = cv2.CascadeClassifier('./data/ui/haarcascade_frontalface_default.xml')
-    gray = cv2.cvtColor(im_bgr, cv2.COLOR_BGR2GRAY)
-    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
-    return faces
+    filter_0 = np.array([[[-1, 0, 0], [-1, 0, 0], [-1, 0, 0]],
+                         [[-1, 0, 0], [9, 0, 0], [-1, 0, 0]],
+                         [[-1, 0, 0], [-1, 0, 0], [-1, 0, 0]]],
+                        dtype=np.int16)
+    filter_1 = np.array([[[0, -1, 0], [0, -1, 0], [0, -1, 0]],
+                         [[0, -1, 0], [0, 9, 0], [0, -1, 0]],
+                         [[0, -1, 0], [0, -1, 0], [0, -1, 0]]],
+                        dtype=np.int16)
+    filter_2 = np.array([[[0, 0, -1], [0, 0, -1], [0, 0, -1]],
+                         [[0, 0, -1], [0, 0, 9], [0, 0, -1]],
+                         [[0, 0, -1], [0, 0, -1], [0, 0, -1]]],
+                        dtype=np.int16)
+    return filter_0, filter_1, filter_2
 
 
-def detect_skin(im_bgr):
+def Sharpness_Edge_Filter():
     """
-    皮肤识别
-    :param im_bgr: BGR图片
-    @return: 皮肤信息
-    """
-    rows, cols, channels = im_bgr.shape
-    im_skin = np.zeros(im_bgr.shape)
-    for r in range(rows):
-        for c in range(cols):
-            B = im_bgr.item(r, c, 0)
-            G = im_bgr.item(r, c, 1)
-            R = im_bgr.item(r, c, 2)
-            if (abs(R - G) > 15) and (R > G) and (R > B):
-                if (R > 95) and (G > 40) and (B > 20) and (max(R, G, B) - min(R, G, B) > 15):
-                    im_skin[r, c] = (1, 1, 1)
-                elif (R > 220) and (G > 210) and (B > 170):
-                    im_skin[r, c] = (1, 1, 1)
-    return im_skin
-
-
-def dermabrasion(im_bgr, im_skin, value1=3, value2=2):
-    """
-    皮肤磨皮处理
-    :param im_bgr: BGR图片
-    :param im_skin: 皮肤信息
-    :param value1: 精细度（0～10）
-    :param value2: 程度（0～10）
-    @return: 处理后BGR图片
-    """
-
-    if value1 == 0 and value2 == 0:
-        return 0
-    if value2 == 0:
-        value2 = 2
-    if value1 == 0:
-        value1 = 3
-
-    dx = value1 * 5
-    fc = value1 * 12.5
-    p = 50
-    temp1 = cv2.bilateralFilter(im_bgr, dx, fc, fc)
-    temp2 = (temp1 - im_bgr + 128)
-    temp3 = cv2.GaussianBlur(temp2, (2 * value2 - 1, 2 * value2 - 1), 0, 0)
-    temp4 = im_bgr + 2 * temp3 - 255
-    dst = np.uint8(im_bgr * ((100 - p) / 100) + temp4 * (p / 100))
-
-    imgskin_c = np.uint8(-(im_skin - 1))
-
-    im_new = np.uint8(dst * im_skin + im_bgr * imgskin_c)
-    return im_new
-
-
-def whitening_skin(im_bgr, im_skin, value=30):
-    """
-    美白算法(皮肤识别)
-    :param im_bgr: BGR图片
-    :param im_skin: 皮肤信息
-    :param value: 程度（0～50）
-    @return: 处理后BGR图片
-    """
-
-    im_new = np.zeros(im_bgr.shape, dtype='uint8')
-    im_new = im_bgr.copy()
-    midtones_add = np.zeros(256)
-
-    for i in range(256):
-        midtones_add[i] = 0.667 * (1 - ((i - 127.0) / 127) * ((i - 127.0) / 127))
-
-    lookup = np.zeros(256, dtype="uint8")
-
-    for i in range(256):
-        red = i
-        red += np.uint8(value * midtones_add[red])
-        red = max(0, min(0xff, red))
-        lookup[i] = np.uint8(red)
-
-    rows, cols, channals = im_bgr.shape
-    for r in range(rows):
-        for c in range(cols):
-
-            if im_skin[r, c, 0] == 1:
-                im_new[r, c, 0] = lookup[im_new[r, c, 0]]
-                im_new[r, c, 1] = lookup[im_new[r, c, 1]]
-                im_new[r, c, 2] = lookup[im_new[r, c, 2]]
-    return im_new
-
-
-def whitening_face(im_bgr, faces, value=30):
-    """
-    美白算法(人脸识别)
-    :param im_bgr: BGR图片
-    :param faces: 人脸信息
-    :param value: 程度（0～50）
-    @return: 处理后BGR图片
-    """
-
-    im_new = np.zeros(im_bgr.shape, dtype='uint8')
-    im_new = im_bgr.copy()
-    midtones_add = np.zeros(256)
-
-    for i in range(256):
-        midtones_add[i] = 0.667 * (1 - ((i - 127.0) / 127) * ((i - 127.0) / 127))
-
-    lookup = np.zeros(256, dtype="uint8")
-
-    for i in range(256):
-        red = i
-        red += np.uint8(value * midtones_add[red])
-        red = max(0, min(0xff, red))
-        lookup[i] = np.uint8(red)
-
-    if faces == ():
-        rows, cols, channels = im_bgr.shape
-        for r in range(rows):
-            for c in range(cols):
-                im_new[r, c, 0] = lookup[im_new[r, c, 0]]
-                im_new[r, c, 1] = lookup[im_new[r, c, 1]]
-                im_new[r, c, 2] = lookup[im_new[r, c, 2]]
-
-    else:
-        x, y, w, h = faces[0]
-        rows, cols, channels = im_bgr.shape
-        x = max(x - (w * np.sqrt(2) - w) / 2, 0)
-        y = max(y - (h * np.sqrt(2) - h) / 2, 0)
-        w = w * np.sqrt(2)
-        h = h * np.sqrt(2)
-        rows = min(rows, y + h)
-        cols = min(cols, x + w)
-        for r in range(int(y), int(rows)):
-            for c in range(int(x), int(cols)):
-                im_new[r, c, 0] = lookup[im_new[r, c, 0]]
-                im_new[r, c, 1] = lookup[im_new[r, c, 1]]
-                im_new[r, c, 2] = lookup[im_new[r, c, 2]]
-
-        processWidth = int(max(min(rows - y, cols - 1) / 8, 2))
-        for i in range(1, processWidth):
-            alpha = (i - 1) / processWidth
-            for r in range(int(y), int(rows)):
-                im_new[r, int(x) + i - 1] = np.uint8(
-                    im_new[r, int(x) + i - 1] * alpha + im_bgr[r, int(x) + i - 1] * (1 - alpha))
-                im_new[r, int(cols) - i] = np.uint8(
-                    im_new[r, int(cols) - i] * alpha + im_bgr[r, int(cols) - i] * (1 - alpha))
-            for c in range(int(x) + processWidth, int(cols) - processWidth):
-                im_new[int(y) + i - 1, c] = np.uint8(
-                    im_new[int(y) + i - 1, c] * alpha + im_bgr[int(y) + i - 1, c] * (1 - alpha))
-                im_new[int(rows) - i, c] = np.uint8(
-                    im_new[int(rows) - i, c] * alpha + im_bgr[int(rows) - i, c] * (1 - alpha))
-    return im_new
-
-
-def gamma_trans(im_bgr, value):
-    """
-    Gamma矫正
-    :param im_bgr: BGR图片
-    :param value: 设定值（-10～10）
-    @return: 处理后BGR图片
-    """
-    gamma = (value + 10) / 10
-    gamma_table = [np.power(x / 255.0, gamma) * 255.0 for x in range(256)]
-    gamma_table = np.round(np.array(gamma_table)).astype(np.uint8)
-    im_new = cv2.LUT(im_bgr, gamma_table)
-    return im_new
-
-
-def reminiscene(im_bgr, value):
-    """
-    怀旧滤镜
-    :param im_bgr: BGR图片
-    :param value: 设定值（0～1）
-    @return: 处理后BGR图片
+    Sharpness_Edge Filter
+    边缘锐化 滤波
+    :return:
     """
 
-    if value == 0:
-        return im_bgr
+    filter_0 = np.array([[[1, 0, 0], [1, 0, 0], [1, 0, 0]],
+                         [[1, 0, 0], [-7, 0, 0], [1, 0, 0]],
+                         [[1, 0, 0], [1, 0, 0], [1, 0, 0]]],
+                        dtype=np.int16)
+    filter_1 = np.array([[[0, 1, 0], [0, 1, 0], [0, 1, 0]],
+                         [[0, 1, 0], [0, -7, 0], [0, 1, 0]],
+                         [[0, 1, 0], [0, 1, 0], [0, 1, 0]]],
+                        dtype=np.int16)
+    filter_2 = np.array([[[0, 0, 1], [0, 0, 1], [0, 0, 1]],
+                         [[0, 0, 1], [0, 0, -7], [0, 0, 1]],
+                         [[0, 0, 1], [0, 0, 1], [0, 0, 1]]],
+                        dtype=np.int16)
+    return filter_0, filter_1, filter_2
 
-    rows, cols, channals = im_bgr.shape
-    im_new = im_bgr.copy()
-    for r in range(rows):
-        for c in range(cols):
-            B = im_new.item(r, c, 0)
-            G = im_new.item(r, c, 1)
-            R = im_new.item(r, c, 2)
-            im_new[r, c, 0] = np.uint8(min(max(0.272 * R + 0.534 * G + 0.131 * B, 0), 255))
-            im_new[r, c, 1] = np.uint8(min(max(0.349 * R + 0.686 * G + 0.168 * B, 0), 255))
-            im_new[r, c, 2] = np.uint8(min(max(0.393 * R + 0.769 * G + 0.189 * B, 0), 255))
-    return im_new
 
-
-def woodcut(im_bgr, value):
+def Edge_Detection_360_degree_Filter():
     """
-    木刻滤镜
-    :param im_bgr: BGR图片
-    :param value: 设定值（0～50）
-    @return: 处理后BGR图片
+    Edge_Detection_360° Filter
+    360°边缘检测 滤波
+    :return:
     """
-    if im_bgr is None:
-        return 0
-    if value == 0:
-        return im_bgr
-    im_gray = cv2.cvtColor(im_bgr, cv2.COLOR_BGR2GRAY)
-    value = 70 + value
-    rows, cols = im_gray.shape
-    for r in range(rows):
-        for c in range(cols):
-            if im_gray[r, c] > value:
-                im_gray[r, c] = 255
-            else:
-                im_gray[r, c] = 0
-    im_new = cv2.cvtColor(im_gray, cv2.COLOR_GRAY2BGR)
-    return im_new
+
+    filter_0 = np.array([[[-1, 0, 0], [-1, 0, 0], [-1, 0, 0]],
+                         [[-1, 0, 0], [8, 0, 0], [-1, 0, 0]],
+                         [[-1, 0, 0], [-1, 0, 0], [-1, 0, 0]]],
+                        dtype=np.int16)
+    filter_1 = np.array([[[0, -1, 0], [0, -1, 0], [0, -1, 0]],
+                         [[0, -1, 0], [0, 8, 0], [0, -1, 0]],
+                         [[0, -1, 0], [0, -1, 0], [0, -1, 0]]],
+                        dtype=np.int16)
+    filter_2 = np.array([[[0, 0, -1], [0, 0, -1], [0, 0, -1]],
+                         [[0, 0, -1], [0, 0, 8], [0, 0, -1]],
+                         [[0, 0, -1], [0, 0, -1], [0, 0, -1]]],
+                        dtype=np.int16)
+    return filter_0, filter_1, filter_2
 
 
-def im_filter(im_bgr, filter_name, value):
+def Edge_Detection_45_degree_Filter():
     """
-    使用指定滤镜对图片进行处理
-    :param im_bgr: BGR图片
-    :param filter_name: 滤镜名
-    :param value: 设定值（0～10）
-    :param gray: 取得灰度图
-    @return: 处理后BGR图片
+    Edge_Detection_45°
+    Filter  45°边缘检测 滤波
+    :return:
     """
-    if im_bgr is None:
-        return 0
-    if value == 0:
-        return im_bgr
-    value = value * 0.05
-
-    # 铅笔灰度滤镜
-    if filter_name == "pencil_gray":
-        im_gray, im_color = cv2.pencilSketch(im_bgr, sigma_s=50, sigma_r=value, shade_factor=0.04)
-        im_new = cv2.cvtColor(im_gray, cv2.COLOR_GRAY2BGR)
-
-    # 铅笔彩色滤镜
-    if filter_name == "pencil_color":
-        im_gray, im_new = cv2.pencilSketch(im_bgr, sigma_s=50, sigma_r=value, shade_factor=0.04)
-
-    # 风格化滤镜
-    if filter_name == "stylize":
-        im_new = cv2.stylization(im_bgr, sigma_s=50, sigma_r=value)
-
-    # 细节增强滤镜
-    if filter_name == "detail_enhance":
-        im_new = cv2.detailEnhance(im_bgr, sigma_s=50, sigma_r=value)
-
-    # 边缘保持
-    if filter_name == "edge_preserve":
-        im_new = cv2.edgePreservingFilter(im_bgr, flags=1, sigma_s=50, sigma_r=value)
-
-    return im_new
+    filter_0 = np.array([[[-1, 0, 0], [0, 0, 0], [0, 0, 0]],
+                         [[0, 0, 0], [2, 0, 0], [0, 0, 0]],
+                         [[0, 0, 0], [0, 0, 0], [-1, 0, 0]]],
+                        dtype=np.int16)
+    filter_1 = np.array([[[0, -1, 0], [0, 0, 0], [0, 0, 0]],
+                         [[0, 0, 0], [0, 2, 0], [0, 0, 0]],
+                         [[0, 0, 0], [0, 0, 0], [0, -1, 0]]],
+                        dtype=np.int16)
+    filter_2 = np.array([[[0, 0, -1], [0, 0, 0], [0, 0, 0]],
+                         [[0, 0, 0], [0, 0, 2], [0, 0, 0]],
+                         [[0, 0, 0], [0, 0, 0], [0, 0, -1]]],
+                        dtype=np.int16)
+    return filter_0, filter_1, filter_2
 
 
-def mark_face(im_bgr, faces=None, bdcolor=(255, 0, 0), border=1):
+def Embossing_45_degree_Filter():
     """
-    标记人脸
-    :param im_bgr: BGR图片
-    :param faces: 人脸信息
-    :param bdcolor: 边框色
-    :param border: 边框宽度
-    @return: 处理后BGR图片
+    Embossing_45° Filter
+    45°浮雕 滤波
+    :return:
     """
-    if im_bgr is None:
-        return None
-    # 获取人脸信息
-    if faces is None:
-        faces = detect_face(im_bgr)
-    im_new = im_bgr.copy()
-    for (x, y, w, h) in faces:
-        im_new = cv2.rectangle(im_new, (x, y), (x + w, y + h), bdcolor, border)
-    return im_new
+    filter_0 = np.array([[[-1, 0, 0], [-1, 0, 0], [0, 0, 0]],
+                         [[-1, 0, 0], [1, 0, 0], [1, 0, 0]],
+                         [[0, 0, 0], [1, 0, 0], [1, 0, 0]]],
+                        dtype=np.int16)
+    filter_1 = np.array([[[0, -1, 0], [0, -1, 0], [0, 0, 0]],
+                         [[0, -1, 0], [0, 1, 0], [0, 1, 0]],
+                         [[0, 0, 0], [0, 1, 0], [0, 1, 0]]],
+                        dtype=np.int16)
+    filter_2 = np.array([[[0, 0, -1], [0, 0, -1], [0, 0, 0]],
+                         [[0, 0, -1], [0, 0, 1], [0, 0, 1]],
+                         [[0, 0, 0], [0, 0, 1], [0, 0, 1]]],
+                        dtype=np.int16)
+    return filter_0, filter_1, filter_2
+
+
+def Embossing_Asymmetric_Filter():
+    """
+    Embossing_Asymmetric Filter
+    非对称浮雕 滤波
+    :return:
+    """
+
+    filter_0 = np.array([[[2, 0, 0], [0, 0, 0], [0, 0, 0]],
+                         [[0, 0, 0], [-1, 0, 0], [0, 0, 0]],
+                         [[0, 0, 0], [0, 0, 0], [-1, 0, 0]]],
+                        dtype=np.int16)
+    filter_1 = np.array([[[0, 2, 0], [0, 0, 0], [0, 0, 0]],
+                         [[0, 0, 0], [0, -1, 0], [0, 0, 0]],
+                         [[0, 0, 0], [0, 0, 0], [0, -1, 0]]],
+                        dtype=np.int16)
+    filter_2 = np.array([[[0, 0, 2], [0, 0, 0], [0, 0, 0]],
+                         [[0, 0, 0], [0, 0, -1], [0, 0, 0]],
+                         [[0, 0, 0], [0, 0, 0], [0, 0, -1]]],
+                        dtype=np.int16)
+    return filter_0, filter_1, filter_2
+
+
+def Averaging_Blur_Filter():
+    """
+    Averaging_Blur Filter  均值模糊 滤波
+    :return:
+    """
+
+    filter_0 = np.array([[[0, 0, 0], [0.25, 0, 0], [0, 0, 0]],
+                         [[0.25, 0, 0], [0, 0, 0], [0.25, 0, 0]],
+                         [[0, 0, 0], [0.25, 0, 0], [0, 0, 0]]],
+                        dtype=np.float)
+    filter_1 = np.array([[[0, 0, 0], [0, 0.25, 0], [0, 0, 0]],
+                         [[0, 0.25, 0], [0, 0, 0], [0, 0.25, 0]],
+                         [[0, 0, 0], [0, 0.25, 0], [0, 0, 0]]],
+                        dtype=np.float)
+    filter_2 = np.array([[[0, 0, 0], [0, 0, 0.25], [0, 0, 0]],
+                         [[0, 0, 0.25], [0, 0, 0], [0, 0, 0.25]],
+                         [[0, 0, 0], [0, 0, 0.25], [0, 0, 0]]],
+                        dtype=np.float)
+    return filter_0, filter_1, filter_2
+
+
+def Completed_Blur_Filter():
+    """
+    Completed_Blur Filter  完全模糊 滤波
+    :return:
+    """
+
+    filter_0 = np.array([[[1.0 / 9, 0, 0], [1.0 / 9, 0, 0], [1.0 / 9, 0, 0]],
+                         [[1.0 / 9, 0, 0], [1.0 / 9, 0, 0], [1.0 / 9, 0, 0]],
+                         [[1.0 / 9, 0, 0], [1.0 / 9, 0, 0], [1.0 / 9, 0, 0]]],
+                        dtype=np.float)
+    filter_1 = np.array([[[0, 1.0 / 9, 0], [0, 1.0 / 9, 0], [0, 1.0 / 9, 0]],
+                         [[0, 1.0 / 9, 0], [0, 1.0 / 9, 0], [0, 1.0 / 9, 0]],
+                         [[0, 1.0 / 9, 0], [0, 1.0 / 9, 0], [0, 1.0 / 9, 0]]],
+                        dtype=np.float)
+    filter_2 = np.array([[[0, 0, 1.0 / 9], [0, 0, 1.0 / 9], [0, 0, 1.0 / 9]],
+                         [[0, 0, 1.0 / 9], [0, 0, 1.0 / 9], [0, 0, 1.0 / 9]],
+                         [[0, 0, 1.0 / 9], [0, 0, 1.0 / 9], [0, 0, 1.0 / 9]]],
+                        dtype=np.float)
+    return filter_0, filter_1, filter_2
+
+
+def Motion_Blur_Filter():
+    """
+    Motion_Blur Filter  运动模糊 滤波
+    :return:
+    """
+
+    filter_0 = np.array([[[1, 0, 0], [0, 0, 0], [0, 0, 0]],
+                         [[0, 0, 0], [1, 0, 0], [0, 0, 0]],
+                         [[0, 0, 0], [0, 0, 0], [1, 0, 0]]],
+                        dtype=np.int16)
+    filter_1 = np.array([[[0, 1, 0], [0, 0, 0], [0, 0, 0]],
+                         [[0, 0, 0], [0, 1, 0], [0, 0, 0]],
+                         [[0, 0, 0], [0, 0, 0], [0, 1, 0]]],
+                        dtype=np.int16)
+    filter_2 = np.array([[[0, 0, 1], [0, 0, 0], [0, 0, 0]],
+                         [[0, 0, 0], [0, 0, 1], [0, 0, 0]],
+                         [[0, 0, 0], [0, 0, 0], [0, 0, 1]]],
+                        dtype=np.int16)
+    return filter_0, filter_1, filter_2
+
+
+def Gaussian_Blur_Filter():
+    """
+    Gaussian_Blur Filter  高斯模糊 滤波
+    :return:
+    """
+
+    filter_0 = np.array([[[1.0 / 36, 0, 0], [4.0 / 36, 0, 0], [1.0 / 36, 0, 0]],
+                         [[4.0 / 36, 0, 0], [16.0 / 36, 0, 0], [4.0 / 36, 0, 0]],
+                         [[1.0 / 36, 0, 0], [4.0 / 36, 0, 0], [1.0 / 36, 0, 0]]],
+                        dtype=np.float)
+    filter_1 = np.array([[[0, 1.0 / 36, 0], [0, 4.0 / 36, 0], [0, 1.0 / 36, 0]],
+                         [[0, 4.0 / 36, 0], [0, 16.0 / 36, 0], [0, 4.0 / 36, 0]],
+                         [[0, 1.0 / 36, 0], [0, 4.0 / 36, 0], [0, 1.0 / 36, 0]]],
+                        dtype=np.float)
+    filter_2 = np.array([[[0, 0, 1.0 / 36], [0, 0, 4.0 / 36], [0, 0, 1.0 / 36]],
+                         [[0, 0, 4.0 / 36], [0, 0, 16.0 / 36], [0, 0, 4.0 / 36]],
+                         [[0, 0, 1.0 / 36], [0, 0, 4.0 / 36], [0, 0, 1.0 / 36]]],
+                        dtype=np.float)
+    return filter_0, filter_1, filter_2
+
+
+def DIY_Filter():
+    """
+    Design a filter yourself  自己设计一个滤波器
+    :return:
+    """
+
+    filter_0 = np.array([[[0, 0, 0], [0, 0, 0], [0, 0, 0]],
+                         [[0, 0, 0], [1, 0, 0], [0, 0, 0]],
+                         [[0, 0, 0], [0, 0, 0], [0, 0, 0]]],
+                        dtype=np.int16)
+    filter_1 = np.array([[[0, 0, 0], [0, 0, 0], [0, 0, 0]],
+                         [[0, 0, 0], [0, 1, 0], [0, 0, 0]],
+                         [[0, 0, 0], [0, 0, 0], [0, 0, 0]]],
+                        dtype=np.int16)
+    filter_2 = np.array([[[0, 0, 0], [0, 0, 0], [0, 0, 0]],
+                         [[0, 0, 0], [0, 0, 1], [0, 0, 0]],
+                         [[0, 0, 0], [0, 0, 0], [0, 0, 0]]],
+                        dtype=np.int16)
+    return filter_0, filter_1, filter_2
+
+
+def No_Exist_Filter():
+    """
+    When filter name doesn't exist  当滤波器不存在时
+    :return:
+    """
+
+    filter_0 = np.zeros((3, 3, 3), dtype=np.float)
+    filter_1 = np.zeros((3, 3, 3), dtype=np.float)
+    filter_2 = np.zeros((3, 3, 3), dtype=np.float)
+    return filter_0, filter_1, filter_2

@@ -12,7 +12,9 @@ import numpy as np
 
 from common import logcm
 from common import datecm
-from common import imfiltercm
+from common import imoptcm
+from common.imfiltercm import Filter
+
 from PIL import Image
 from skimage import img_as_ubyte, img_as_float, io, transform
 
@@ -53,9 +55,22 @@ class VideoActionOutput:
         self.last_im = self.im_bgr
         self.last_img_type = ImageType.IMG_BGR
         # 人脸侦测
-        self.faces = imfiltercm.detect_face(self.im_bgr)
+        self.faces = imoptcm.detect_face(self.im_bgr)
         # 皮肤侦测
-        self.im_skin = imfiltercm.detect_skin(self.im_bgr)
+        self.im_skin = imoptcm.detect_skin(self.im_bgr)
+        # 滤镜字典
+        self.filter_map = {}
+
+    def get_conv_filter(self, filter_name):
+        """
+        根据名称取得卷积滤镜,并使用字典进行缓存
+        """
+        if filter_name in self.filter_map:
+            return self.filter_map[filter_name]
+
+        new_filter = Filter(filter_name)
+        self.filter_map[filter_name] = new_filter
+        return new_filter
 
     def out_action(self, action_type, val_list, val_ratio=1, **kwargs):
         """
@@ -75,10 +90,10 @@ class VideoActionOutput:
                 img = add_img_HSV(self.im_bgr, add_h=value)
             # 饱和度动画
             elif action_type == "change_saturation":
-                img = imfiltercm.change_saturation(self.im_bgr, value)
+                img = imoptcm.change_saturation(self.im_bgr, value)
             # 饱和度动画
             elif action_type == "change_darker":
-                img = imfiltercm.change_darker(self.im_bgr, value)
+                img = imoptcm.change_darker(self.im_bgr, value)
             # 放大动画
             elif action_type == "zoom_in":
                 img = zoom_in(self.img_path, value)
@@ -109,16 +124,21 @@ class VideoActionOutput:
                 out_img_type = ImageType.IMG_PIL
             # 标记人脸
             elif action_type == "mark_face":
-                img = imfiltercm.mark_face(self.im_bgr, self.faces, border=int(value))
+                img = imoptcm.mark_face(self.im_bgr, self.faces, border=int(value))
             # 人脸美白动画
             elif action_type == "whitening_face":
-                img = imfiltercm.whitening_face(self.im_bgr, self.faces, value)
+                img = imoptcm.whitening_face(self.im_bgr, self.faces, value)
             # 皮肤美白动画
             elif action_type == "whitening_skin":
-                img = imfiltercm.whitening_skin(self.im_bgr, self.im_skin, value)
+                img = imoptcm.whitening_skin(self.im_bgr, self.im_skin, value)
             # 滤镜
             elif action_type == "im_filter":
-                img = imfiltercm.im_filter(self.im_bgr, kwargs["filter_name"], value)
+                img = imoptcm.im_filter(self.im_bgr, kwargs["filter_name"], value)
+                title += "-" + kwargs["filter_name"]
+            # 卷积滤镜
+            elif action_type == "conv_filter":
+                conv_filter = self.get_conv_filter(kwargs["filter_name"])
+                img = conv_filter.do_filter(self.im_bgr)
                 title += "-" + kwargs["filter_name"]
             # Hold住最近一次图片
             elif action_type == "hold":
