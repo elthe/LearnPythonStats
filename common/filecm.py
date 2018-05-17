@@ -203,6 +203,30 @@ def read_str(path=None, file_name=None, encoding="utf-8"):
     return all_str
 
 
+def read_bytes(path=None, file_name=None):
+    """
+    读取文件到字节数组
+    @param path: 文件路径
+    @param file_name: 文件名
+    @return: 字节数组
+    """
+    # 文件名为空返回空
+    if file_name is None:
+        logcm.print_info("File name is empty.", fg='red')
+        return None
+
+    # 路径不为空，路径拼接
+    if path is not None:
+        file_path = os.path.join(path, file_name)
+    else:
+        file_path = file_name
+
+    # 读取字节数组
+    file_object = open(file_path, 'rb')
+    bytes = file_object.read()
+    return bytes
+
+
 def search_files(search_path, ext=None, match=None):
     """
     对指定目录进行文件检索，返回满足条件的文件路径一览。
