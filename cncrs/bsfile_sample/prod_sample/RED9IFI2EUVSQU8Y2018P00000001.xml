@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cncrs:CNCRS version="1.0" xmlns:stc="http://aeoi.chinatax.gov.cn/crs/stctypes/v1" xmlns:cncrs="http://aeoi.chinatax.gov.cn/crs/cncrs/v1">
+    <cncrs:MessageHeader>
+        <cncrs:ReportingID>heh001</cncrs:ReportingID>
+        <cncrs:FIID>D9IFI2EUVSQU8Y</cncrs:FIID>
+        <cncrs:ReportingType>CRS</cncrs:ReportingType>
+        <cncrs:MessageRefId>RED9IFI2EUVSQU8Y2018P00000001</cncrs:MessageRefId>
+        <cncrs:ReportingPeriod>2017-12-31</cncrs:ReportingPeriod>
+        <cncrs:MessageTypeIndic>CRS701</cncrs:MessageTypeIndic>
+        <cncrs:Tmstp>2018-01-10T11:10:11</cncrs:Tmstp>
+    </cncrs:MessageHeader>
+    <cncrs:ReportingGroup>
+        <cncrs:AccountReport>
+            <cncrs:DocSpec>
+                <stc:DocRefId>CN2017D9IFI2EUVSQU8Y000000001</stc:DocRefId>
+                <stc:DocTypeIndic>R1</stc:DocTypeIndic>
+            </cncrs:DocSpec>
+            <cncrs:AccountNumber>6227000839360305939</cncrs:AccountNumber>
+            <cncrs:ClosedAccount>false</cncrs:ClosedAccount>
+            <cncrs:DueDiligenceInd>P</cncrs:DueDiligenceInd>
+            <cncrs:SelfCertification>true</cncrs:SelfCertification>
+            <cncrs:AccountBalance currCode="USD">123.33</cncrs:AccountBalance>
+            <cncrs:AccountHolderType>CRS100</cncrs:AccountHolderType>
+            <cncrs:OpeningFIName>中国建设银行北京分行</cncrs:OpeningFIName>
+            <cncrs:Payment>
+                <cncrs:PaymentType>CRS501</cncrs:PaymentType>
+                <cncrs:PaymentAmnt currCode="USD">123.33</cncrs:PaymentAmnt>
+            </cncrs:Payment>
+            <cncrs:AccountHolder>
+                <cncrs:Individual>
+                    <stc:Name nameType="OECD202">
+                        <stc:FirstName>NFN</stc:FirstName>
+                        <stc:MiddleName>Ffjnh1uiJJAeiKA3DU94</stc:MiddleName>
+                        <stc:LastName>zhangsan</stc:LastName>
+                        <stc:NameCN>张三</stc:NameCN>
+                        <stc:NamePrefix>Mr</stc:NamePrefix>
+                        <stc:PrecedingTitle>2222222222222222222222222222222222222</stc:PrecedingTitle>
+                        <stc:Title>Mr</stc:Title>
+                        <stc:Title>Dr</stc:Title>
+                        <stc:GenerationIdentifier>Jnr</stc:GenerationIdentifier>
+                        <stc:GenerationIdentifier>Third</stc:GenerationIdentifier>
+                        <stc:Suffix>VC</stc:Suffix>
+                        <stc:Suffix>QC</stc:Suffix>
+                        <stc:GeneralSuffix>VN</stc:GeneralSuffix>
+                    </stc:Name>
+                    <stc:Gender>M</stc:Gender>
+                    <stc:Address legalAddressType="OECD301">
+                        <stc:CountryCode>CN</stc:CountryCode>
+                        <stc:AddressEN>
+                            <stc:AddressFixEN>
+                                <stc:CityEN>Beijing</stc:CityEN>
+                                <stc:Street>Street 32</stc:Street>
+                                <stc:BuildingIdentifier>Building B2</stc:BuildingIdentifier>
+                                <stc:SuiteIdentifier>501</stc:SuiteIdentifier>
+                                <stc:FloorIdentifier>Floor5</stc:FloorIdentifier>
+                                <stc:DistrictName>Haidian</stc:DistrictName>
+                                <stc:POB>support@thunisoft.com</stc:POB>
+                                <stc:PostCode>100000</stc:PostCode>
+                                <stc:CountrySubentity>Beijing</stc:CountrySubentity>
+                            </stc:AddressFixEN>
+                            <stc:AddressFreeEN>Dongsheng science and Technology Park, Haidian District, Beijing</stc:AddressFreeEN>
+                        </stc:AddressEN>
+                        <stc:AddressCN>
+                            <stc:AddressFixCN>
+                                <stc:CityCN>110000</stc:CityCN>
+                                <stc:DistrictName>110108</stc:DistrictName>
+                                <stc:PostCode>100000</stc:PostCode>
+                                <stc:Province>110000</stc:Province>
+                            </stc:AddressFixCN>
+                            <stc:AddressFreeCN>北京市海淀区东升科技园</stc:AddressFreeCN>
+                        </stc:AddressCN>
+                    </stc:Address>
+                    <stc:PhoneNo>1397102724</stc:PhoneNo>
+                    <stc:IDType>ACC201</stc:IDType>
+                    <stc:IDNumber>110226198501272116</stc:IDNumber>
+                    <stc:ResCountryCode>GB</stc:ResCountryCode>
+                    <stc:TIN inType="TIN" issuedBy="GB">91410105757145609K</stc:TIN>
+                    <stc:Nationality>CN</stc:Nationality>
+                    <stc:BirthInfo>
+                        <stc:BirthDate>2017-01-10</stc:BirthDate>
+                        <stc:City>ShangHai</stc:City>
+                        <stc:CountryInfo>
+                            <stc:CountryCode>CN</stc:CountryCode>
+                        </stc:CountryInfo>
+                    </stc:BirthInfo>
+                </cncrs:Individual>
+            </cncrs:AccountHolder>
+        </cncrs:AccountReport>
+    </cncrs:ReportingGroup>
+</cncrs:CNCRS>

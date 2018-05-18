@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cncrs:CNCRS version="1.0" xmlns:stc="http://aeoi.chinatax.gov.cn/crs/stctypes/v1" xmlns:cncrs="http://aeoi.chinatax.gov.cn/crs/cncrs/v1">
+	<cncrs:MessageHeader>
+		<cncrs:ReportingID>heh001</cncrs:ReportingID>
+		<cncrs:FIID>C1YINUFUXUEZCI</cncrs:FIID>
+		<cncrs:ReportingType>CRS</cncrs:ReportingType>
+		<cncrs:MessageRefId>TRC1YINUFUXUEZCI2018N00000001</cncrs:MessageRefId>
+		<cncrs:ReportingPeriod>2017-12-31</cncrs:ReportingPeriod>
+		<cncrs:MessageTypeIndic>CRS701</cncrs:MessageTypeIndic>
+		<cncrs:Tmstp>2018-03-26T10:00:13</cncrs:Tmstp>
+	</cncrs:MessageHeader>
+	<cncrs:ReportingGroup>
+	<cncrs:AccountReport>
+			<cncrs:DocSpec>
+				<stc:DocRefId>CN2017C1YINUFUXUEZCI000000001</stc:DocRefId>
+				<stc:DocTypeIndic>T1</stc:DocTypeIndic>
+			</cncrs:DocSpec>
+			<cncrs:AccountNumber>123459</cncrs:AccountNumber>
+			<cncrs:ClosedAccount>false</cncrs:ClosedAccount>
+			<cncrs:DueDiligenceInd>N</cncrs:DueDiligenceInd>
+			<cncrs:SelfCertification>false</cncrs:SelfCertification>
+			<cncrs:AccountBalance currCode="GBP">13.00</cncrs:AccountBalance>
+			<cncrs:AccountHolderType>CRS100</cncrs:AccountHolderType>
+			<cncrs:OpeningFIName>FFI2</cncrs:OpeningFIName>
+			<cncrs:Payment>
+				<cncrs:PaymentType>CRS501</cncrs:PaymentType>
+				<cncrs:PaymentAmnt currCode="GBP">13.00</cncrs:PaymentAmnt>
+			</cncrs:Payment>
+			<cncrs:Payment>
+				<cncrs:PaymentType>CRS502</cncrs:PaymentType>
+				<cncrs:PaymentAmnt currCode="GBP">13.00</cncrs:PaymentAmnt>
+			</cncrs:Payment>
+			<cncrs:Payment>
+				<cncrs:PaymentType>CRS503</cncrs:PaymentType>
+				<cncrs:PaymentAmnt currCode="GBP">13.00</cncrs:PaymentAmnt>
+			</cncrs:Payment>
+			<cncrs:Payment>
+				<cncrs:PaymentType>CRS504</cncrs:PaymentType>
+				<cncrs:PaymentAmnt currCode="GBP">13.00</cncrs:PaymentAmnt>
+			</cncrs:Payment>
+			<cncrs:AccountHolder>
+				<cncrs:Individual>
+					<stc:Name nameType="OECD204">
+						<stc:FirstName>Acc First Name 3</stc:FirstName>
+						<stc:LastName>Acc Last Name 3</stc:LastName>
+						<stc:NameCN>NameCN4</stc:NameCN>
+					</stc:Name>
+					<stc:Gender>N</stc:Gender>
+					<stc:Address legalAddressType="OECD304">
+						<stc:CountryCode>CH</stc:CountryCode>
+						<stc:AddressEN>
+							<stc:AddressFixEN>
+								<stc:CityEN>Acc City</stc:CityEN>
+								<stc:Street>Acc Street</stc:Street>
+								<stc:BuildingIdentifier>Acc Building Identifier</stc:BuildingIdentifier>
+								<stc:SuiteIdentifier>Acc Suite ID</stc:SuiteIdentifier>
+								<stc:FloorIdentifier>Acc FloorIdentifier</stc:FloorIdentifier>
+								<stc:DistrictName>Acc District</stc:DistrictName>
+								<stc:POB>Acc POB</stc:POB>
+								<stc:PostCode>Acc PostCode</stc:PostCode>
+								<stc:CountrySubentity>Acc CountrySubentity</stc:CountrySubentity>
+							</stc:AddressFixEN>
+							<stc:AddressFreeEN>123 Street Name/City/State</stc:AddressFreeEN>
+						</stc:AddressEN>
+						<stc:AddressCN>
+							<stc:AddressFixCN>
+								<stc:CityCN>110000</stc:CityCN>
+								<stc:DistrictName>110108</stc:DistrictName>
+								<stc:PostCode>110000</stc:PostCode>
+								<stc:Province>110000</stc:Province>
+							</stc:AddressFixCN>
+							<stc:AddressFreeCN>AddressFreeCN4</stc:AddressFreeCN>
+						</stc:AddressCN>
+					</stc:Address>
+					<stc:PhoneNo>123459</stc:PhoneNo>
+					<stc:IDType>ACC220</stc:IDType>
+					<stc:IDNumber>1237</stc:IDNumber>
+					<stc:ResCountryCode>CH</stc:ResCountryCode>
+					<stc:ResCountryCode>HK</stc:ResCountryCode>
+					<stc:ResCountryCode>US</stc:ResCountryCode>
+					<stc:ResCountryCode>GB</stc:ResCountryCode>
+					<stc:TIN issuedBy="CH" inType="TIN">123546</stc:TIN>
+					<stc:TIN issuedBy="US" inType="TIN">164666</stc:TIN>
+					<stc:TIN issuedBy="GB" inType="TIN">151653</stc:TIN>
+					<stc:TIN issuedBy="HK" inType="TIN">16343</stc:TIN>
+					<stc:Nationality>JP</stc:Nationality>
+					<stc:BirthInfo>
+						<stc:BirthDate>1980-02-26</stc:BirthDate>
+						<stc:CountryInfo>
+							<stc:CountryCode>DE</stc:CountryCode>
+						</stc:CountryInfo>
+					</stc:BirthInfo>
+				</cncrs:Individual>
+			</cncrs:AccountHolder>
+		</cncrs:AccountReport>
+		<cncrs:AccountReport>
+			<cncrs:DocSpec>
+				<stc:DocRefId>CN2017C1YINUFUXUEZCI000000002</stc:DocRefId>
+				<stc:DocTypeIndic>R1</stc:DocTypeIndic>
+			</cncrs:DocSpec>
+			<cncrs:AccountNumber>123460</cncrs:AccountNumber>
+			<cncrs:ClosedAccount>false</cncrs:ClosedAccount>
+			<cncrs:DueDiligenceInd>N</cncrs:DueDiligenceInd>
+			<cncrs:SelfCertification>true</cncrs:SelfCertification>
+			<cncrs:AccountBalance currCode="GBP">14.00</cncrs:AccountBalance>
+			<cncrs:AccountHolderType>CRS100</cncrs:AccountHolderType>
+			<cncrs:OpeningFIName>FFI2</cncrs:OpeningFIName>
+			<cncrs:Payment>
+				<cncrs:PaymentType>CRS501</cncrs:PaymentType>
+				<cncrs:PaymentAmnt currCode="GBP">14.00</cncrs:PaymentAmnt>
+			</cncrs:Payment>
+			<cncrs:Payment>
+				<cncrs:PaymentType>CRS502</cncrs:PaymentType>
+				<cncrs:PaymentAmnt currCode="GBP">14.00</cncrs:PaymentAmnt>
+			</cncrs:Payment>
+			<cncrs:Payment>
+				<cncrs:PaymentType>CRS503</cncrs:PaymentType>
+				<cncrs:PaymentAmnt currCode="GBP">14.00</cncrs:PaymentAmnt>
+			</cncrs:Payment>
+			<cncrs:Payment>
+				<cncrs:PaymentType>CRS504</cncrs:PaymentType>
+				<cncrs:PaymentAmnt currCode="GBP">14.00</cncrs:PaymentAmnt>
+			</cncrs:Payment>
+			<cncrs:AccountHolder>
+				<cncrs:Individual>
+					<stc:Name nameType="OECD205">
+						<stc:FirstName>Acc First Name 4</stc:FirstName>
+						<stc:LastName>Acc Last Name 4</stc:LastName>
+						<stc:NameCN>NameCN5</stc:NameCN>
+					</stc:Name>
+					<stc:Gender>M</stc:Gender>
+					<stc:Address legalAddressType="OECD305">
+						<stc:CountryCode>HK</stc:CountryCode>
+						<stc:AddressEN>
+							<stc:AddressFixEN>
+								<stc:CityEN>Acc City</stc:CityEN>
+							</stc:AddressFixEN>
+							<stc:AddressFreeEN>123 Street Name/City/State</stc:AddressFreeEN>
+						</stc:AddressEN>
+						<stc:AddressCN>
+							<stc:AddressFixCN>
+								<stc:CityCN>110000</stc:CityCN>
+								<stc:Province>110000</stc:Province>
+							</stc:AddressFixCN>
+							<stc:AddressFreeCN>AddressFreeCN5</stc:AddressFreeCN>
+						</stc:AddressCN>
+					</stc:Address>
+					<stc:PhoneNo>123460</stc:PhoneNo>
+					<stc:IDType>ACC235</stc:IDType>
+					<stc:IDNumber>1238</stc:IDNumber>
+					<stc:ResCountryCode>GR</stc:ResCountryCode>
+					<stc:Nationality>CH</stc:Nationality>
+					<stc:BirthInfo>
+						<stc:BirthDate>1980-02-26</stc:BirthDate>
+						<stc:City>London</stc:City>
+						<stc:CountryInfo>
+							<stc:CountryCode>GR</stc:CountryCode>
+						</stc:CountryInfo>
+					</stc:BirthInfo>
+					<stc:Explanation>Explanation</stc:Explanation>
+				</cncrs:Individual>
+			</cncrs:AccountHolder>
+		</cncrs:AccountReport>
+	</cncrs:ReportingGroup>
+</cncrs:CNCRS>

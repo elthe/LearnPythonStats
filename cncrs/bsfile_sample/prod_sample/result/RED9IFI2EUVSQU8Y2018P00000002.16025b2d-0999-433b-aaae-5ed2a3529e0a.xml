@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CNCRS version="1.0" xmlns="http://aeoi.chinatax.gov.cn/crs/res/v1">
+    <MessageHeader>
+        <ReportingID>heh001</ReportingID>
+        <FIID>D9IFI2EUVSQU8Y</FIID>
+        <MessageRefId>RED9IFI2EUVSQU8Y2018P00000002</MessageRefId>
+        <Tmstp>2018-04-12T17:04:57.234+08:00</Tmstp>
+    </MessageHeader>
+    <ResultGroup>
+        <ResultType>S</ResultType>
+    </ResultGroup>
+</CNCRS>

@@ -279,17 +279,19 @@ def print_obj_data(obj, type_name, full_show, show_json):
         # 打印列表
         if type_name == 'list':
             if array(obj).ndim > 1:
-                return print_matrix_data(obj, 40)
+                print_matrix_data(obj, 40)
             else:
-                return print_list_data(obj, 60)
+                print_list_data(obj, 60)
 
-        if type_name == 'numpy.ndarray':
+        elif type_name == 'numpy.ndarray':
             if obj.ndim > 1:
-                return print_matrix_data(obj.tolist(), 40)
+                print_matrix_data(obj.tolist(), 40)
             else:
-                return print_list_data(obj.tolist(), 60)
-
-    print(obj)
+                print_list_data(obj.tolist(), 60)
+        else:
+            print(obj)
+    else:
+        print(obj)
 
     # 显示JSON
     if show_json:

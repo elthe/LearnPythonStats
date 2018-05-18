@@ -7,12 +7,30 @@ CNCRS 非居民金融账户涉税信息报送XML 做成示例
 
 from common import logcm
 from common import xmlcm
+from common.xmlcm import XmlTag
 from common.classcm import BaseObject
 
 from enum import Enum, unique
 
 # 金融机构注册码 14位
 FIID = "XXXXXXXXXXXXXX"
+
+
+class CNCRSReport(XmlTag):
+    def __init__(self):
+        """
+        标签初始化
+        @return: 无
+        """
+        init_param = {
+            'prefix': "cncrs",
+            'attr': {'version': "1.0"},
+            'xmlns': {
+                'stc': "http://aeoi.chinatax.gov.cn/crs/stctypes/v1",
+                'cncrs': "http://aeoi.chinatax.gov.cn/crs/cncrs/v1"
+            }
+        }
+        super(CNCRSReport, self).__init__("CNCRS", **init_param)
 
 
 @unique
@@ -247,13 +265,13 @@ class NamePerson:
     # 英文(拼音)姓. (最大长度100)
     # 身份证件只有中文的,填写拼音
     # 法定姓名为单名时,填于此处
-    FirstName = None
+    LastName = None
     # 英文中间名(最大长度100)
     MiddleName = None
     # 英文(拼音)名.(最大长度100)
     # 身份证件只有中文的,填写拼音
     # 法定姓名为单名时,固定填"NFN"
-    LastName = None
+    FirstName = None
     # 中文姓名
     # 开户证件有中文姓名的应填报
     NameCN = None
@@ -301,6 +319,7 @@ class Addess:
     # 国家代码(固定长度2位)
     # ISO 3166
     CountryCode = None
+
 
 # < stc: CountryCode > CH < / stc: CountryCode >
 # < stc: AddressEN >
