@@ -11,6 +11,7 @@ import xml.dom.minidom as minidom
 from lxml import etree
 from common import logcm
 from common import filecm
+from common import dictcm
 
 # 常量
 KEY_TAG = "tag"
@@ -35,7 +36,7 @@ class XmlTag:
     # 命名空间字典
     xmlns = None
 
-    def __init__(self, tag, prefix=None, attr=None, value=None, xmlns=None):
+    def __init__(self, tag, **kwargs):
         """
         XML标签初始化
         :param tag: 标签名
@@ -45,10 +46,10 @@ class XmlTag:
         :param xmlns: 命名空间字典
         """
         self.tag = tag
-        self.prefix = prefix
-        self.attr = attr
-        self.value = value
-        self.xmlns = xmlns
+        self.prefix = dictcm.get(kwargs, 'prefix')
+        self.attr = dictcm.get(kwargs, 'attr')
+        self.value = dictcm.get(kwargs, 'value')
+        self.xmlns = dictcm.get(kwargs, 'xmlns')
 
     def add_sub_tag(self, sub_tag):
         """
@@ -62,6 +63,31 @@ class XmlTag:
         # 添加子标签
         if sub_tag is not None:
             self.value.append(sub_tag)
+
+    def set_attr(self, k, v):
+        """
+        设置标签属性
+        :param k:属性KEY
+        :param v:属性值
+        :return:无
+        """
+        # 属性初始化
+        if not self.attr:
+            self.attr = {}
+        # 属性值设置
+        self.attr[k] = v
+
+    def set_attr_by_map(self, map):
+        """
+        根据字典批量设置属性值
+        :param map:属性Map
+        :return:无
+        """
+        # 属性初始化
+        if not self.attr:
+            self.attr = {}
+        # 属性值批量设置
+        self.attr.update(map)
 
     def to_dict(self):
         """
