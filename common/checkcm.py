@@ -40,12 +40,42 @@ class CheckResult(BaseObject):
         self.msg = msg
 
 
+def load_check_map(chk_cfg):
+    """
+    载入校验规则字典
+    :param chk_cfg: 校验配置对象
+    :return: 规则字典
+    """
+    chk_rule_map = {}
+    for (cfg_key, cfg_list) in chk_cfg.items():
+        cfg_rule_list = []
+        for cfg_item in cfg_list:
+            rule_list = load_check_list(cfg_item)
+            cfg_rule_list += rule_list
+        chk_rule_map[cfg_key] = cfg_rule_list
+    return chk_rule_map
+
+
+def load_check_list(cfg_item):
+    """
+    根据校验配置,取得校验规则列表
+    :param cfg_item: 校验配置项
+    :return:校验规则列表
+    """
+    rule_list = []
+    for name in cfg_item["rules"]:
+        args = dictcm.get(cfg_item["rule_args"], name, {})
+        rule = CheckRule(cfg_item["key"], cfg_item["title"], name, **args)
+        rule_list.append(rule)
+    return rule_list
+
+
 def check_obj_by_list(obj, check_list):
     """
     对对象按照校验列表进行校验
     :param obj:对象
     :param check_list:校验列表
-    :return:(是否OK,错误消息列表)
+    :return:校验结果对象
     """
     is_ok_all = True
     msg_list = []
@@ -62,7 +92,7 @@ def check_obj(obj, chk):
     对对象的属性进行校验
     :param obj: 对象
     :param chk: 校验规则
-    :return: (是否OK,错误消息)
+    :return: 校验结果对象
     """
 
     if chk is None:
@@ -77,18 +107,19 @@ def check_obj(obj, chk):
         return check_in_list(val, chk.title, **chk.args)
     elif chk.rule == "date":
         return check_date(val, chk.title, **chk.args)
+    elif chk.rule == "number":
+        return check_number(val, chk.title, **chk.args)
 
     return CheckResult(True)
 
 
-def check_date(obj, title="", check_format=None, fix_month=None, fix_day=None, fix_year=None, max_year=None,
-               min_year=None, max_month=None, min_month=None, max_day=None, min_day=None):
+def check_date(obj, title="", check_format=None, **kwargs):
     """
     非空校验
     :param obj: 对象
     :param title: 标题
     :param check_format: 日期格式
-    :return:(是否OK,错误消息)
+    :return:校验结果对象
     """
     if obj is None:
         return CheckResult(True)
@@ -101,9 +132,37 @@ def check_date(obj, title="", check_format=None, fix_month=None, fix_day=None, f
             logcm.print_info(msg, fg='red')
             return CheckResult(False, msg)
 
-    # if isinstance(obj, float):
-    #     date = datecm.xldate_to_date(obj)
+    # 取得日期值
+    date_val = datecm.to_date(obj, check_format)
+    if date_val is None:
+        return CheckResult(True)
 
+    # 年月日判断
+    key_list = ["year", "month", "day"]
+    name_list = ["年份", "月份", "日"]
+    date_list = [date_val.year, date_val.month, date_val.day]
+    for i in range(len(key_list)):
+        key = key_list[i]
+        val = date_list[i]
+        name = name_list[i]
+        # 固定值判断
+        chk_val = dictcm.get(kwargs, "fix_" + key)
+        if chk_val is not None and val != chk_val:
+            msg = "%s的%s为%d,与要求的固定值%d不同!" % (title, name, val, chk_val)
+            logcm.print_info(msg, fg='red')
+            return CheckResult(False, msg)
+        # 最小值判断
+        chk_val = dictcm.get(kwargs, "min_" + key)
+        if chk_val is not None and val < chk_val:
+            msg = "%s的%s为%d,小于要求的最小值%d!" % (title, name, val, chk_val)
+            logcm.print_info(msg, fg='red')
+            return CheckResult(False, msg)
+        # 最大值判断
+        chk_val = dictcm.get(kwargs, "max_" + key)
+        if chk_val is not None and val > chk_val:
+            msg = "%s的%s为%d,大于要求的最大值%d!" % (title, name, val, chk_val)
+            logcm.print_info(msg, fg='red')
+            return CheckResult(False, msg)
 
     return CheckResult(True)
 
@@ -133,7 +192,7 @@ def check_in_list(obj, title="", range_list=None):
     :param obj: 对象
     :param title: 标题
     :param range_list: 列表
-    :return:(是否OK,错误消息)
+    :return:校验结果对象
     """
     if obj is None or range_list is None:
         return CheckResult(True)
@@ -149,7 +208,7 @@ def check_notnull(obj, title=""):
     非空校验
     :param obj: 对象
     :param title: 标题
-    :return:(是否OK,错误消息)
+    :return:校验结果对象
     """
     if obj is None or len(str(obj)) == 0:
         msg = "%s不能为空!" % title
@@ -167,7 +226,7 @@ def check_len(obj, title="", max_len=None, min_len=None, fix_len=None):
     :param max_len:最大长度
     :param min_len:最小长度
     :param fix_len:固定长度
-    :return: (是否OK,错误消息)
+    :return: 校验结果对象
     """
     obj_len = len(obj)
     if fix_len is not None:
@@ -185,6 +244,37 @@ def check_len(obj, title="", max_len=None, min_len=None, fix_len=None):
     if min_len is not None:
         if obj_len < min_len:
             msg = "%s长度为%d,小于要求的最小长度%d!" % (title, obj_len, min_len)
+            logcm.print_info(msg, fg='red')
+            return CheckResult(False, msg)
+
+    return CheckResult(True)
+
+
+def check_number(obj, title="", max_val=None, min_val=None, fix_val=None):
+    """
+    数值校验(最小,最大,固定值)
+    :param obj: 对象
+    :param title: 标题
+    :param max_val:最大值
+    :param min_val:最小值
+    :param fix_val:固定值
+    :return: 校验结果对象
+    """
+    if fix_val is not None:
+        if obj != fix_val:
+            msg = "%s值为%d,与要求的固定值%d不同!" % (title, obj, fix_val)
+            logcm.print_info(msg, fg='red')
+            return CheckResult(False, msg)
+
+    if max_val is not None:
+        if obj > max_val:
+            msg = "%s值为%d,超过了要求的最大值%d!" % (title, obj, max_val)
+            logcm.print_info(msg, fg='red')
+            return CheckResult(False, msg)
+
+    if min_val is not None:
+        if obj < min_val:
+            msg = "%s值为%d,小于要求的最小值%d!" % (title, obj, min_val)
             logcm.print_info(msg, fg='red')
             return CheckResult(False, msg)
 

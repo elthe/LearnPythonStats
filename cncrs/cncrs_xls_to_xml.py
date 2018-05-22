@@ -8,25 +8,28 @@
 import sys
 
 from common import logcm
+from common import datecm
 from common import xmlcm
 from common import filecm
+from common import xlscm
 from common import loadcfgcm
 from common import checkcm
 from common.checkcm import CheckRule
 
+from cncrs.cncrs_cm import CNCRSReportMaker
 from cncrs.cncrs_tag import *
 
 # 配置
 # Excel文件名，可以对应到多个Sheet，每个Sheet有一个标题行。
 default_config = """
 {
-    "excel_path" : "/path/to/excel",
+    "excel_path" : "./template/非居民金融账户涉税信息采集表-测试.xlsx",
     "sheet_name" : "申报表",
-    "manager" : {
+    "Manager" : {
         "title_line" : 3,
         "data_start_line" : 5,
         "title_group" : {
-            "manager" : {
+            "Manager" : {
                 "start_col" : 0,
                 "end_col" : 2,
                 "title_map" : {
@@ -37,11 +40,11 @@ default_config = """
             }
         }
     },
-    "account" : {
+    "Account" : {
         "title_line" : 10,
         "data_start_line" : 12,
         "title_group" : {
-            "account" : {
+            "Account" : {
                 "start_col" : 0,
                 "end_col" : 11,
                 "title_map" : {
@@ -115,70 +118,129 @@ default_config = """
 }
 """
 
+check_config = """
+{
+    "Manager" : [
+        {
+            "key" : "ReportingID",
+            "title" : "系统用户账号",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 50}
+            }            
+        },
+        {
+            "key" : "FIID",
+            "title" : "金融机构注册码",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"fix_len" : 14}
+            }
+        },
+        {
+            "key" : "ReportingPeriod",
+            "title" : "报送年度",
+            "rules" : ["not_null", "date"],
+            "rule_args" : {
+                "length" : {"fix_month" : 12, "fix_day" : 31, "min_year" : 2017}
+            }
+        }        
+    ],
+    "Account" : [
+        {
+            "key" : "AccountNumber",
+            "title" : "基金账号",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 100}
+            }
+        },
+        {
+            "key" : "ClosedAccount",
+            "title" : "客户类别(是否已注销)",
+            "rules" : ["not_null", "in_list"],
+            "rule_args" : {
+                "in_list" : {"range_list" : ["是", "否"]}
+            }
+        },
+        {
+            "key" : "DueDiligenceInd",
+            "title" : "账号类别(是否新开账户)",
+            "rules" : ["not_null", "in_list"],
+            "rule_args" : {
+                "in_list" : {"range_list" : ["是", "否"]}
+            }
+        },
+        {
+            "key" : "SelfCertification",
+            "title" : "自证声明",
+            "rules" : ["not_null", "in_list"],
+            "rule_args" : {
+                "in_list" : {"range_list" : ["是", "否"]}
+            }
+        },
+        {
+            "key" : "AccountBalance",
+            "title" : "自证声明",
+            "rules" : ["not_null", "number"],
+            "rule_args" : {
+                "number" : {"min_val" : 0}
+            }
+        },
+        {
+            "key" : "AccountHolderType",
+            "title" : "账户持有人类别",
+            "rules" : ["not_null", "in_list"],
+            "rule_args" : {
+                "in_list" : {"range_list" : ["01", "02", "03", "04"]}
+            }
+        },
+        {
+            "key" : "OpeningFIName",
+            "title" : "开户金融机构名称",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 200}
+            }
+        }
+    ]    
+}
+"""
+
 # 加载配置文件
 cfg = loadcfgcm.load("cncrs_xls_to_xml.json", default_config, config_path='../config')
 
+# 加载规则字典
+chk_cfg = loadcfgcm.load("cncrs_xls_to_xml_chk.json", check_config, config_path='../config')
+chk_rule_map = checkcm.load_check_map(chk_cfg)
+
 # 加载Excel管理信息
-cfg_mng = cfg['manager']
-mng_list = filecm.load_excel_dict(cfg['excel_path'], cfg['sheet_name'], cfg_mng['title_line'],
-                                  cfg_mng['data_start_line'], cfg_mng['title_group'])
-# 管理信息检验
+cfg_mng = cfg['Manager']
+mng_list = xlscm.load_excel_dict(cfg['excel_path'], cfg['sheet_name'], cfg_mng['title_line'],
+                                 cfg_mng['data_start_line'], cfg_mng['title_group'])
+# 管理信息为空判断
 if mng_list is None or len(mng_list) == 0:
     logcm.print_info("Manager Info is not set!", fg='red')
     sys.exit()
 if len(mng_list) != 1:
     logcm.print_info("Manager Info need only one!", fg='red')
     sys.exit()
-mng_info = mng_list[0]["manager"]
+mng_info = mng_list[0]["Manager"]
 logcm.print_obj(mng_info, "mng_info", show_json=True)
-check_list = [
-    CheckRule("ReportingID", "系统用户账号", "notnull"),
-    CheckRule("ReportingID", "系统用户账号", "length", max_len=50),
-    CheckRule("FIID", "金融机构注册码", "notnull"),
-    CheckRule("FIID", "金融机构注册码", "length", fix_len=14),
-    CheckRule("ReportingPeriod", "报送年度", "notnull"),
-    CheckRule("ReportingPeriod", "报送年度", "date", fix_month=12, fix_day=31, min_year=2017),
-]
-
-check_result = checkcm.check_obj_by_list(mng_info, check_list)
 
 # 加载Excel账户信息
-cfg_acc = cfg['account']
-acc_list = filecm.load_excel_dict(cfg['excel_path'], cfg['sheet_name'], cfg_acc['title_line'],
-                                  cfg_acc['data_start_line'], cfg_acc['title_group'])
+cfg_acc = cfg['Account']
+acc_list = xlscm.load_excel_dict(cfg['excel_path'], cfg['sheet_name'], cfg_acc['title_line'],
+                                 cfg_acc['data_start_line'], cfg_acc['title_group'])
 logcm.print_obj(acc_list, "acc_list", show_json=True)
+# 账户信息为空判断
+if acc_list is None or len(acc_list) == 0:
+    logcm.print_info("Account Info is not set!", fg='red')
+    sys.exit()
 
-# 根节点标签
-root = CNCRSRootTag()
-# Header标签
-header = {
-    "ReportingID": "1111",
-    "FIID": "2222",
-    "ReportingType": "3333",
-    "MessageRefId": "4444",
-    "ReportingPeriod": "5555",
-    "Tmstp": "6666"
-}
-root.add_sub_tag(MessageHeaderTag(**header))
-# 报送组
-group = ReportingGroupTag()
-for i in range(10):
-    # 报送账户
-    acc = AccountReportTag()
-
-    spec_map = {
-        "DocRefId": "CN2017C1YINUFUXUEZCI000000001",
-        "DocTypeIndic": "T1"
-    }
-    spec = DocSpecTag(**spec_map)
-    acc.add_sub_tag(spec)
-
-    group.add_sub_tag(acc)
-root.add_sub_tag(group)
-# 转成XML
-tree = root.to_dict()
-xml = xmlcm.dict_to_xml(tree)
-logcm.print_obj(xml, "xml")
-# XML文件输出
-out_file = "../temp/cncrs_tag_sample.xml"
-xmlcm.dict_to_xml(tree, save_path=out_file)
+# 报告生成器
+maker = CNCRSReportMaker(save_path="../temp/file", chk_rule=chk_rule_map, test=True, **mng_info)
+# 设置账户信息
+maker.set_acc_list(acc_list)
+# 生成XML报告
+maker.make_all_report()

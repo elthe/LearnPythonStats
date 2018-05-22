@@ -7,6 +7,7 @@ EXCEL数据加载
 
 from common import datecm
 from common import filecm
+from common import xlscm
 from common import loadcfgcm
 from common import logcm
 
@@ -56,7 +57,7 @@ for path in path_list:
     cfg_list = config_map[short_name]
     for cfg in cfg_list:
         # 读取数据
-        data_list = filecm.load_excel_data(path, short_name, cfg['sheet_name'], cfg['title_line'], cfg['col_titles'])
+        data_list = xlscm.load_excel_data(path, short_name, cfg['sheet_name'], cfg['title_line'], cfg['col_titles'])
         if data_list:
             # 写入CSV文件
             filecm.append_csv(out_file, data_list)

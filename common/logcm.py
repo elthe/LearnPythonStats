@@ -7,7 +7,9 @@ Log common api
 """
 
 import json
+
 from numpy import *
+from common.datecm import DateEncoder
 
 colors_dict = {
     'reset': '0',
@@ -300,7 +302,7 @@ def print_obj_data(obj, type_name, full_show, show_json):
         print('Json Dumps', end='')
         print('-' * 45)
         obj_json = json.dumps(obj, sort_keys=True, indent=4, separators=(',', ': '),
-                              ensure_ascii=False)
+                              ensure_ascii=False, cls=DateEncoder)
         print(obj_json)
     return None
 
