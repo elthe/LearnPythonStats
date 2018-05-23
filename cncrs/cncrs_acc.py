@@ -190,9 +190,10 @@ class CNCRSAccount:
         res_country = self.convert("country", input_data["ResCountryCode"])
         tag.add_sub_tag_by_kv("ResCountryCode", res_country)
         # 税收识别号
-        tin_code = input_data["TIN"]
-        tin = TINTag(res_country, tin_code)
-        tag.add_sub_tag(tin)
+        if "TIN" in input_data:
+            tin_code = input_data["TIN"]
+            tin = TINTag(res_country, tin_code)
+            tag.add_sub_tag(tin)
         # 不提供的理由
         if "Explanation" in input_data:
             tag.add_sub_tag_by_kv("Explanation", input_data["Explanation"])
@@ -213,7 +214,34 @@ class CNCRSAccount:
         :return:
         """
 
+        input_data = self.acc_info["Organisation"]
         tag = OrganisationTag()
+        # 姓名标签
+        init_param = {
+            "nameType": "OECD207",
+            "OrganisationNameEN": input_data["OrganisationNameEN"],
+            "OrganisationNameCN": input_data["OrganisationNameCN"]
+        }
+        name = OrganisationNameTag(**init_param)
+        tag.add_sub_tag(name)
+        # 地址
+        country_code = self.convert("country", input_data["AddressCountryCode"])
+        city_en = input_data["AddressCityEN"]
+        address_free_en = input_data["AddressFreeEN"]
+        address_free_cn = input_data["AddressFreeCN"]
+        address = AddressTag("OECD301", country_code, city_en, address_free_en, address_free_cn)
+        tag.add_sub_tag(address)
+        # 税收居民国代码
+        res_country = self.convert("country", input_data["ResCountryCode"])
+        tag.add_sub_tag_by_kv("ResCountryCode", res_country)
+        # 税收识别号
+        if "TIN" in input_data:
+            tin_code = input_data["TIN"]
+            tin = TINTag(res_country, tin_code)
+            tag.add_sub_tag(tin)
+        # 不提供的理由
+        if "Explanation" in input_data:
+            tag.add_sub_tag_by_kv("Explanation", input_data["Explanation"])
 
         return tag
 
@@ -223,7 +251,41 @@ class CNCRSAccount:
         :return:
         """
 
+        input_data = self.acc_info["ControllingPerson"]
         tag = ControllingPersonTag()
+        # 姓名标签
+        init_param = {
+            "nameType": "OECD202",
+            "FirstName": input_data["FirstName"],
+            "LastName": input_data["LastName"],
+            "NameCN": input_data["NameCN"]
+        }
+        name = NameTag(**init_param)
+        tag.add_sub_tag(name)
+        # 地址
+        country_code = self.convert("country", input_data["AddressCountryCode"])
+        city_en = input_data["AddressCityEN"]
+        address_free_en = input_data["AddressFreeEN"]
+        address_free_cn = input_data["AddressFreeCN"]
+        address = AddressTag("OECD301", country_code, city_en, address_free_en, address_free_cn)
+        tag.add_sub_tag(address)
+        # 税收居民国代码
+        res_country = self.convert("country", input_data["ResCountryCode"])
+        tag.add_sub_tag_by_kv("ResCountryCode", res_country)
+        # 税收识别号
+        if "TIN" in input_data:
+            tin_code = input_data["TIN"]
+            tin = TINTag(res_country, tin_code)
+            tag.add_sub_tag(tin)
+        # 不提供的理由
+        if "Explanation" in input_data:
+            tag.add_sub_tag_by_kv("Explanation", input_data["Explanation"])
+
+        # 出生信息
+        birth_date = self.convert("date", input_data["BirthDate"])
+        birth_country = self.convert("country", input_data["BirthCountryCode"])
+        birth = BirthInfoTag(birth_date, birth_country)
+        tag.add_sub_tag(birth)
 
         return tag
 

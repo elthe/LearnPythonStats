@@ -258,6 +258,28 @@ class NameTag(CNCRSBaseTag):
         ]
         self.add_sub_tags(tag_keys, kwargs)
 
+class OrganisationNameTag(CNCRSBaseTag):
+    """
+    机构Name标签
+    """
+
+    def __init__(self, **kwargs):
+        """
+        标签初始化
+        @:param curr_code:货币代码
+        @:param amount:金额
+        @return: 无
+        """
+        init_param = {
+            'attr': {'nameType': dictcm.get(kwargs, "nameType")}
+        }
+        super(OrganisationNameTag, self).__init__("Name", **init_param)
+        # 用字典初始化子标签
+        tag_keys = [
+            "OrganisationNameEN",  # 机构英文名
+            "OrganisationNameCN"  # 机构中文名
+        ]
+        self.add_sub_tags(tag_keys, kwargs)
 
 class AddressTag(CNCRSBaseTag):
     """
