@@ -10,13 +10,10 @@ from common import logcm
 from common import xmlcm
 from common import dictcm
 from common import datecm
-from common.xmlcm import XmlTag
-from common.classcm import BaseObject
 from common import checkcm
-from common.checkcm import CheckRule
 
-from enum import Enum, unique
 from cncrs.cncrs_tag import *
+from cncrs.cncrs_acc import *
 
 
 class CNCRSReportMaker:
@@ -24,15 +21,18 @@ class CNCRSReportMaker:
     CNCRS 报告生成器类
     """
 
-    def __init__(self, chk_rule=None, save_path=None, test=False, **kwargs):
+    def __init__(self, chk_rule=None, save_path=None, test=False, last_report=None, **kwargs):
         """
         初始化
+        :param chk_rule:校验规则
         :param save_path:保存路径
+        :param last_report:上次报告记录
         :param test:是否测试模式
         """
         self.test = test
         self.save_path = save_path
         self.chk_rule = chk_rule
+        self.last_report = last_report
         self.check_info("Manager", kwargs)
         # 校验通过保存管理信息
         self.ReportingID = kwargs['ReportingID']
@@ -42,6 +42,8 @@ class CNCRSReportMaker:
         self.new_acc_list = []
         # 修改或删除数据列表
         self.update_acc_list = []
+        # 账户记录编号
+        self.doc_no = 1
 
     def check_info(self, chk_key, info, line_no=1):
         """
@@ -65,12 +67,13 @@ class CNCRSReportMaker:
         :param acc_list:账户列表
         :return:
         """
+        # 账户信息校验
         for i in range(len(acc_list)):
             acc_info = acc_list[i]
             line_no = i + 1
             self.check_info("Account", acc_info, line_no)
 
-            holder_type = acc_info["account"]["AccountHolderType"]
+            holder_type = acc_info["Account"]["AccountHolderType"]
             if holder_type == "01":
                 # 非居民个人客户
                 self.check_info("Individual", acc_info["Individual"], line_no)
@@ -80,6 +83,27 @@ class CNCRSReportMaker:
                 # 有非居民控制人的消极非金融机构
                 if holder_type == "02":
                     self.check_info("ControllingPerson", acc_info["ControllingPerson"], line_no)
+
+            # 根据新增和变更加入不同列表
+            doc_ref_id = self.get_doc_ref_id(acc_info, line_no)
+            acc_obj = CNCRSAccount(acc_info, doc_ref_id=doc_ref_id, test=self.test)
+            if acc_obj.new_data:
+                self.new_acc_list.append(acc_obj)
+            else:
+                self.update_acc_list.append(acc_obj)
+
+    def get_doc_ref_id(self, acc_info, line_no):
+        """
+        取得新的账户记录编号
+        :return:编号文本
+        """
+        # 格式: CN + 4位年份 + 14位金融机构注册码 + 9位序列号
+        doc_ref_id = "CN%d%s%09d" % (self.ReportingPeriod.year, self.FIID, line_no)
+        # 把文档ID和客户编号关联
+        if self.last_report:
+            key = acc_info["Account"]["AccountNumber"]
+            self.last_report[key] = doc_ref_id
+        return doc_ref_id
 
     def get_ref_id(self, new_data, sort_no):
         """
@@ -112,7 +136,14 @@ class CNCRSReportMaker:
         }
         return MessageHeaderTag(**header)
 
-    def make_report(self, acc_info, new_data, sort_no):
+    def make_report(self, acc_obj, new_data, sort_no):
+        """
+        生成报送报告
+        :param acc_obj:账户信息
+        :param new_data:是否新数据
+        :param sort_no:序号
+        :return:无
+        """
 
         # 根节点标签
         root = CNCRSRootTag()
@@ -123,15 +154,8 @@ class CNCRSReportMaker:
 
         # 报送组
         group = ReportingGroupTag()
-        # 报送账户
-        acc = AccountReportTag()
-        spec_map = {
-            "DocRefId": "CN2017C1YINUFUXUEZCI000000001",
-            "DocTypeIndic": "T1"
-        }
-        spec = DocSpecTag(**spec_map)
-        acc.add_sub_tag(spec)
-
+        # 取得账户的标签
+        acc = acc_obj.get_tag()
         group.add_sub_tag(acc)
         # 添加报送组标签
         root.add_sub_tag(group)
@@ -156,21 +180,21 @@ class CNCRSReportMaker:
 
     def make_all_report(self):
         """
-        生成报送文件
+        生成所有报送文件
         :return:
         """
         # 生成新数据报告
         if len(self.new_acc_list) > 0:
             sort_no = 1
-            for acc in self.new_acc_list:
-                self.make_report(acc, True, sort_no)
+            for acc_obj in self.new_acc_list:
+                self.make_report(acc_obj, True, sort_no)
                 sort_no += 1
 
         # 生成更新数据报告
         if len(self.update_acc_list) > 0:
             sort_no = 1
-            for acc in self.update_acc_list:
-                self.make_report(acc, False, sort_no)
+            for acc_obj in self.update_acc_list:
+                self.make_report(acc_obj, False, sort_no)
                 sort_no += 1
 
 

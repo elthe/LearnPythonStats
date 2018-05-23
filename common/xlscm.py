@@ -6,7 +6,6 @@ Excel common api
 Excel文件相关共通函数
 """
 
-
 import xlrd
 
 from common import filecm
@@ -122,7 +121,9 @@ def load_excel_dict(file_path, sheet_name, title_line, data_start_line, title_gr
         for (title, title_key) in group_setting["title_map"].items():
             # 查找标题
             found_title = False
-            for i in range(group_setting["start_col"], group_setting["end_col"] + 1):
+            start_col = colname_to_index(group_setting["start_col"])
+            end_col = colname_to_index(group_setting["end_col"])
+            for i in range(start_col, end_col + 1):
                 val = get_cell_val(worksheet, title_line, i)
                 if title == val:
                     # 记录标题的索引,标记找到
@@ -191,3 +192,24 @@ def get_cell_val(sheet, row, col):
         return bool_val
     else:
         return cell_val
+
+
+def colname_to_index(col_name):
+    """
+    字母列名转成数字索引
+    :param col_name:
+    :return:
+    """
+    base = ord("A")
+    r = 0
+    for i in list(col_name):
+        r = r * 26 + ord(i) - base + 1
+    return r - 1
+
+
+if __name__ == '__main__':
+    print(colname_to_index("A"))
+    print(colname_to_index("Z"))
+    print(colname_to_index("AA"))
+    print(colname_to_index("AZ"))
+    print(colname_to_index("ZZ"))

@@ -30,8 +30,8 @@ default_config = """
         "data_start_line" : 5,
         "title_group" : {
             "Manager" : {
-                "start_col" : 0,
-                "end_col" : 2,
+                "start_col" : "A",
+                "end_col" : "C",
                 "title_map" : {
                     "系统用户账号" : "ReportingID",
                     "金融机构注册码" : "FIID", 
@@ -45,8 +45,8 @@ default_config = """
         "data_start_line" : 12,
         "title_group" : {
             "Account" : {
-                "start_col" : 0,
-                "end_col" : 11,
+                "start_col" : "B",
+                "end_col" : "L",
                 "title_map" : {
                     "基金账号" : "AccountNumber",
                     "账户类型" : "ClosedAccount",
@@ -62,8 +62,8 @@ default_config = """
                 }
             },
             "Individual" : {
-                "start_col" : 12,
-                "end_col" : 25,
+                "start_col" : "M",
+                "end_col" : "AB",
                 "title_map" : {
                     "客户姓名" : "NameCN",
                     "拼音/英文-姓" : "LastName",
@@ -75,6 +75,8 @@ default_config = """
                     "证件号码" : "IDNumber",
                     "现居地址" : "AddressFreeCN",
                     "拼音/英文-现居地址" : "AddressFreeEN",
+                    "拼音/英文-所在城市" : "AddressCityEN",
+                    "现居住国" : "AddressCountryCode",                    
                     "出生国" : "BirthCountryCode",
                     "税收居民国" : "ResCountryCode",
                     "纳税识别号" : "TIN",
@@ -82,21 +84,23 @@ default_config = """
                 }
             },
             "Organisation" : {
-                "start_col" : 26,
-                "end_col" : 32,
+                "start_col" : "AC",
+                "end_col" : "AK",
                 "title_map" : {
                     "机构名称" : "OrganisationNameCN",
                     "拼音/英文-机构名称" : "OrganisationNameEN",
                     "机构地址" : "AddressFreeCN",
                     "拼音/英文-机构地址" : "AddressFreeEN",
+                    "拼音/英文-所在城市" : "AddressCityEN",
+                    "机构所在国" : "AddressCountryCode",
                     "税收居民国" : "ResCountryCode",
                     "纳税识别号" : "TIN",
                     "无纳税识别号理由" : "Explanation"
                 }
             },
             "ControllingPerson" : {
-                "start_col" : 33,
-                "end_col" : 45,
+                "start_col" : "AL",
+                "end_col" : "AZ",
                 "title_map" : {
                     "控制人姓名" : "NameCN",
                     "拼音/英文-姓" : "LastName",
@@ -107,6 +111,8 @@ default_config = """
                     "证件号码" : "IDNumber",
                     "现居地址" : "AddressFreeCN",
                     "拼音/英文-现居地址" : "AddressFreeEN",
+                    "拼音/英文-所在城市" : "AddressCityEN",
+                    "现居住国" : "AddressCountryCode",
                     "出生国" : "BirthCountryCode",
                     "税收居民国" : "ResCountryCode",
                     "纳税识别号" : "TIN",
@@ -203,7 +209,351 @@ check_config = """
                 "length" : {"max_len" : 200}
             }
         }
-    ]    
+    ],
+    "Individual" : [
+        {
+            "key" : "FirstName",
+            "title" : "拼音/英文-名",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 100}
+            }
+        },
+        {
+            "key" : "LastName",
+            "title" : "拼音/英文-姓",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 100}
+            }
+        },
+        {
+            "key" : "NameCN",
+            "title" : "客户姓名",
+            "rules" : ["length"],
+            "rule_args" : {
+                "length" : {"max_len" : 100}
+            }
+        },
+        {
+            "key" : "Gender",
+            "title" : "性别",
+            "rules" : ["not_null", "in_list"],
+            "rule_args" : {
+                "in_list" : {"range_list" : ["男", "女", "未明"]}
+            }
+        },
+        {
+            "key" : "AddressFreeEN",
+            "title" : "拼音/英文-现居地址",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 500}
+            }
+        },
+        {
+            "key" : "AddressCityEN",
+            "title" : "拼音/英文-所在城市",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 200}
+            }
+        },
+        {
+            "key" : "AddressCountryCode",
+            "title" : "现居住国",
+            "rules" : ["not_null", "regex"],
+            "rule_args" : {
+                "regex" : {"pattern" : "country"}
+            }
+        },
+        {
+            "key" : "AddressFreeCN",
+            "title" : "现居地址",
+            "rules" : ["length"],
+            "rule_args" : {
+                "length" : {"max_len" : 500}
+            }
+        },
+        {
+            "key" : "BirthCountryCode",
+            "title" : "出生国",
+            "rules" : ["not_null", "regex"],
+            "rule_args" : {
+                "regex" : {"pattern" : "country"}
+            }
+        },
+        {
+            "key" : "BirthDate",
+            "title" : "出生日期",
+            "rules" : ["not_null", "date"],
+            "rule_args" : {
+                "date" : {"max_year" : 2018}
+            }
+        },
+        {
+            "key" : "Nationality",
+            "title" : "国籍",
+            "rules" : ["not_null", "regex"],
+            "rule_args" : {
+                "regex" : {"pattern" : "country"}
+            }
+        },
+        {
+            "key" : "IDType",
+            "title" : "证件类型",
+            "rules" : ["not_null", "in_list"],
+            "rule_args" : {
+                "in_list" : {"range_list" : [
+                    "居民身份证","外国护照","港澳居民来往内地通行证",
+                    "台湾居民来往大陆通行证","外国人居留证","外交官证","使（领事）馆证",
+                    "香港永久性居民身份证","台湾身份证","澳门永久性居民身份证",
+                    "外国人身份证件","外国人永久居留身份证","香港特别行政区护照",
+                    "澳门特别行政区护照","其他个人证件"
+                ]}
+            }
+        },
+        {
+            "key" : "IDNumber",
+            "title" : "证件号码",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 30}
+            }
+        },
+        {
+            "key" : "ResCountryCode",
+            "title" : "税收居民国",
+            "rules" : ["not_null", "regex"],
+            "rule_args" : {
+                "regex" : {"pattern" : "country"}
+            }
+        },
+        {
+            "key" : "TIN",
+            "title" : "纳税识别号",
+            "rules" : ["length"],
+            "rule_args" : {
+                "length" : {"max_len" : 200}
+            }
+        },
+        {
+            "key" : "Explanation",
+            "title" : "无纳税识别号理由",
+            "rules" : ["length"],
+            "rule_args" : {
+                "length" : {"max_len" : 1000}
+            }
+        }
+    ],
+    "Organisation" : [        
+        {
+            "key" : "OrganisationNameCN",
+            "title" : "机构名称",
+            "rules" : ["length"],
+            "rule_args" : {
+                "length" : {"max_len" : 200}
+            }
+        },
+        {
+            "key" : "OrganisationNameCN",
+            "title" : "拼音/英文-机构名称",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 200}
+            }
+        },        
+        {
+            "key" : "AddressFreeEN",
+            "title" : "拼音/英文-机构地址",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 500}
+            }
+        },
+        {
+            "key" : "AddressCityEN",
+            "title" : "拼音/英文-所在城市",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 200}
+            }
+        },
+        {
+            "key" : "AddressCountryCode",
+            "title" : "机构所在国",
+            "rules" : ["not_null", "regex"],
+            "rule_args" : {
+                "regex" : {"pattern" : "country"}
+            }
+        },
+        {
+            "key" : "AddressFreeCN",
+            "title" : "机构地址",
+            "rules" : ["length"],
+            "rule_args" : {
+                "length" : {"max_len" : 500}
+            }
+        },        
+        {
+            "key" : "ResCountryCode",
+            "title" : "税收居民国",
+            "rules" : ["not_null", "regex"],
+            "rule_args" : {
+                "regex" : {"pattern" : "country"}
+            }
+        },
+        {
+            "key" : "TIN",
+            "title" : "纳税识别号",
+            "rules" : ["length"],
+            "rule_args" : {
+                "length" : {"max_len" : 200}
+            }
+        },
+        {
+            "key" : "Explanation",
+            "title" : "无纳税识别号理由",
+            "rules" : ["length"],
+            "rule_args" : {
+                "length" : {"max_len" : 1000}
+            }
+        }
+    ],
+    "ControllingPerson" : [
+        {
+            "key" : "FirstName",
+            "title" : "拼音/英文-名",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 100}
+            }
+        },
+        {
+            "key" : "LastName",
+            "title" : "拼音/英文-姓",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 100}
+            }
+        },
+        {
+            "key" : "NameCN",
+            "title" : "客户姓名",
+            "rules" : ["length"],
+            "rule_args" : {
+                "length" : {"max_len" : 100}
+            }
+        },
+        {
+            "key" : "Gender",
+            "title" : "性别",
+            "rules" : ["not_null", "in_list"],
+            "rule_args" : {
+                "in_list" : {"range_list" : ["男", "女", "未明"]}
+            }
+        },
+        {
+            "key" : "AddressFreeEN",
+            "title" : "拼音/英文-现居地址",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 500}
+            }
+        },
+        {
+            "key" : "AddressCityEN",
+            "title" : "拼音/英文-所在城市",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 200}
+            }
+        },
+        {
+            "key" : "AddressCountryCode",
+            "title" : "现居住国",
+            "rules" : ["not_null", "regex"],
+            "rule_args" : {
+                "regex" : {"pattern" : "country"}
+            }
+        },
+        {
+            "key" : "AddressFreeCN",
+            "title" : "现居地址",
+            "rules" : ["length"],
+            "rule_args" : {
+                "length" : {"max_len" : 500}
+            }
+        },
+        {
+            "key" : "BirthCountryCode",
+            "title" : "出生国",
+            "rules" : ["not_null", "regex"],
+            "rule_args" : {
+                "regex" : {"pattern" : "country"}
+            }
+        },
+        {
+            "key" : "BirthDate",
+            "title" : "出生日期",
+            "rules" : ["not_null", "date"],
+            "rule_args" : {
+                "date" : {"max_year" : 2018}
+            }
+        },        
+        {
+            "key" : "IDType",
+            "title" : "证件类型",
+            "rules" : ["not_null", "in_list"],
+            "rule_args" : {
+                "in_list" : {"range_list" : [
+                    "居民身份证","外国护照","港澳居民来往内地通行证",
+                    "台湾居民来往大陆通行证","外国人居留证","外交官证","使（领事）馆证",
+                    "香港永久性居民身份证","台湾身份证","澳门永久性居民身份证",
+                    "外国人身份证件","外国人永久居留身份证","香港特别行政区护照",
+                    "澳门特别行政区护照","其他个人证件"
+                ]}
+            }
+        },
+        {
+            "key" : "IDNumber",
+            "title" : "证件号码",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 30}
+            }
+        },
+        {
+            "key" : "ResCountryCode",
+            "title" : "税收居民国",
+            "rules" : ["not_null", "regex"],
+            "rule_args" : {
+                "regex" : {"pattern" : "country"}
+            }
+        },
+        {
+            "key" : "TIN",
+            "title" : "纳税识别号",
+            "rules" : ["length"],
+            "rule_args" : {
+                "length" : {"max_len" : 200}
+            }
+        },
+        {
+            "key" : "Explanation",
+            "title" : "无纳税识别号理由",
+            "rules" : ["length"],
+            "rule_args" : {
+                "length" : {"max_len" : 1000}
+            }
+        }
+    ]
+}
+"""
+
+last_report = """
+{
+    "AccountNumber" : "CNXXXXXXX00001"
 }
 """
 
@@ -213,6 +563,9 @@ cfg = loadcfgcm.load("cncrs_xls_to_xml.json", default_config, config_path='../co
 # 加载规则字典
 chk_cfg = loadcfgcm.load("cncrs_xls_to_xml_chk.json", check_config, config_path='../config')
 chk_rule_map = checkcm.load_check_map(chk_cfg)
+
+# 加载历史报送
+last_report = loadcfgcm.load("cncrs_xls_to_xml_last.json", last_report, config_path='../config')
 
 # 加载Excel管理信息
 cfg_mng = cfg['Manager']
@@ -239,8 +592,12 @@ if acc_list is None or len(acc_list) == 0:
     sys.exit()
 
 # 报告生成器
-maker = CNCRSReportMaker(save_path="../temp/file", chk_rule=chk_rule_map, test=True, **mng_info)
+maker = CNCRSReportMaker(save_path="../temp/file", chk_rule=chk_rule_map, test=True, last_report=last_report,
+                         **mng_info)
 # 设置账户信息
 maker.set_acc_list(acc_list)
 # 生成XML报告
 maker.make_all_report()
+
+# 更新配置信息
+loadcfgcm.save_cfg_file(last_report, '../config', "cncrs_xls_to_xml_last.json")

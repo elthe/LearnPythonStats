@@ -164,6 +164,19 @@ class OrganisationTag(CNCRSBaseTag):
         super(OrganisationTag, self).__init__("Organisation", **kwargs)
 
 
+class ControllingPersonTag(CNCRSBaseTag):
+    """
+    ControllingPerson标签
+    """
+
+    def __init__(self, **kwargs):
+        """
+        标签初始化
+        @return: 无
+        """
+        super(ControllingPersonTag, self).__init__("ControllingPerson", **kwargs)
+
+
 class DocSpecTag(CNCRSBaseTag):
     """
     DocSpec标签
@@ -184,6 +197,25 @@ class DocSpecTag(CNCRSBaseTag):
         self.add_sub_tags(tag_keys, kwargs)
 
 
+class MoneyAmountTag(CNCRSBaseTag):
+    """
+    货币金额标签
+    """
+
+    def __init__(self, tag, curr_code, amount):
+        """
+        标签初始化
+        @:param curr_code:货币代码
+        @:param amount:金额
+        @return: 无
+        """
+        init_param = {
+            'attr': {'currCode': curr_code},
+            'value': amount
+        }
+        super(MoneyAmountTag, self).__init__(tag, **init_param)
+
+
 class PaymentTag(CNCRSBaseTag):
     """
     Payment标签
@@ -198,26 +230,8 @@ class PaymentTag(CNCRSBaseTag):
         # 收入类型
         self.add_sub_tag_by_kv("PaymentType", payment_type)
         # 收入金额数量
-        self.add_sub_tag(PaymentAmntTag(curr_code, amount))
-
-
-class PaymentAmntTag(CNCRSBaseTag):
-    """
-    PaymentAmnt标签
-    """
-
-    def __init__(self, curr_code, amount):
-        """
-        标签初始化
-        @:param curr_code:货币代码
-        @:param amount:金额
-        @return: 无
-        """
-        init_param = {
-            'attr': {'currCode': curr_code},
-            'value': amount
-        }
-        super(PaymentAmntTag, self).__init__("PaymentAmnt", **init_param)
+        amount_tag = MoneyAmountTag("PaymentAmnt", curr_code, amount)
+        self.add_sub_tag(amount_tag)
 
 
 class NameTag(CNCRSBaseTag):
@@ -250,7 +264,7 @@ class AddressTag(CNCRSBaseTag):
     Address标签
     """
 
-    def __init__(self, address_type, country_code, address_free_en, address_free_cn):
+    def __init__(self, address_type, country_code, city_en, address_free_en, address_free_cn):
         """
         标签初始化
         @:param curr_code:货币代码
@@ -260,17 +274,43 @@ class AddressTag(CNCRSBaseTag):
         init_param = {
             'attr': {'legalAddressType': address_type}
         }
-        super(PaymentAmntTag, self).__init__("Address", **init_param)
+        super(AddressTag, self).__init__("Address", **init_param)
         # 国家代码
         self.add_sub_tag_by_kv("CountryCode", country_code)
         # 英文地址
         adr_en = CNCRSBaseTag("AddressEN")
         adr_en.add_sub_tag(CNCRSBaseTag("AddressFreeEN", value=address_free_en))
+        # 英文固定地址
+        adr_fix_en = CNCRSBaseTag("AddressFixEN")
+        adr_fix_en.add_sub_tag(CNCRSBaseTag("CityEN", value=city_en))
+        adr_en.add_sub_tag(adr_fix_en)
         self.add_sub_tag(adr_en)
         # 中文文地址
         adr_cn = CNCRSBaseTag("AddressCN")
         adr_cn.add_sub_tag(CNCRSBaseTag("AddressFreeCN", value=address_free_cn))
         self.add_sub_tag(adr_cn)
+
+
+class TINTag(CNCRSBaseTag):
+    """
+    纳税人识别号标签
+    """
+
+    def __init__(self, country_code, tin_code):
+        """
+        标签初始化
+        @:param country_code:国家代码
+        @:param tin_code:识别号
+        @return: 无
+        """
+        init_param = {
+            'attr': {
+                'issuedBy': country_code,
+                'inType': "TIN"
+            },
+            'value': tin_code
+        }
+        super(TINTag, self).__init__("TIN", **init_param)
 
 
 class BirthInfoTag(CNCRSBaseTag):

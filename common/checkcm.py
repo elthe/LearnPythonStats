@@ -6,6 +6,8 @@ check common api
 check 相关共通函数
 """
 
+import re
+
 from common import logcm
 from common import dictcm
 from common import datecm
@@ -38,6 +40,12 @@ class CheckResult(BaseObject):
         self.ok = ok
         # 错误消息
         self.msg = msg
+
+
+# 规则表达式字典
+REGEX_MAP = {
+    "country": r"[A-Z]{2}\([^\(\)]+\)"
+}
 
 
 def load_check_map(chk_cfg):
@@ -109,6 +117,8 @@ def check_obj(obj, chk):
         return check_date(val, chk.title, **chk.args)
     elif chk.rule == "number":
         return check_number(val, chk.title, **chk.args)
+    elif chk.rule == "regex":
+        return check_regex(val, chk.title, **chk.args)
 
     return CheckResult(True)
 
@@ -228,6 +238,13 @@ def check_len(obj, title="", max_len=None, min_len=None, fix_len=None):
     :param fix_len:固定长度
     :return: 校验结果对象
     """
+    if obj is None:
+        return CheckResult(True)
+
+    # 如果不是字符串类型,强制转换成字符串后校验
+    if not isinstance(obj, str):
+        obj = str(obj)
+
     obj_len = len(obj)
     if fix_len is not None:
         if obj_len != fix_len:
@@ -260,6 +277,9 @@ def check_number(obj, title="", max_val=None, min_val=None, fix_val=None):
     :param fix_val:固定值
     :return: 校验结果对象
     """
+    if obj is None:
+        return CheckResult(True)
+
     if fix_val is not None:
         if obj != fix_val:
             msg = "%s值为%d,与要求的固定值%d不同!" % (title, obj, fix_val)
@@ -275,6 +295,27 @@ def check_number(obj, title="", max_val=None, min_val=None, fix_val=None):
     if min_val is not None:
         if obj < min_val:
             msg = "%s值为%d,小于要求的最小值%d!" % (title, obj, min_val)
+            logcm.print_info(msg, fg='red')
+            return CheckResult(False, msg)
+
+    return CheckResult(True)
+
+
+def check_regex(obj, title="", pattern=None):
+    """
+    规则表达式校验
+    :param obj: 对象
+    :param title: 标题
+    :param pattern:规则表达式
+    :return: 校验结果对象
+    """
+    if obj is None:
+        return CheckResult(True)
+
+    if pattern is not None and pattern in REGEX_MAP:
+        ptn = re.compile(REGEX_MAP[pattern])
+        if not ptn.match(obj):
+            msg = "%s值为%d,与不符合要求的规则表达式:%s!" % (title, obj, pattern)
             logcm.print_info(msg, fg='red')
             return CheckResult(False, msg)
 
