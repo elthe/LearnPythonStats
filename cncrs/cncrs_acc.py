@@ -50,6 +50,31 @@ CNCRS_CONVERT_MAP = {
 }
 
 
+def convert(convert_key, val_from):
+    """
+    根据数据转换字典进行转换.
+    :param convert_key:转换KEY
+    :param val_from:转换前的值
+    :return:转换后的值
+    """
+    if val_from is None or convert_key is None:
+        return ""
+
+    # 国家代码,取前两位
+    if convert_key == "country":
+        return val_from[0:2]
+    # 日期转换
+    if convert_key == "date":
+        return val_from.strftime("%Y-%m-%d")
+
+    # 转换
+    if convert_key in CNCRS_CONVERT_MAP:
+        if val_from in CNCRS_CONVERT_MAP[convert_key]:
+            val_to = CNCRS_CONVERT_MAP[convert_key][val_from]
+            return val_to
+    return ""
+
+
 class CNCRSAccount:
     """
     CNCRS 账户类
@@ -123,7 +148,7 @@ class CNCRSAccount:
         acc.add_sub_tag(amount_tag)
         # 账户持有人类别
         holder_type = self.acc_info["Account"]["AccountHolderType"]
-        acc.add_sub_tag_by_kv("AccountHolderType", self.convert("holder_type", holder_type))
+        acc.add_sub_tag_by_kv("AccountHolderType", convert("holder_type", holder_type))
         # 开户金融机构名称
         acc.add_sub_tag_by_kv("OpeningFIName", self.acc_info["Account"]["OpeningFIName"])
         # 账户收入
@@ -173,9 +198,9 @@ class CNCRSAccount:
         tag.add_sub_tag(name)
         # 性别
         gender = input_data["Gender"]
-        tag.add_sub_tag_by_kv("Gender", self.convert("Gender", gender))
+        tag.add_sub_tag_by_kv("Gender", convert("Gender", gender))
         # 地址
-        country_code = self.convert("country", input_data["AddressCountryCode"])
+        country_code = convert("country", input_data["AddressCountryCode"])
         city_en = input_data["AddressCityEN"]
         address_free_en = input_data["AddressFreeEN"]
         address_free_cn = input_data["AddressFreeCN"]
@@ -183,11 +208,11 @@ class CNCRSAccount:
         tag.add_sub_tag(address)
         # 证件类型
         idtype = input_data["IDType"]
-        tag.add_sub_tag_by_kv("IDType", self.convert("IDType", idtype))
+        tag.add_sub_tag_by_kv("IDType", convert("IDType", idtype))
         # 证件号码
         tag.add_sub_tag_by_kv("IDNumber", input_data["IDNumber"])
         # 税收居民国代码
-        res_country = self.convert("country", input_data["ResCountryCode"])
+        res_country = convert("country", input_data["ResCountryCode"])
         tag.add_sub_tag_by_kv("ResCountryCode", res_country)
         # 税收识别号
         if "TIN" in input_data:
@@ -198,11 +223,11 @@ class CNCRSAccount:
         if "Explanation" in input_data:
             tag.add_sub_tag_by_kv("Explanation", input_data["Explanation"])
         # 国籍
-        nationality = self.convert("country", input_data["Nationality"])
+        nationality = convert("country", input_data["Nationality"])
         tag.add_sub_tag_by_kv("Nationality", nationality)
         # 出生信息
-        birth_date = self.convert("date", input_data["BirthDate"])
-        birth_country = self.convert("country", input_data["BirthCountryCode"])
+        birth_date = convert("date", input_data["BirthDate"])
+        birth_country = convert("country", input_data["BirthCountryCode"])
         birth = BirthInfoTag(birth_date, birth_country)
         tag.add_sub_tag(birth)
 
@@ -225,14 +250,14 @@ class CNCRSAccount:
         name = OrganisationNameTag(**init_param)
         tag.add_sub_tag(name)
         # 地址
-        country_code = self.convert("country", input_data["AddressCountryCode"])
+        country_code = convert("country", input_data["AddressCountryCode"])
         city_en = input_data["AddressCityEN"]
         address_free_en = input_data["AddressFreeEN"]
         address_free_cn = input_data["AddressFreeCN"]
         address = AddressTag("OECD301", country_code, city_en, address_free_en, address_free_cn)
         tag.add_sub_tag(address)
         # 税收居民国代码
-        res_country = self.convert("country", input_data["ResCountryCode"])
+        res_country = convert("country", input_data["ResCountryCode"])
         tag.add_sub_tag_by_kv("ResCountryCode", res_country)
         # 税收识别号
         if "TIN" in input_data:
@@ -263,14 +288,14 @@ class CNCRSAccount:
         name = NameTag(**init_param)
         tag.add_sub_tag(name)
         # 地址
-        country_code = self.convert("country", input_data["AddressCountryCode"])
+        country_code = convert("country", input_data["AddressCountryCode"])
         city_en = input_data["AddressCityEN"]
         address_free_en = input_data["AddressFreeEN"]
         address_free_cn = input_data["AddressFreeCN"]
         address = AddressTag("OECD301", country_code, city_en, address_free_en, address_free_cn)
         tag.add_sub_tag(address)
         # 税收居民国代码
-        res_country = self.convert("country", input_data["ResCountryCode"])
+        res_country = convert("country", input_data["ResCountryCode"])
         tag.add_sub_tag_by_kv("ResCountryCode", res_country)
         # 税收识别号
         if "TIN" in input_data:
@@ -282,33 +307,9 @@ class CNCRSAccount:
             tag.add_sub_tag_by_kv("Explanation", input_data["Explanation"])
 
         # 出生信息
-        birth_date = self.convert("date", input_data["BirthDate"])
-        birth_country = self.convert("country", input_data["BirthCountryCode"])
+        birth_date = convert("date", input_data["BirthDate"])
+        birth_country = convert("country", input_data["BirthCountryCode"])
         birth = BirthInfoTag(birth_date, birth_country)
         tag.add_sub_tag(birth)
 
         return tag
-
-    def convert(self, convert_key, val_from):
-        """
-        根据数据转换字典进行转换.
-        :param convert_key:转换KEY
-        :param val_from:转换前的值
-        :return:转换后的值
-        """
-        if val_from is None or convert_key is None:
-            return ""
-
-        # 国家代码,取前两位
-        if convert_key == "country":
-            return val_from[0:2]
-        # 日期转换
-        if convert_key == "date":
-            return val_from.strftime("%Y-%m-%d")
-
-        # 转换
-        if convert_key in CNCRS_CONVERT_MAP:
-            if val_from in CNCRS_CONVERT_MAP[convert_key]:
-                val_to = CNCRS_CONVERT_MAP[convert_key][val_from]
-                return val_to
-        return ""

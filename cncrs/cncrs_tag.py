@@ -258,6 +258,7 @@ class NameTag(CNCRSBaseTag):
         ]
         self.add_sub_tags(tag_keys, kwargs)
 
+
 class OrganisationNameTag(CNCRSBaseTag):
     """
     机构Name标签
@@ -280,6 +281,7 @@ class OrganisationNameTag(CNCRSBaseTag):
             "OrganisationNameCN"  # 机构中文名
         ]
         self.add_sub_tags(tag_keys, kwargs)
+
 
 class AddressTag(CNCRSBaseTag):
     """
@@ -354,44 +356,3 @@ class BirthInfoTag(CNCRSBaseTag):
         country = CNCRSBaseTag("CountryInfo")
         country.add_sub_tag(CNCRSBaseTag("CountryCode", value=country_code))
         self.add_sub_tag(country)
-
-
-def sample():
-    # 根节点标签
-    root = CNCRSRootTag()
-    # Header标签
-    header = {
-        "ReportingID": "1111",
-        "FIID": "2222",
-        "ReportingType": "3333",
-        "MessageRefId": "4444",
-        "ReportingPeriod": "5555",
-        "Tmstp": "6666"
-    }
-    root.add_sub_tag(MessageHeaderTag(**header))
-    # 报送组
-    group = ReportingGroupTag()
-    for i in range(10):
-        # 报送账户
-        acc = AccountReportTag()
-
-        spec_map = {
-            "DocRefId": "CN2017C1YINUFUXUEZCI000000001",
-            "DocTypeIndic": "T1"
-        }
-        spec = DocSpecTag(**spec_map)
-        acc.add_sub_tag(spec)
-
-        group.add_sub_tag(acc)
-    root.add_sub_tag(group)
-    # 转成XML
-    tree = root.to_dict()
-    xml = xmlcm.dict_to_xml(tree)
-    logcm.print_obj(xml, "xml")
-    # XML文件输出
-    out_file = "../temp/cncrs_tag_sample.xml"
-    xmlcm.dict_to_xml(tree, save_path=out_file)
-
-
-if __name__ == '__main__':
-    sample()

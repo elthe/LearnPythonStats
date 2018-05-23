@@ -16,7 +16,7 @@ from common import loadcfgcm
 from common import checkcm
 from common.checkcm import CheckRule
 
-from cncrs.cncrs_cm import CNCRSReportMaker
+from cncrs.cncrs_mk import CNCRSReportMaker
 from cncrs.cncrs_tag import *
 
 # 配置
