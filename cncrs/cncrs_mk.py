@@ -11,7 +11,7 @@ from common import xmlcm
 from common import dictcm
 from common import datecm
 from common import checkcm
-
+from cncrs import cncrs_cm
 from cncrs.cncrs_tag import *
 from cncrs.cncrs_acc import *
 
@@ -130,8 +130,8 @@ class CNCRSReportMaker:
             "FIID": self.FIID,
             "ReportingType": "CRS",
             "MessageRefId": ref_id,
-            "ReportingPeriod": self.ReportingPeriod,
-            "MessageTypeIndic": get_message_type_indic(new_data, no_data),
+            "ReportingPeriod": cncrs_cm.convert("date", self.ReportingPeriod),
+            "MessageTypeIndic": cncrs_cm.get_message_type_indic(new_data, no_data),
             "Tmstp": datecm.now_time_str("%Y-%m-%dT%H:%M:%S+08:00")
         }
         return MessageHeaderTag(**header)
@@ -199,20 +199,3 @@ class CNCRSReportMaker:
                 sort_no += 1
 
 
-def get_message_type_indic(new_data=True, no_data=False):
-    """
-    取得申报数据类型
-    :param new_data: 是否新数据
-    :param no_data:是否无申报
-    :return:
-    """
-    if new_data:
-        # 新数据
-        return "CRS701"
-    else:
-        if not no_data:
-            # 修改或删除数据
-            return "CRS702"
-        else:
-            # 零申报
-            return "CRS703"

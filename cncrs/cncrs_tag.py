@@ -5,8 +5,6 @@
 CNCRS XML标签类定义
 """
 
-from common import logcm
-from common import xmlcm
 from common import dictcm
 from common.xmlcm import XmlTag
 
@@ -24,27 +22,29 @@ class CNCRSBaseTag(XmlTag):
         # 为空的话,初始化
         if not kwargs:
             kwargs = {}
-        # 统一的标签前缀
-        kwargs["prefix"] = "cncrs"
+        # 标签默认前缀,如果指定的话,保留指定值
+        if "prefix" not in kwargs or not kwargs["prefix"]:
+            kwargs["prefix"] = "cncrs"
 
         super(CNCRSBaseTag, self).__init__(tag, **kwargs)
 
-    def add_sub_tag_by_kv(self, k, v):
+    def add_sub_tag_by_kv(self, k, v, prefix=None):
         """
         给当前标签添加子标签
         :param sub_tag: 子标签对象
         :return: 无
         """
         # 添加子标签
-        tag = CNCRSBaseTag(k, value=v)
+        tag = CNCRSBaseTag(k, value=v, prefix=prefix)
         self.add_sub_tag(tag)
 
-    def add_sub_tags(self, keys, data_map, ignore_empty=True):
+    def add_sub_tags(self, keys, data_map, ignore_empty=True, prefix=None):
         """
         按照关键词一览和数据字典批量添加子标签
         :param keys:关键词列表
         :param data_map:数据字典
         :param ignore_empty:忽略空值
+        :param prefix:子标签的前缀
         :return:无
         """
         for k in keys:
@@ -52,7 +52,7 @@ class CNCRSBaseTag(XmlTag):
             # 如果忽略空白,且值为空,则不添加子标签
             if ignore_empty and v is None:
                 continue
-            self.add_sub_tag_by_kv(k, v)
+            self.add_sub_tag_by_kv(k, v, prefix)
 
 
 class CNCRSRootTag(CNCRSBaseTag):
@@ -194,7 +194,7 @@ class DocSpecTag(CNCRSBaseTag):
             "CorrDocRefId",  # 被修改或被删除的账户记录编号（固定长度29位）
             "DocTypeIndic"  # 账户报告的类型（固定长度2位）
         ]
-        self.add_sub_tags(tag_keys, kwargs)
+        self.add_sub_tags(tag_keys, kwargs, prefix="stc")
 
 
 class MoneyAmountTag(CNCRSBaseTag):
@@ -211,7 +211,7 @@ class MoneyAmountTag(CNCRSBaseTag):
         """
         init_param = {
             'attr': {'currCode': curr_code},
-            'value': amount
+            'value': '%.2f' % amount
         }
         super(MoneyAmountTag, self).__init__(tag, **init_param)
 
@@ -247,7 +247,8 @@ class NameTag(CNCRSBaseTag):
         @return: 无
         """
         init_param = {
-            'attr': {'nameType': dictcm.get(kwargs, "nameType")}
+            'attr': {'nameType': dictcm.get(kwargs, "nameType")},
+            'prefix': "stc"
         }
         super(NameTag, self).__init__("Name", **init_param)
         # 用字典初始化子标签
@@ -256,7 +257,7 @@ class NameTag(CNCRSBaseTag):
             "LastName",  # 英文(拼音)名
             "NameCN"  # 中文姓名
         ]
-        self.add_sub_tags(tag_keys, kwargs)
+        self.add_sub_tags(tag_keys, kwargs, prefix="stc")
 
 
 class OrganisationNameTag(CNCRSBaseTag):
@@ -272,7 +273,8 @@ class OrganisationNameTag(CNCRSBaseTag):
         @return: 无
         """
         init_param = {
-            'attr': {'nameType': dictcm.get(kwargs, "nameType")}
+            'attr': {'nameType': dictcm.get(kwargs, "nameType")},
+            'prefix': "stc"
         }
         super(OrganisationNameTag, self).__init__("Name", **init_param)
         # 用字典初始化子标签
@@ -280,7 +282,7 @@ class OrganisationNameTag(CNCRSBaseTag):
             "OrganisationNameEN",  # 机构英文名
             "OrganisationNameCN"  # 机构中文名
         ]
-        self.add_sub_tags(tag_keys, kwargs)
+        self.add_sub_tags(tag_keys, kwargs, prefix="stc")
 
 
 class AddressTag(CNCRSBaseTag):
@@ -296,22 +298,23 @@ class AddressTag(CNCRSBaseTag):
         @return: 无
         """
         init_param = {
-            'attr': {'legalAddressType': address_type}
+            'attr': {'legalAddressType': address_type},
+            'prefix' : "stc"
         }
         super(AddressTag, self).__init__("Address", **init_param)
         # 国家代码
-        self.add_sub_tag_by_kv("CountryCode", country_code)
+        self.add_sub_tag_by_kv("CountryCode", country_code, prefix="stc")
         # 英文地址
-        adr_en = CNCRSBaseTag("AddressEN")
-        adr_en.add_sub_tag(CNCRSBaseTag("AddressFreeEN", value=address_free_en))
+        adr_en = CNCRSBaseTag("AddressEN", prefix="stc")
+        adr_en.add_sub_tag(CNCRSBaseTag("AddressFreeEN", value=address_free_en, prefix="stc"))
         # 英文固定地址
-        adr_fix_en = CNCRSBaseTag("AddressFixEN")
-        adr_fix_en.add_sub_tag(CNCRSBaseTag("CityEN", value=city_en))
+        adr_fix_en = CNCRSBaseTag("AddressFixEN", prefix="stc")
+        adr_fix_en.add_sub_tag(CNCRSBaseTag("CityEN", value=city_en, prefix="stc"))
         adr_en.add_sub_tag(adr_fix_en)
         self.add_sub_tag(adr_en)
         # 中文文地址
-        adr_cn = CNCRSBaseTag("AddressCN")
-        adr_cn.add_sub_tag(CNCRSBaseTag("AddressFreeCN", value=address_free_cn))
+        adr_cn = CNCRSBaseTag("AddressCN", prefix="stc")
+        adr_cn.add_sub_tag(CNCRSBaseTag("AddressFreeCN", value=address_free_cn, prefix="stc"))
         self.add_sub_tag(adr_cn)
 
 
@@ -332,7 +335,8 @@ class TINTag(CNCRSBaseTag):
                 'issuedBy': country_code,
                 'inType': "TIN"
             },
-            'value': tin_code
+            'value': tin_code,
+            'prefix': "stc"
         }
         super(TINTag, self).__init__("TIN", **init_param)
 
@@ -349,10 +353,10 @@ class BirthInfoTag(CNCRSBaseTag):
         @:param country_code:出生国代码
         @return: 无
         """
-        super(BirthInfoTag, self).__init__("BirthInfo")
+        super(BirthInfoTag, self).__init__("BirthInfo", prefix="stc")
         # 生日
-        self.add_sub_tag_by_kv("BirthDate", birth_date)
+        self.add_sub_tag_by_kv("BirthDate", birth_date, prefix="stc")
         # 国家
-        country = CNCRSBaseTag("CountryInfo")
-        country.add_sub_tag(CNCRSBaseTag("CountryCode", value=country_code))
+        country = CNCRSBaseTag("CountryInfo", prefix="stc")
+        country.add_sub_tag(CNCRSBaseTag("CountryCode", value=country_code, prefix="stc"))
         self.add_sub_tag(country)
