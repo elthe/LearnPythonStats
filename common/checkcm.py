@@ -44,7 +44,8 @@ class CheckResult(BaseObject):
 
 # 规则表达式字典
 REGEX_MAP = {
-    "country": r"[A-Z]{2}\([^\(\)]+\)"
+    "country": r"[A-Z]{2}\([^\(\)]+\)",
+    "key-name": r"[A-Z0-9]+-"
 }
 
 

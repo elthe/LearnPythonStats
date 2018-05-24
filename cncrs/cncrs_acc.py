@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-CNCRS 非居民金融账户涉税信息报送账户类
+CNCRS 非居民金融账户涉税信息报送账户信息处理类
 """
 
 import sys
@@ -66,6 +66,9 @@ def convert(convert_key, val_from):
     # 日期转换
     if convert_key == "date":
         return val_from.strftime("%Y-%m-%d")
+    # KEY-NAME
+    if convert_key == "key-name":
+        return val_from.split("-")[0]
 
     # 转换
     if convert_key in CNCRS_CONVERT_MAP:
@@ -147,8 +150,8 @@ class CNCRSAccount:
         amount_tag = MoneyAmountTag("AccountBalance", "CNY", self.acc_info["Account"]["AccountBalance"])
         acc.add_sub_tag(amount_tag)
         # 账户持有人类别
-        holder_type = self.acc_info["Account"]["AccountHolderType"]
-        acc.add_sub_tag_by_kv("AccountHolderType", convert("holder_type", holder_type))
+        holder_type = convert("key-name", self.acc_info["Account"]["AccountHolderType"])
+        acc.add_sub_tag_by_kv("AccountHolderType", holder_type)
         # 开户金融机构名称
         acc.add_sub_tag_by_kv("OpeningFIName", self.acc_info["Account"]["OpeningFIName"])
         # 账户收入
@@ -164,7 +167,7 @@ class CNCRSAccount:
 
         # 账户持有人信息
         acc_holder = AccountHolderTag()
-        if holder_type == "01":
+        if holder_type == "CRS100":
             # 非居民个人标签
             acc_holder.add_sub_tag(self.get_individual_tag())
         else:
@@ -175,7 +178,7 @@ class CNCRSAccount:
         acc.add_sub_tag(acc_holder)
 
         # 非居民控制人
-        if holder_type == "02":
+        if holder_type == "CRS101":
             acc.add_sub_tag(self.get_controlling_tag())
 
         return acc
@@ -197,8 +200,7 @@ class CNCRSAccount:
         name = NameTag(**init_param)
         tag.add_sub_tag(name)
         # 性别
-        gender = input_data["Gender"]
-        tag.add_sub_tag_by_kv("Gender", convert("Gender", gender))
+        tag.add_sub_tag_by_kv("Gender", convert("key-name", input_data["Gender"]))
         # 地址
         country_code = convert("country", input_data["AddressCountryCode"])
         city_en = input_data["AddressCityEN"]
@@ -207,8 +209,7 @@ class CNCRSAccount:
         address = AddressTag("OECD301", country_code, city_en, address_free_en, address_free_cn)
         tag.add_sub_tag(address)
         # 证件类型
-        idtype = input_data["IDType"]
-        tag.add_sub_tag_by_kv("IDType", convert("IDType", idtype))
+        tag.add_sub_tag_by_kv("IDType", convert("key-name", input_data["IDType"]))
         # 证件号码
         tag.add_sub_tag_by_kv("IDNumber", input_data["IDNumber"])
         # 税收居民国代码

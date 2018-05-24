@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-CNCRS XML标签定义
+CNCRS XML标签类定义
 """
 
 from common import logcm

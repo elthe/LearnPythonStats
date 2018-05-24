@@ -31,7 +31,7 @@ def load(config_name, default_config, config_path='./config', encoding='utf-8'):
     logcm.print_info('配置文件不存在：%s/%s' % (config_path, config_name))
 
     # 保存默认配置
-    save_cfg_file(default_config, config_path, config_name, encoding=encoding)
+    save_cfg_file(default_config, config_name, config_path, encoding=encoding)
 
     # 重新读取文件
     return load_cfg_file(config_path, config_name, encoding)
@@ -52,12 +52,12 @@ def load_cfg_file(config_path, config_name, encoding='utf-8'):
     return cfg_info
 
 
-def save_cfg_file(config_info, config_path, config_name, encoding='utf-8'):
+def save_cfg_file(config_info, config_name, config_path='./config', encoding='utf-8'):
     """
     保存配置信息
     :param config_info:配置数据字典或JSON文本
-    :param config_path: 配置路径
     :param config_name: 配置文件名
+    :param config_path: 配置路径
     :param encoding: 文字编码
     :return:
     """

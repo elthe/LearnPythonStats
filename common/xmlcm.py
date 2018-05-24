@@ -280,6 +280,9 @@ def save_xml(xml_str, save_path, encoding="utf-8"):
         # 解析XML文档
         xml_doc = minidom.parseString(xml_str.encode(encoding))
 
+        # 确保目录存在
+        filecm.makedir(save_path, by_file=True)
+
         # 写入XML文件
         with open(save_path, "w+") as file:
             xml_doc.writexml(file, addindent="\t", newl="\n", encoding=encoding)

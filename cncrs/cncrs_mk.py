@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-CNCRS 非居民金融账户涉税信息报送XML 做成示例
+CNCRS 非居民金融账户涉税信息报送信息生成工具类
 """
 
 import sys
@@ -101,7 +101,7 @@ class CNCRSReportMaker:
         doc_ref_id = "CN%d%s%09d" % (self.ReportingPeriod.year, self.FIID, line_no)
         # 把文档ID和客户编号关联
         if self.last_report:
-            key = acc_info["Account"]["AccountNumber"]
+            key = str(acc_info["Account"]["AccountNumber"])
             self.last_report[key] = doc_ref_id
         return doc_ref_id
 
@@ -114,7 +114,7 @@ class CNCRSReportMaker:
         """
         prefix = "TR" if self.test else "RE"
         pn = "N" if new_data else "P"
-        ref_id = "%s%s%d%s%08d" % (prefix, self.FIID, self.ReportingPeriod.year, pn, sort_no)
+        ref_id = "%s%s%d%s%08d" % (prefix, self.FIID, self.ReportingPeriod.year + 1, pn, sort_no)
         return ref_id
 
     def get_header_tag(self, new_data, ref_id, no_data=False):
@@ -175,7 +175,8 @@ class CNCRSReportMaker:
         xml = xmlcm.dict_to_xml(tree)
         logcm.print_obj(xml, "xml")
         # XML文件输出
-        out_file = "%s/%s.xml" % (self.save_path, ref_id)
+        sub_path = "test" if self.test else "prod"
+        out_file = "%s/%s/%s.xml" % (self.save_path, sub_path, ref_id)
         xmlcm.dict_to_xml(tree, save_path=out_file)
 
     def make_all_report(self):
