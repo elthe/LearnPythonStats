@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cncrs:CNCRS version="1.0" xmlns:cncrs="http://aeoi.chinatax.gov.cn/crs/cncrs/v1" xmlns:stc="http://aeoi.chinatax.gov.cn/crs/stctypes/v1">
+	<cncrs:MessageHeader>
+		<cncrs:ReportingID>heh001</cncrs:ReportingID>
+		<cncrs:FIID>D9IFI2EUVSQU8Y</cncrs:FIID>
+		<cncrs:ReportingType>CRS</cncrs:ReportingType>
+		<cncrs:MessageRefId>TRD9IFI2EUVSQU8Y2018P00000001</cncrs:MessageRefId>
+		<cncrs:ReportingPeriod>2017-12-31</cncrs:ReportingPeriod>
+		<cncrs:MessageTypeIndic>CRS702</cncrs:MessageTypeIndic>
+		<cncrs:Tmstp>2018-05-24T16:28:19+08:00</cncrs:Tmstp>
+	</cncrs:MessageHeader>
+	<cncrs:ReportingGroup>
+		<cncrs:AccountReport>
+			<cncrs:DocSpec>
+				<stc:DocRefId>CN2017D9IFI2EUVSQU8Y000000001</stc:DocRefId>
+				<stc:DocTypeIndic>T2</stc:DocTypeIndic>
+			</cncrs:DocSpec>
+			<cncrs:AccountNumber>6227000839360305939</cncrs:AccountNumber>
+			<cncrs:ClosedAccount>false</cncrs:ClosedAccount>
+			<cncrs:DueDiligenceInd>P</cncrs:DueDiligenceInd>
+			<cncrs:SelfCertification>true</cncrs:SelfCertification>
+			<cncrs:AccountBalance currCode="CNY">123.33</cncrs:AccountBalance>
+			<cncrs:AccountHolderType>CRS100</cncrs:AccountHolderType>
+			<cncrs:OpeningFIName>中国建设银行北京分行</cncrs:OpeningFIName>
+			<cncrs:Payment>
+				<cncrs:PaymentType>CRS501</cncrs:PaymentType>
+				<cncrs:PaymentAmnt currCode="CNY">123.33</cncrs:PaymentAmnt>
+			</cncrs:Payment>
+			<cncrs:AccountHolder>
+				<cncrs:Individual>
+					<stc:Name nameType="OECD202">
+						<stc:FirstName>NFN</stc:FirstName>
+						<stc:LastName>zhangsan</stc:LastName>
+						<stc:NameCN>张三</stc:NameCN>
+					</stc:Name>
+					<stc:Gender>M</stc:Gender>
+					<stc:Address legalAddressType="OECD301">
+						<stc:CountryCode>CN</stc:CountryCode>
+						<stc:AddressEN>
+							<stc:AddressFreeEN>Dongsheng science and Technology Park, Haidian District, Beijing</stc:AddressFreeEN>
+							<stc:AddressFixEN>
+								<stc:CityEN>Beijing</stc:CityEN>
+							</stc:AddressFixEN>
+						</stc:AddressEN>
+						<stc:AddressCN>
+							<stc:AddressFreeCN>北京市海淀区东升科技园</stc:AddressFreeCN>
+						</stc:AddressCN>
+					</stc:Address>
+					<stc:IDType>ACC201</stc:IDType>
+					<stc:IDNumber>110226198501272116</stc:IDNumber>
+					<stc:ResCountryCode>GB</stc:ResCountryCode>
+					<stc:TIN inType="TIN" issuedBy="GB">91410105757145609K</stc:TIN>
+					<stc:Nationality>CN</stc:Nationality>
+					<stc:BirthInfo>
+						<stc:BirthDate>2017-01-10</stc:BirthDate>
+						<stc:CountryInfo>
+							<stc:CountryCode>CN</stc:CountryCode>
+						</stc:CountryInfo>
+					</stc:BirthInfo>
+				</cncrs:Individual>
+			</cncrs:AccountHolder>
+		</cncrs:AccountReport>
+	</cncrs:ReportingGroup>
+</cncrs:CNCRS>

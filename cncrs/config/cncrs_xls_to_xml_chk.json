@@ -1,0 +1,412 @@
+{
+    "Manager" : [
+        {
+            "key" : "ReportingID",
+            "title" : "系统用户账号",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 50}
+            }            
+        },
+        {
+            "key" : "FIID",
+            "title" : "金融机构注册码",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"fix_len" : 14}
+            }
+        },
+        {
+            "key" : "ReportingPeriod",
+            "title" : "报送年度",
+            "rules" : ["not_null", "date"],
+            "rule_args" : {
+                "length" : {"fix_month" : 12, "fix_day" : 31, "min_year" : 2017}
+            }
+        }        
+    ],
+    "Account" : [
+        {
+            "key" : "AccountNumber",
+            "title" : "基金账号",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 100}
+            }
+        },
+        {
+            "key" : "ClosedAccount",
+            "title" : "客户类别(是否已注销)",
+            "rules" : ["not_null", "in_list"],
+            "rule_args" : {
+                "in_list" : {"range_list" : ["是", "否"]}
+            }
+        },
+        {
+            "key" : "DueDiligenceInd",
+            "title" : "账号类别(是否新开账户)",
+            "rules" : ["not_null", "in_list"],
+            "rule_args" : {
+                "in_list" : {"range_list" : ["是", "否"]}
+            }
+        },
+        {
+            "key" : "SelfCertification",
+            "title" : "自证声明",
+            "rules" : ["not_null", "in_list"],
+            "rule_args" : {
+                "in_list" : {"range_list" : ["是", "否"]}
+            }
+        },
+        {
+            "key" : "AccountBalance",
+            "title" : "账户余额",
+            "rules" : ["not_null", "number"],
+            "rule_args" : {
+                "number" : {"min_val" : 0}
+            }
+        },
+        {
+            "key" : "AccountHolderType",
+            "title" : "账户持有人类别",
+            "rules" : ["not_null", "regex"],
+            "rule_args" : {
+                "regex" : {"pattern" : "key-name"}
+            }
+        },
+        {
+            "key" : "OpeningFIName",
+            "title" : "开户金融机构名称",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 200}
+            }
+        }
+    ],
+    "Individual" : [
+        {
+            "key" : "FirstName",
+            "title" : "拼音/英文-名",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 100}
+            }
+        },
+        {
+            "key" : "LastName",
+            "title" : "拼音/英文-姓",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 100}
+            }
+        },
+        {
+            "key" : "NameCN",
+            "title" : "客户姓名",
+            "rules" : ["length"],
+            "rule_args" : {
+                "length" : {"max_len" : 100}
+            }
+        },
+        {
+            "key" : "Gender",
+            "title" : "性别",
+            "rules" : ["not_null", "regex"],
+            "rule_args" : {
+                "regex" : {"pattern" : "key-name"}
+            }
+        },
+        {
+            "key" : "AddressFreeEN",
+            "title" : "拼音/英文-现居地址",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 500}
+            }
+        },
+        {
+            "key" : "AddressCityEN",
+            "title" : "拼音/英文-所在城市",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 200}
+            }
+        },
+        {
+            "key" : "AddressCountryCode",
+            "title" : "现居住国",
+            "rules" : ["not_null", "regex"],
+            "rule_args" : {
+                "regex" : {"pattern" : "country"}
+            }
+        },
+        {
+            "key" : "AddressFreeCN",
+            "title" : "现居地址",
+            "rules" : ["length"],
+            "rule_args" : {
+                "length" : {"max_len" : 500}
+            }
+        },
+        {
+            "key" : "BirthCountryCode",
+            "title" : "出生国",
+            "rules" : ["not_null", "regex"],
+            "rule_args" : {
+                "regex" : {"pattern" : "country"}
+            }
+        },
+        {
+            "key" : "BirthDate",
+            "title" : "出生日期",
+            "rules" : ["not_null", "date"],
+            "rule_args" : {
+                "date" : {"max_year" : 2018}
+            }
+        },
+        {
+            "key" : "Nationality",
+            "title" : "国籍",
+            "rules" : ["not_null", "regex"],
+            "rule_args" : {
+                "regex" : {"pattern" : "country"}
+            }
+        },
+        {
+            "key" : "IDType",
+            "title" : "证件类型",
+            "rules" : ["not_null", "regex"],
+            "rule_args" : {
+                "regex" : {"pattern" : "key-name"}
+            }
+        },
+        {
+            "key" : "IDNumber",
+            "title" : "证件号码",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 30}
+            }
+        },
+        {
+            "key" : "ResCountryCode",
+            "title" : "税收居民国",
+            "rules" : ["not_null", "regex"],
+            "rule_args" : {
+                "regex" : {"pattern" : "country"}
+            }
+        },
+        {
+            "key" : "TIN",
+            "title" : "纳税识别号",
+            "rules" : ["length"],
+            "rule_args" : {
+                "length" : {"max_len" : 200}
+            }
+        },
+        {
+            "key" : "Explanation",
+            "title" : "无纳税识别号理由",
+            "rules" : ["length"],
+            "rule_args" : {
+                "length" : {"max_len" : 1000}
+            }
+        }
+    ],
+    "Organisation" : [        
+        {
+            "key" : "OrganisationNameCN",
+            "title" : "机构名称",
+            "rules" : ["length"],
+            "rule_args" : {
+                "length" : {"max_len" : 200}
+            }
+        },
+        {
+            "key" : "OrganisationNameCN",
+            "title" : "拼音/英文-机构名称",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 200}
+            }
+        },        
+        {
+            "key" : "AddressFreeEN",
+            "title" : "拼音/英文-机构地址",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 500}
+            }
+        },
+        {
+            "key" : "AddressCityEN",
+            "title" : "拼音/英文-所在城市",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 200}
+            }
+        },
+        {
+            "key" : "AddressCountryCode",
+            "title" : "机构所在国",
+            "rules" : ["not_null", "regex"],
+            "rule_args" : {
+                "regex" : {"pattern" : "country"}
+            }
+        },
+        {
+            "key" : "AddressFreeCN",
+            "title" : "机构地址",
+            "rules" : ["length"],
+            "rule_args" : {
+                "length" : {"max_len" : 500}
+            }
+        },        
+        {
+            "key" : "ResCountryCode",
+            "title" : "税收居民国",
+            "rules" : ["not_null", "regex"],
+            "rule_args" : {
+                "regex" : {"pattern" : "country"}
+            }
+        },
+        {
+            "key" : "TIN",
+            "title" : "纳税识别号",
+            "rules" : ["length"],
+            "rule_args" : {
+                "length" : {"max_len" : 200}
+            }
+        },
+        {
+            "key" : "Explanation",
+            "title" : "无纳税识别号理由",
+            "rules" : ["length"],
+            "rule_args" : {
+                "length" : {"max_len" : 1000}
+            }
+        }
+    ],
+    "ControllingPerson" : [
+        {
+            "key" : "FirstName",
+            "title" : "拼音/英文-名",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 100}
+            }
+        },
+        {
+            "key" : "LastName",
+            "title" : "拼音/英文-姓",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 100}
+            }
+        },
+        {
+            "key" : "NameCN",
+            "title" : "客户姓名",
+            "rules" : ["length"],
+            "rule_args" : {
+                "length" : {"max_len" : 100}
+            }
+        },
+        {
+            "key" : "Gender",
+            "title" : "性别",
+            "rules" : ["not_null", "regex"],
+            "rule_args" : {
+                "regex" : {"pattern" : "key-name"}
+            }
+        },
+        {
+            "key" : "AddressFreeEN",
+            "title" : "拼音/英文-现居地址",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 500}
+            }
+        },
+        {
+            "key" : "AddressCityEN",
+            "title" : "拼音/英文-所在城市",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 200}
+            }
+        },
+        {
+            "key" : "AddressCountryCode",
+            "title" : "现居住国",
+            "rules" : ["not_null", "regex"],
+            "rule_args" : {
+                "regex" : {"pattern" : "country"}
+            }
+        },
+        {
+            "key" : "AddressFreeCN",
+            "title" : "现居地址",
+            "rules" : ["length"],
+            "rule_args" : {
+                "length" : {"max_len" : 500}
+            }
+        },
+        {
+            "key" : "BirthCountryCode",
+            "title" : "出生国",
+            "rules" : ["not_null", "regex"],
+            "rule_args" : {
+                "regex" : {"pattern" : "country"}
+            }
+        },
+        {
+            "key" : "BirthDate",
+            "title" : "出生日期",
+            "rules" : ["not_null", "date"],
+            "rule_args" : {
+                "date" : {"max_year" : 2018}
+            }
+        },        
+        {
+            "key" : "IDType",
+            "title" : "证件类型",
+            "rules" : ["not_null", "regex"],
+            "rule_args" : {
+                "regex" : {"pattern" : "key-name"}
+            }
+        },
+        {
+            "key" : "IDNumber",
+            "title" : "证件号码",
+            "rules" : ["not_null", "length"],
+            "rule_args" : {
+                "length" : {"max_len" : 30}
+            }
+        },
+        {
+            "key" : "ResCountryCode",
+            "title" : "税收居民国",
+            "rules" : ["not_null", "regex"],
+            "rule_args" : {
+                "regex" : {"pattern" : "country"}
+            }
+        },
+        {
+            "key" : "TIN",
+            "title" : "纳税识别号",
+            "rules" : ["length"],
+            "rule_args" : {
+                "length" : {"max_len" : 200}
+            }
+        },
+        {
+            "key" : "Explanation",
+            "title" : "无纳税识别号理由",
+            "rules" : ["length"],
+            "rule_args" : {
+                "length" : {"max_len" : 1000}
+            }
+        }
+    ]
+}

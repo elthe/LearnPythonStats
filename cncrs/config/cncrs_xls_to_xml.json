@@ -1,0 +1,99 @@
+{
+    "sheet_name" : "申报表",
+    "Manager" : {
+        "title_line" : 3,
+        "data_start_line" : 5,
+        "title_group" : {
+            "Manager" : {
+                "start_col" : "A",
+                "end_col" : "C",
+                "title_map" : {
+                    "系统用户账号" : "ReportingID",
+                    "金融机构注册码" : "FIID", 
+                    "报送年度" : "ReportingPeriod"
+                }
+            }
+        }
+    },
+    "Account" : {
+        "title_line" : 10,
+        "data_start_line" : 12,
+        "title_group" : {
+            "Account" : {
+                "start_col" : "B",
+                "end_col" : "L",
+                "title_map" : {
+                    "基金账号" : "AccountNumber",
+                    "账户类型" : "ClosedAccount",
+                    "账户类别" : "DueDiligenceInd",
+                    "自证声明" : "SelfCertification",
+                    "账户余额" : "AccountBalance",
+                    "账户持有人" : "AccountHolderType",
+                    "开户金融机构名称" : "OpeningFIName",
+                    "股息收入金额" : "Payment_CRS501",
+                    "利息收入金额" : "Payment_CRS502",
+                    "销售或者赎回金融资产总收入金额" : "Payment_CRS503",
+                    "其他收入" : "Payment_CRS504"
+                }
+            },
+            "Individual" : {
+                "start_col" : "M",
+                "end_col" : "AB",
+                "title_map" : {
+                    "客户姓名" : "NameCN",
+                    "拼音/英文-姓" : "LastName",
+                    "拼音/英文-名" : "FirstName",
+                    "客户性别" : "Gender",
+                    "出生日期" : "BirthDate",
+                    "国籍" : "Nationality",
+                    "证件类型" : "IDType",
+                    "证件号码" : "IDNumber",
+                    "现居地址" : "AddressFreeCN",
+                    "拼音/英文-现居地址" : "AddressFreeEN",
+                    "拼音/英文-所在城市" : "AddressCityEN",
+                    "现居住国" : "AddressCountryCode",                    
+                    "出生国" : "BirthCountryCode",
+                    "税收居民国" : "ResCountryCode",
+                    "纳税识别号" : "TIN",
+                    "无纳税识别号理由" : "Explanation"
+                }
+            },
+            "Organisation" : {
+                "start_col" : "AC",
+                "end_col" : "AK",
+                "title_map" : {
+                    "机构名称" : "OrganisationNameCN",
+                    "拼音/英文-机构名称" : "OrganisationNameEN",
+                    "机构地址" : "AddressFreeCN",
+                    "拼音/英文-机构地址" : "AddressFreeEN",
+                    "拼音/英文-所在城市" : "AddressCityEN",
+                    "机构所在国" : "AddressCountryCode",
+                    "税收居民国" : "ResCountryCode",
+                    "纳税识别号" : "TIN",
+                    "无纳税识别号理由" : "Explanation"
+                }
+            },
+            "ControllingPerson" : {
+                "start_col" : "AL",
+                "end_col" : "AZ",
+                "title_map" : {
+                    "控制人姓名" : "NameCN",
+                    "拼音/英文-姓" : "LastName",
+                    "拼音/英文-名" : "FirstName",
+                    "控制人性别" : "Gender",
+                    "出生日期" : "BirthDate",
+                    "证件类型" : "IDType",
+                    "证件号码" : "IDNumber",
+                    "现居地址" : "AddressFreeCN",
+                    "拼音/英文-现居地址" : "AddressFreeEN",
+                    "拼音/英文-所在城市" : "AddressCityEN",
+                    "现居住国" : "AddressCountryCode",
+                    "出生国" : "BirthCountryCode",
+                    "税收居民国" : "ResCountryCode",
+                    "纳税识别号" : "TIN",
+                    "无纳税识别号理由" : "Explanation"
+                }
+            }
+        }
+    }
+}
