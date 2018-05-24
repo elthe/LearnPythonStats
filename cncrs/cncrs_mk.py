@@ -73,15 +73,16 @@ class CNCRSReportMaker:
             line_no = i + 1
             self.check_info("Account", acc_info, line_no)
 
-            holder_type = acc_info["Account"]["AccountHolderType"]
-            if holder_type == "01":
+            # 账户持有人类别
+            holder_type = cncrs_cm.convert("key-name", acc_info["Account"]["AccountHolderType"])
+            if holder_type == "CRS100":
                 # 非居民个人客户
                 self.check_info("Individual", acc_info["Individual"], line_no)
             else:
                 # 机构客户
                 self.check_info("Organisation", acc_info["Organisation"], line_no)
                 # 有非居民控制人的消极非金融机构
-                if holder_type == "02":
+                if holder_type == "CRS101":
                     self.check_info("ControllingPerson", acc_info["ControllingPerson"], line_no)
 
             # 根据新增和变更加入不同列表
@@ -173,7 +174,7 @@ class CNCRSReportMaker:
         # 转成XML
         tree = root.to_dict()
         xml = xmlcm.dict_to_xml(tree)
-        logcm.print_obj(xml, "xml")
+        # logcm.print_obj(xml, "xml")
         # XML文件输出
         sub_path = "test" if self.test else "prod"
         out_file = "%s/%s/%s.xml" % (self.save_path, sub_path, ref_id)

@@ -7,7 +7,7 @@
 		<cncrs:MessageRefId>TRC2XNUTNMNUZTU32018N00000001</cncrs:MessageRefId>
 		<cncrs:ReportingPeriod>2017-12-31</cncrs:ReportingPeriod>
 		<cncrs:MessageTypeIndic>CRS701</cncrs:MessageTypeIndic>
-		<cncrs:Tmstp>2018-05-24T16:28:19+08:00</cncrs:Tmstp>
+		<cncrs:Tmstp>2018-05-24T17:49:00+08:00</cncrs:Tmstp>
 	</cncrs:MessageHeader>
 	<cncrs:ReportingGroup>
 		<cncrs:AccountReport>

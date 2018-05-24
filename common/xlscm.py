@@ -135,7 +135,7 @@ def load_excel_dict(file_path, sheet_name, title_line, data_start_line, title_gr
                 logcm.print_info("标题没找到 %s-%s" % (group_key, title), fg='red')
                 return None
 
-    logcm.print_obj(title_group, "title_group", show_json=True)
+    # logcm.print_obj(title_group, "title_group", show_json=True)
 
     # 取得数据
     data_list = []

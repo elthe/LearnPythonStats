@@ -558,7 +558,7 @@ class CNCRSConverter:
         self.last_report = loadcfgcm.load("cncrs_xls_to_xml_last.json", last_report)
 
     def xls_to_xml(self, xls_path, save_path, test):
-        logcm.print_info("Convert %s to xml start!" % xls_path, fg='green')
+        logcm.print_info("Converting xml : %s ..." % xls_path)
         # 加载Excel管理信息
         cfg_mng = self.cfg_xls['Manager']
         mng_list = xlscm.load_excel_dict(xls_path, self.cfg_xls['sheet_name'], cfg_mng['title_line'],
@@ -571,20 +571,21 @@ class CNCRSConverter:
             logcm.print_info("Manager Info need only one!", fg='red')
             sys.exit()
         mng_info = mng_list[0]["Manager"]
-        logcm.print_obj(mng_info, "mng_info", show_json=True)
+        # logcm.print_obj(mng_info, "mng_info", show_json=True)
 
         # 加载Excel账户信息
         cfg_acc = self.cfg_xls['Account']
         acc_list = xlscm.load_excel_dict(xls_path, self.cfg_xls['sheet_name'], cfg_acc['title_line'],
                                          cfg_acc['data_start_line'], cfg_acc['title_group'])
-        logcm.print_obj(acc_list, "acc_list", show_json=True)
+        # logcm.print_obj(acc_list, "acc_list", show_json=True)
         # 账户信息为空判断
         if acc_list is None or len(acc_list) == 0:
             logcm.print_info("Account Info is not set!", fg='red')
             sys.exit()
 
         # 报告生成器
-        maker = CNCRSReportMaker(save_path=save_path, chk_rule=self.chk_rule_map, test=test, last_report=self.last_report,
+        maker = CNCRSReportMaker(save_path=save_path, chk_rule=self.chk_rule_map, test=test,
+                                 last_report=self.last_report,
                                  **mng_info)
         # 设置账户信息
         maker.set_acc_list(acc_list)
