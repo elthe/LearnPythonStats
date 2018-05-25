@@ -13,6 +13,9 @@
 ## [file_hdf5.py](file_hdf5.py)
 ### HDF5文件的写入和读取示例。
 
+## [file_pdf_sub.py](file_pdf_sub.py)
+### PDF文件的截取和另存。
+
 ## [file_xml.py](file_xml.py)
 ### XML文件的写入和读取示例。
 
