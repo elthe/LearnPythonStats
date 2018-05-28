@@ -306,12 +306,13 @@ class AddressTag(CNCRSBaseTag):
         self.add_sub_tag_by_kv("CountryCode", country_code, prefix="stc")
         # 英文地址
         adr_en = CNCRSBaseTag("AddressEN", prefix="stc")
-        adr_en.add_sub_tag(CNCRSBaseTag("AddressFreeEN", value=address_free_en, prefix="stc"))
         # 英文固定地址
         adr_fix_en = CNCRSBaseTag("AddressFixEN", prefix="stc")
         adr_fix_en.add_sub_tag(CNCRSBaseTag("CityEN", value=city_en, prefix="stc"))
         adr_en.add_sub_tag(adr_fix_en)
+        adr_en.add_sub_tag(CNCRSBaseTag("AddressFreeEN", value=address_free_en, prefix="stc"))
         self.add_sub_tag(adr_en)
+
         # 中文文地址
         adr_cn = CNCRSBaseTag("AddressCN", prefix="stc")
         adr_cn.add_sub_tag(CNCRSBaseTag("AddressFreeCN", value=address_free_cn, prefix="stc"))

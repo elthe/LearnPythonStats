@@ -162,9 +162,6 @@ class CNCRSAccount:
             tin_code = input_data["TIN"]
             tin = TINTag(res_country, tin_code)
             tag.add_sub_tag(tin)
-        # 不提供的理由
-        if "Explanation" in input_data:
-            tag.add_sub_tag_by_kv("Explanation", input_data["Explanation"], prefix="stc")
         # 国籍
         nationality = cncrs_cm.convert("country", input_data["Nationality"])
         tag.add_sub_tag_by_kv("Nationality", nationality, prefix="stc")
@@ -173,6 +170,9 @@ class CNCRSAccount:
         birth_country = cncrs_cm.convert("country", input_data["BirthCountryCode"])
         birth = BirthInfoTag(birth_date, birth_country)
         tag.add_sub_tag(birth)
+        # 不提供的理由
+        if "Explanation" in input_data:
+            tag.add_sub_tag_by_kv("Explanation", input_data["Explanation"], prefix="stc")
 
         return tag
 

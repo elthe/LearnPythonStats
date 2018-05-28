@@ -316,7 +316,7 @@ def check_regex(obj, title="", pattern=None):
     if pattern is not None and pattern in REGEX_MAP:
         ptn = re.compile(REGEX_MAP[pattern])
         if not ptn.match(obj):
-            msg = "%s值为%d,与不符合要求的规则表达式:%s!" % (title, obj, pattern)
+            msg = "%s值为%s,与不符合要求的规则表达式:%s!" % (title, obj, pattern)
             logcm.print_info(msg, fg='red')
             return CheckResult(False, msg)
 
