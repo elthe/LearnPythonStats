@@ -6,12 +6,138 @@ Excel common api
 Excel文件相关共通函数
 """
 
+import os
 import xlrd
-
 from common import filecm
 from common import logcm
+from common.classcm import BaseObject
 from datetime import datetime
 from xlrd import xldate_as_tuple
+from xlwt import *
+
+
+class ExcelDiffInfo(BaseObject):
+    """
+    Excel不同点类
+    """
+
+    def __init__(self, row, col, key, title, val_from, val_to):
+        # 行号
+        self.row = row
+        # 列号
+        self.col = col
+        # 列号
+        self.key = key
+        # 标题
+        self.title = title
+        # 当前值
+        self.val_from = val_from
+        # 对比值
+        self.val_to = val_to
+
+
+def cmp_excel(left_file_path, right_file_path, sheet_name, title_line, start_line, pk_col, start_col=0, ignore_new_line=False):
+    """
+    比较两个Excel文件指定Sheet,从指定行开始的数据,如果指定主键列值相同,比较数据有无不同.如果主键值不存在,列出所有数据.
+    :param left_file_path:左文件路径
+    :param right_file_path:右文件路径
+    :param sheet_name:Sheet名
+    :param title_line:标题行号
+    :param start_line:数据开始行号
+    :param pk_col:主键列号
+    :return:差分列表
+    """
+
+    # 读取Sheet
+    sheet_left = get_sheet(left_file_path, sheet_name)
+    sheet_right = get_sheet(right_file_path, sheet_name)
+
+    is_ok = True
+    is_ok &= check_row(sheet_left, title_line, "标题行")
+    is_ok &= check_row(sheet_right, title_line, "标题行")
+    is_ok &= check_row(sheet_left, start_line, "数据开始行")
+    is_ok &= check_row(sheet_right, start_line, "数据开始行")
+    is_ok &= check_col(sheet_left, pk_col, "主键列")
+    is_ok &= check_col(sheet_right, pk_col, "主键列")
+    is_ok &= check_col(sheet_left, start_col, "开始列")
+    is_ok &= check_col(sheet_right, start_col, "开始列")
+    if not is_ok:
+        return
+
+    # 差分列表
+    diff_list = []
+    for row_left in range(start_line, sheet_left.nrows):
+        # 主键值
+        pk_val = sheet_left.cell_value(row_left, pk_col)
+        if pk_val is None or pk_val == "":
+            break
+
+        row_right = find_row_by_pk(sheet_right, pk_col, start_line, pk_val)
+        if row_right is not None:
+            for col_left in range(start_col, sheet_left.ncols):
+                val_left = sheet_left.cell_value(row_left, col_left)
+                val_right = sheet_right.cell_value(row_right, col_left)
+                if val_left != val_right:
+                    title = sheet_left.cell_value(title_line, col_left)
+                    diff = ExcelDiffInfo(row_left, col_left, pk_val, title, val_left, val_right)
+                    diff_list.append(diff)
+        elif not ignore_new_line:
+            for col_left in range(start_col, sheet_left.ncols):
+                val_left = sheet_left.cell_value(row_left, col_left)
+                title = sheet_left.cell_value(title_line, col_left)
+                diff = ExcelDiffInfo(row_left, col_left, pk_val, title, val_left, None)
+                diff_list.append(diff)
+
+    return diff_list
+
+
+def find_row_by_pk(sheet, pk_col, start_line, pk_val):
+    for row in range(start_line, sheet.nrows):
+        val = sheet.cell_value(row, pk_col)
+        if val == pk_val:
+            return row
+    return None
+
+
+def check_row(sheet, row, title):
+    # 判断标题行是否在合理范围
+    if row < 0 or row >= sheet.nrows:
+        logcm.print_info("%s的行号不合理! 正常范围:[0~%d), 当前值:%d" % (title, sheet.nrows, row), fg='red')
+        return False
+    return True
+
+
+def check_col(sheet, col, title):
+    # 判断标题行是否在合理范围
+    if col < 0 or col >= sheet.ncols:
+        logcm.print_info("%s的列号不合理! 正常范围:[0~%d), 当前值:%d" % (title, sheet.ncols, col), fg='red')
+        return False
+    return True
+
+
+def get_sheet(file_path, sheet_name):
+    """
+    取得指定excel文件的Sheet
+    :param file_path: Excel文件路径
+    :param sheet_name: Sheet名
+    :return: Sheet对象
+    """
+    if not os.path.exists(file_path):
+        logcm.print_info("文件不存在! %s" % file_path, fg='red')
+        return None
+
+    # 读取Excel
+    workbook = xlrd.open_workbook(file_path)
+    file_name = filecm.short_name(file_path)
+    sheets = workbook.sheet_names()
+    if not sheet_name in sheets:
+        # 如果没有这个Sheet，则跳过
+        logcm.print_info("Sheet[%s]在文件[%s]中不存在!" % (sheet_name, file_name), fg='red')
+        return None
+
+    # 读取Sheet
+    worksheet = workbook.sheet_by_name(sheet_name)
+    return worksheet
 
 
 def load_excel_data(file_path, short_name, sheet_name, title_line, col_titles):
@@ -25,16 +151,8 @@ def load_excel_data(file_path, short_name, sheet_name, title_line, col_titles):
     @return: 数据列表
     """
 
-    # 读取Excel
-    workbook = xlrd.open_workbook(file_path)
-    sheets = workbook.sheet_names()
-    if not sheet_name in sheets:
-        # 如果没有这个Sheet，则跳过
-        logcm.print_info("Sheet不存在 %s - %s" % (short_name, sheet_name), fg='red')
-        return None
-
     # 读取Sheet
-    worksheet = workbook.sheet_by_name(sheet_name)
+    worksheet = get_sheet(file_path, sheet_name)
 
     # 判断标题行是否在合理范围
     if title_line < 0 or title_line >= worksheet.nrows:
@@ -98,17 +216,8 @@ def load_excel_dict(file_path, sheet_name, title_line, data_start_line, title_gr
     @return: 数据字典列表
     """
 
-    # 读取Excel
-    workbook = xlrd.open_workbook(file_path)
-    sheets = workbook.sheet_names()
-    file_name = filecm.short_name(file_path)
-    if not sheet_name in sheets:
-        # 如果没有这个Sheet，则跳过
-        logcm.print_info("Sheet不存在 %s - %s" % (file_name, sheet_name), fg='red')
-        return None
-
     # 读取Sheet
-    worksheet = workbook.sheet_by_name(sheet_name)
+    worksheet = get_sheet(file_path, sheet_name)
 
     # 判断标题行是否在合理范围
     if title_line < 0 or title_line >= worksheet.nrows:
@@ -206,10 +315,9 @@ def colname_to_index(col_name):
         r = r * 26 + ord(i) - base + 1
     return r - 1
 
-
-if __name__ == '__main__':
-    print(colname_to_index("A"))
-    print(colname_to_index("Z"))
-    print(colname_to_index("AA"))
-    print(colname_to_index("AZ"))
-    print(colname_to_index("ZZ"))
+# if __name__ == '__main__':
+#     print(colname_to_index("A"))
+#     print(colname_to_index("Z"))
+#     print(colname_to_index("AA"))
+#     print(colname_to_index("AZ"))
+#     print(colname_to_index("ZZ"))

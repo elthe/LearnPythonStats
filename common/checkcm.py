@@ -93,7 +93,7 @@ def check_obj_by_list(obj, check_list):
         if not result.ok:
             is_ok_all = False
             msg_list.append(result.msg)
-    return CheckResult(is_ok_all, msg_list)
+    return CheckResult(is_ok_all, '\n'.join(msg_list))
 
 
 def check_obj(obj, chk):

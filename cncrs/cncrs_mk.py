@@ -58,7 +58,7 @@ class CNCRSReportMaker:
             # 校验信息
             check_result = checkcm.check_obj_by_list(info, check_list)
             if not check_result.ok:
-                logcm.print_info("%s Info Check Failed on line %d! \n%s" % (chk_key, line_no, check_list.msg), fg='red')
+                logcm.print_info("%s Info Check Failed on line %d! \n%s" % (chk_key, line_no, check_result.msg), fg='red')
                 sys.exit()
 
     def set_acc_list(self, acc_list):
