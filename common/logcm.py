@@ -6,10 +6,8 @@ Log common api
 日志输出相关共通函数
 """
 
-import json
-
 from numpy import *
-from common.datecm import DateEncoder
+from common import classcm
 
 colors_dict = {
     'reset': '0',
@@ -165,7 +163,8 @@ def print_info(obj, blank_first=True, show_header=True, color=None, fg=None, bg=
     print('-' * 100)
 
 
-def print_obj(obj, title, full_show=False, show_json=False, show_header=True, color=None, fg=None, bg=None):
+def print_obj(obj, title, full_show=False, show_json=False, show_header=True, show_table=False, color=None, fg=None,
+              bg=None):
     """
     print输出对象内容，同时输出描述，类型
     @param obj: 输出对象
@@ -173,6 +172,7 @@ def print_obj(obj, title, full_show=False, show_json=False, show_header=True, co
     @param full_show: 全部显示，默认否
     @param show_json: 显示为JSON
     @param show_header: 是否显示头部
+    @param show_table: 显示为表格
     @param color: 颜色
     @param fg: 前景色
     @param bg: 背景色
@@ -198,7 +198,7 @@ def print_obj(obj, title, full_show=False, show_json=False, show_header=True, co
     # 开始线
     print('-' * 100)
     # 输出对象数据
-    print_obj_data(obj, type_name, full_show, show_json)
+    print_obj_data(obj, type_name, full_show, show_json, show_table)
 
     # 结束特殊显示
     if has_style:
@@ -267,13 +267,14 @@ def print_obj_prop(obj, type_name):
     return None
 
 
-def print_obj_data(obj, type_name, full_show, show_json):
+def print_obj_data(obj, type_name, full_show, show_json=False, show_table=False):
     """
     print数据对象，根据类型进行特殊处理
     @param obj : 对象
     @param type_name : 类型名
     @param full_show : 是否全部显示
     @param show_json : 显示为JSON
+    @param show_table : 显示为表格
     @:return 无
     """
 
@@ -301,9 +302,16 @@ def print_obj_data(obj, type_name, full_show, show_json):
         print('-' * 45, end='')
         print('Json Dumps', end='')
         print('-' * 45)
-        obj_json = json.dumps(obj, sort_keys=True, indent=4, separators=(',', ': '),
-                              ensure_ascii=False, cls=DateEncoder)
+        obj_json = classcm.obj_to_json(obj)
         print(obj_json)
+    # 显示表格
+    if show_table:
+        # 分隔线
+        print('-' * 45, end='')
+        print('Table Show', end='')
+        print('-' * 45)
+        obj_table = classcm.obj_to_table(obj)
+        print(obj_table)
     return None
 
 

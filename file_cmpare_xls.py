@@ -29,7 +29,11 @@ cfg = loadcfgcm.load("file_compare_xls.json", default_config)
 
 # 取得指定目录下的文件列表
 diff_list = xlscm.cmp_excel(**cfg)
-logcm.print_obj(diff_list, "diff_list")
+logcm.print_obj(diff_list, "diff_list", show_table=True, show_json=True)
+
+#
+# for diff in diff_list:
+#     print(diff)
 
 
 
