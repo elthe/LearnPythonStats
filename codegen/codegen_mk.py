@@ -26,7 +26,10 @@ default_config = """
     "core_base_project": "xxxx-kkk",
     "core_base_service_prefix": "App",    
     "package_sysname": "app",
-    "controller_path": "app"
+    "controller_path": "app",
+    "author": "somebody",
+    "copyrightEN": "Copyright (c) 2017, www.xxxxx.com.cn All Rights Reserved.",
+    "copyrightCN": "XXXXXXXXXX版权所有"
 }
 """
 
@@ -74,7 +77,7 @@ class CodeGenModuleMaker:
         # 使用接口生成代码
         path = self.cfg_tpl["Service"]["tpl_path"]
         path_map = self.cfg_tpl["Service"]["path_map"]
-        for svc in mdl["svcList"]:
+        for svc in mdl["services"]:
             cfg_obj["service"] = svc
             total_count += self.make_by_path(path, path_map, cfg_obj)
 

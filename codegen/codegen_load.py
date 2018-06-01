@@ -7,6 +7,7 @@
 
 import sys
 
+from common import datecm
 from common import logcm
 from common import xlscm
 from common import loadcfgcm
@@ -22,7 +23,7 @@ default_config = """
                 "end_col" : "F",
                 "title_map" : {
                     "包路径" : "packageName",
-                    "模块ID" : "moduleId", 
+                    "模块ID" : "moduleName", 
                     "模块描述" : "moduleDesc"
                 }
             }
@@ -49,9 +50,9 @@ default_config = """
             "end_col" : "L",
             "group_keys" : ["req", "resp"],
             "title_map" : {
-                "参数ID" : "propId",
-                "参数名" : "propName", 
-                "类型" : "propType",
+                "参数ID" : "id",
+                "参数名" : "name", 
+                "类型" : "type",
                 "开始版本" : "startVersion",
                 "默认值" : "defaultVal",                
                 "说明" : "desc"
@@ -150,9 +151,17 @@ class CodeGenXlsLoader:
             sys.exit()
         mdl_info = mdl_list[0]["Module"]
 
+
+        # 代码时间
+        mdl_info["codeCreateTime"] = datecm.now_time_str("%Y年%m月%d日 00:00:00")
+
         # 加载接口信息
         cfg_svc = self.cfg_xls['Services']
-        mdl_info["svcList"] = xlscm.load_excel_dict(xls_path, sheet_name, **cfg_svc)
+        mdl_info["services"] = xlscm.load_excel_dict(xls_path, sheet_name, **cfg_svc)
+        for svc in mdl_info["services"]:
+            svc["Service"]["methodName"] = svc["Service"]["interfaceName"].split(".")[0]
+            svc["Service"]["hasReqData"] = len(svc["subItems"]["req"]) > 0
+
 
         # 加载Bean信息
         cfg_bean = self.cfg_xls['Beans']

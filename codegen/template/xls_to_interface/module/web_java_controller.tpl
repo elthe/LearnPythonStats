@@ -1,4 +1,4 @@
-package ${config.base_package}.controller.${module.moduleName};
+package {{config.base_package}}.controller.{{module.moduleName}};
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,68 +11,67 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.google.gson.Gson;
-<#list module.services as c >
-import ${config.core_base_package}.facade.bean.dubbo.${config.package_sysname}.${module.moduleName}.${c.className}Req;
-</#list>
-import ${config.base_package}.controller.LcsAppBaseController;
-import ${config.base_package}.service.${module.moduleName}.I${config.base_service_prefix}${module.moduleNameFcu}Service;
-import ${config.base_package}.util.log.LogPrinterTools;
-import ${config.base_package}.web.result.LcsAppResultVo;
+{% for c in module.services %}
+import {{config.core_base_package}}.facade.bean.dubbo.{{config.package_sysname}}.{{module.moduleName}}.{{c.methodName|capitalize}}Req;
+{% endfor %}
+import {{config.base_package}}.controller.LcsAppBaseController;
+import {{config.base_package}}.service.{{module.moduleName}}.I{{config.base_service_prefix}}{{module.moduleName|capitalize}}Service;
+import {{config.base_package}}.util.log.LogPrinterTools;
+import {{config.base_package}}.web.result.LcsAppResultVo;
 
 /**
- * ClassName: ${config.base_controller_prefix}${module.moduleNameFcu}Controller <br/>
- * Function: ${module.moduleDesc}控制器. <br/>
+ * ClassName: {{config.base_controller_prefix}}{{module.moduleName|capitalize}}Controller <br/>
+ * Function: {{module.moduleDesc}}控制器. <br/>
  * Reason: TODO ADD REASON. <br/>
- * Date: ${module.codeCreateTime?string("yyyy年M月d日 00:00:00")} <br/>
+ * Date: {{module.codeCreateTime}} <br/>
  *
- * @author ${config.author}
+ * @author {{config.author}}
  * @version
  * @since JDK 1.7
- * Copyright (c) 2017, www.leadfund.com.cn All Rights Reserved.
- * 版权所有.
+ * {{config.copyrightEN}}
+ * {{config.copyrightCN}}版权所有.
  */
 @Controller
-@RequestMapping("/${config.controller_path}")
-public class ${config.base_controller_prefix}${module.moduleNameFcu}Controller extends LcsAppBaseController {
+@RequestMapping("/{{config.controller_path}}")
+public class {{config.base_controller_prefix}}{{module.moduleName|capitalize}}Controller extends LcsAppBaseController {
 
 	private Logger mLogger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	private I${config.base_service_prefix}${module.moduleNameFcu}Service m${module.moduleNameFcu}Service;
+	private I{{config.base_service_prefix}}{{module.moduleName|capitalize}}Service m{{module.moduleName|capitalize}}Service;
 
-<#list module.services as c >
+{% for c in module.services %}
 	/**
-	 * ${c.methodName}: ${c.name?if_exists}. <br/>
-	 * 说明： ${c.desc?if_exists}.<br/>
-	 * 开始版本：${c.startVersion?if_exists}.<br/>
+	 * {{c.methodName}}: {{c.name}}. <br/>
+	 * 说明： {{c.desc}}.<br/>
+	 * 开始版本：{{c.startVersion}}.<br/>
 	 *
-	 * @author ${config.author}
+	 * @author {{config.author}}
 	 * @param pRequest
 	 * @param pResponse
 	 * @param pModel
 	 * @return
 	 * @since JDK 1.7
 	 */
-	@RequestMapping("/${c.interfaceName}")
-	public String ${c.methodName}(HttpServletRequest pRequest, HttpServletResponse pResponse, ModelMap pModel) {
+	@RequestMapping("/{{c.interfaceName}}")
+	public String {{c.methodName}}(HttpServletRequest pRequest, HttpServletResponse pResponse, ModelMap pModel) {
 		long lStartTime = System.currentTimeMillis();
 		String lReqId = getReqId();
-		<#if (c.hasReqData = 'Y')>
+		{% if c.hasReqData %}
 		// 取得加密参数
-		${c.className}Req lReq = new Gson().fromJson((String) pRequest.getAttribute("data"), ${c.className}Req.class);
-		</#if>
-		<#if (c.hasReqData = 'N')>
+		{{c.methodName|capitalize}}Req lReq = new Gson().fromJson((String) pRequest.getAttribute("data"), {{c.methodName|capitalize}}Req.class);
+		{% elif not c.hasReqData %}
 		// 没有加密参数
-		${c.className}Req lReq = new ${c.className}Req();
-		</#if>
+		{{c.methodName|capitalize}}Req lReq = new {{c.methodName|capitalize}}Req();
+		{% endif %}
 		lReq.setReqId(lReqId);
 
 		// 设置共通请求参数
 		setLcsAppCommonReq(pRequest, lReq);
 		LogPrinterTools.printReqStart(mLogger, lReqId, lReq);
 
-		// ${c.name?if_exists}
-		LcsAppResultVo lResultVo = m${module.moduleNameFcu}Service.${c.methodName}(lReq);
+		// {{c.name}}
+		LcsAppResultVo lResultVo = m{{module.moduleName|capitalize}}Service.{{c.methodName}}(lReq);
 
 		LogPrinterTools.printObject(mLogger, lReqId, "lResultVo", lResultVo);
 		String lResponseStr = render(lResultVo);
@@ -81,5 +80,5 @@ public class ${config.base_controller_prefix}${module.moduleNameFcu}Controller e
 		LogPrinterTools.printReqEnd(mLogger, lReqId, lResultVo, lCostTime);
 		return "json";
 	}
-</#list>
+{% endfor %}
 }

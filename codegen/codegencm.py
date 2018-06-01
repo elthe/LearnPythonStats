@@ -1,20 +1,39 @@
 from common.classcm import BaseObject
+from common import datecm
+from common import dictcm
 
 
 class Module(BaseObject):
     """
     模块
     """
-    pass
+
+    def __init__(self, packageName, moduleName, moduleDesc):
+        """
+
+        :param packageName:
+        :param moduleName:
+        :param moduleDesc:
+        """
+        self.packageName = packageName
+        self.moduleName = moduleName
+        self.moduleDesc = moduleDesc
+        self.codeCreateTime = datecm.now_time_str("%Y年%m月%d日 00:00:00")
+        self.services = []
+        self.beans = []
+        self.codes = []
 
 
 class Service(BaseObject):
     """
     接口
     """
-    req = []
-    resp = []
-    pass
+
+    def __init__(self, svc):
+        self.interfaceName = svc["Service"]["interfaceName"]
+        self.startVersion = svc["Service"]["startVersion"]
+        self.desc = svc["Service"]["desc"]
+        self.interfaceName = svc["Service"]["interfaceName"]
 
 
 class Prop(BaseObject):
@@ -22,7 +41,13 @@ class Prop(BaseObject):
     属性
     """
 
-    def __init__(self, name, remark, **kwargs):
-        self.name = name
-        self.remark = remark
-
+    def __init__(self, **kwargs):
+        """
+        属性初始化
+        :param kwargs:
+        """
+        self.name = dictcm.get(kwargs, "name")
+        self.type = dictcm.get(kwargs, "type")
+        self.id = dictcm.get(kwargs, "id")
+        self.startVersion = dictcm.get(kwargs, "startVersion")
+        self.desc = dictcm.get(kwargs, "desc")
