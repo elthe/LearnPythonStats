@@ -1,0 +1,16 @@
+{
+    "Module" : {
+        "desc" : "以模块为单位生成的文件说明",
+        "tpl_path" : "module",
+        "path_map" : {
+            "web_java_controller" : "base/{{config.base_project}}-web/src/main/java/{{config.base_package_path}}/controller/{{module.moduleName}}/{{config.base_controller_prefix}}{{module.moduleName}}Controller.java"
+        }
+    },
+    "Service" : {
+        "desc" : "以接口为单位生成的文件说明",
+        "tpl_path" : "service",
+        "path_map" : {
+            "facade_java_bean_req" : "core/{{config.core_base_project}}-facade/src/main/java/{{config.core_base_package_path}}/facade/bean/dubbo/{{config.package_sysname}}/{{module.moduleName}}/{{service.className}}Req.java"
+        }
+    }
+}

@@ -234,15 +234,44 @@ def find_first_key(sheet, key, col_index=0):
     return -1
 
 
-def load_excel_dict(file_path, sheet_name, title_line=None, data_start_line=None, title_group=None, start_key=None,
-                    end_type="EMPTY"):
+def find_title_index(sheet, title_line, **kwargs):
+    """
+    在指定Sheet的指定行,查找每个标题对应的列索引
+    :param sheet:Sheet对象
+    :param title_line:标题行索引
+    :param kwargs:其他参数
+    :return:索引字典
+    """
+    index_map = {}
+    for (title, title_key) in kwargs["title_map"].items():
+        # 查找标题
+        found_title = False
+        start_col = colname_to_index(kwargs["start_col"])
+        end_col = colname_to_index(kwargs["end_col"])
+        for i in range(start_col, end_col + 1):
+            val = get_cell_val(sheet, title_line, i)
+            if title == val:
+                # 记录标题的索引,标记找到
+                index_map[title] = i
+                found_title = True
+                continue
+        # 如果找不到,则处理停止
+        if not found_title:
+            logcm.print_info("在第%d行没找到标题:%s" % (title_line + 1, title), fg='red')
+            return None
+    return index_map
+
+
+def load_excel_dict(file_path, sheet_name, title_line=None, data_start_line=None, title_group=None, sub_items=None,
+                    start_key=None, end_type="EMPTY"):
     """
     根据指定路径，Sheet名，标题行，数据开始行，标题组设置
     @param file_path: 文件路径
     @param sheet_name: Sheet名
     @param title_line: 标题行索引
     @param data_start_line: 标题行索引
-    @param title_group: 文件短名
+    @param title_group: 标题组设置
+    @param sub_items: 子项目设置
     @param start_key: 开始KEY(可以根据开始KEY来查找标题行和数据开始行)
     @param end_type: 终止类型(SORT-NO:下一行非排序数字, EMPTY:下一行全空)
     @return: 数据字典列表
@@ -267,25 +296,7 @@ def load_excel_dict(file_path, sheet_name, title_line=None, data_start_line=None
 
     # 为每个标题找到对应的列索引.
     for (group_key, group_setting) in title_group.items():
-        group_setting["index_map"] = {}
-        for (title, title_key) in group_setting["title_map"].items():
-            # 查找标题
-            found_title = False
-            start_col = colname_to_index(group_setting["start_col"])
-            end_col = colname_to_index(group_setting["end_col"])
-            for i in range(start_col, end_col + 1):
-                val = get_cell_val(worksheet, title_line, i)
-                if title == val:
-                    # 记录标题的索引,标记找到
-                    group_setting["index_map"][title] = i
-                    found_title = True
-                    continue
-            # 如果找不到,则处理停止
-            if not found_title:
-                logcm.print_info("标题没找到 %s-%s" % (group_key, title), fg='red')
-                return None
-
-    # logcm.print_obj(title_group, "title_group", show_json=True)
+        group_setting["index_map"] = find_title_index(worksheet, title_line, **group_setting)
 
     # 取得数据
     data_list = []
@@ -294,37 +305,110 @@ def load_excel_dict(file_path, sheet_name, title_line=None, data_start_line=None
         # 判断是否到达结束行
         if end_type == "SORT-NO":
             val = worksheet.cell_value(i, 0)
-            result = checkcm.check_regex(val, pattern="sort-no")
+            result = checkcm.check_regex(val, pattern="sort-no", show_error=False)
+            # 标记开始行和结束行
             if not result.ok:
+                if len(data_list) > 0:
+                    data_list[-1]["end_row"] = i - 1
                 break
+            if val is not None:
+                row_data["start_row"] = i
+                if len(data_list) > 0:
+                    data_list[-1]["end_row"] = i - 1
 
         # 是否空行
         is_blank = True
         # 对标题组遍历
         for (group_key, group_setting) in title_group.items():
             # 每个分组一个字典
-            row_data[group_key] = {}
-            for (title, title_key) in group_setting["title_map"].items():
-                # 根据标题取列索引
-                index = group_setting["index_map"][title]
-                # 取值
-                val = get_cell_val(worksheet, i, index)
-                # 空字段判断（目前只判断字符串类型）
-                if len(str(val)) > 0:
-                    # 设置值及非空行
-                    row_data[group_key][title_key] = val
-                    is_blank = False
+            group_data = load_group_data(worksheet, group_setting["title_map"], group_setting["index_map"], i)
+            if group_data is not None:
+                row_data[group_key] = group_data
+                is_blank = False
 
-        # 遇到空行,则停止取数
+        # 遇到空行
         if is_blank:
             if end_type == "EMPTY":
                 break
             else:
+                row_data["end_row"] = i
                 continue
         # 非空行则加入数据列表
         data_list.append(row_data)
 
+    if len(data_list) > 0 and end_type == "SORT-NO" and sub_items is not None:
+        for row_data in data_list:
+            row_data["subItems"] = load_sub_items(worksheet, sub_items, title_line, row_data["start_row"],
+                                                  row_data["end_row"])
+            # 返回结果中去掉开始结束行
+            row_data.pop("start_row")
+            row_data.pop("end_row")
+
     return data_list
+
+
+def load_group_data(sheet, title_map, index_map, row_line):
+    """
+    在指定Sheet中,按照标题设定,标题索引设定,读取指定行数据
+    :param sheet:Sheet对象
+    :param title_map:标题设定
+    :param index_map:索引设定
+    :param row_line:指定行
+    :return:数据字典对象
+    """
+    row_data = {}
+    is_blank = True
+    for (title, title_key) in title_map.items():
+        # 根据标题取列索引
+        index = index_map[title]
+        # 取值
+        val = get_cell_val(sheet, row_line, index)
+        # 空字段判断（目前只判断字符串类型）
+        if len(str(val)) > 0:
+            # 设置值及非空行
+            row_data[title_key] = val
+            is_blank = False
+
+    if is_blank:
+        return None
+    else:
+        return row_data
+
+
+def load_sub_items(sheet, sub_items, title_line, start_row, end_row):
+    """
+    加载子项目列表
+    :param sheet:Sheet对象
+    :param sub_items:子项目定义
+    @param title_line: 标题行索引
+    :param start_row:开始行
+    :param end_row:结束行
+    :return:子项目数据对象
+    """
+    if sheet is None or sub_items is None:
+        return None
+
+    # 判断数据行是否在合理范围
+    if start_row < 0 or end_row < start_row or end_row >= sheet.nrows:
+        logcm.print_info("数据行不合理 %d ~ %d" % (start_row, end_row), fg='red')
+        return None
+
+    # 标题索引Map
+    index_map = find_title_index(sheet, title_line, **sub_items)
+    # 数据开始列
+    start_col = colname_to_index(sub_items["start_col"])
+    sub_groups = {}
+    group_key = None
+    for i in range(start_row, end_row + 1):
+        start_val = get_cell_val(sheet, i, start_col)
+        if start_val in sub_items["group_keys"]:
+            group_key = start_val
+            sub_groups[group_key] = []
+        else:
+            group_data = load_group_data(sheet, sub_items["title_map"], index_map, i)
+            if group_key is not None and group_data is not None:
+                sub_groups[group_key].append(group_data)
+    return sub_groups
 
 
 def get_cell_val(sheet, row, col):

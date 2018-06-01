@@ -303,12 +303,13 @@ def check_number(obj, title="", max_val=None, min_val=None, fix_val=None):
     return CheckResult(True)
 
 
-def check_regex(obj, title="", pattern=None):
+def check_regex(obj, title="", pattern=None, show_error=True):
     """
     规则表达式校验
     :param obj: 对象
     :param title: 标题
     :param pattern:规则表达式
+    :param show_error:是否显示错误
     :return: 校验结果对象
     """
     if obj is None:
@@ -316,7 +317,8 @@ def check_regex(obj, title="", pattern=None):
 
     if not isinstance(obj, str):
         msg = "%s值为非字符串!" % title
-        logcm.print_info(msg, fg='red')
+        if show_error:
+            logcm.print_info(msg, fg='red')
         return CheckResult(False, msg)
 
     if len(obj) == 0:
@@ -326,7 +328,8 @@ def check_regex(obj, title="", pattern=None):
         ptn = re.compile(REGEX_MAP[pattern])
         if not ptn.match(obj):
             msg = "%s值为%s,不符合要求的规则表达式:%s!" % (title, obj, pattern)
-            logcm.print_info(msg, fg='red')
+            if show_error:
+                logcm.print_info(msg, fg='red')
             return CheckResult(False, msg)
 
     return CheckResult(True)

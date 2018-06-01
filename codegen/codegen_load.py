@@ -2,22 +2,14 @@
 # -*- coding: utf-8 -*-
 
 """
-把EXCEL报送文件转成XML转化器类及配置
+把EXCEL文件转成代码的模块信息字典
 """
 
 import sys
 
 from common import logcm
-from common import datecm
-from common import xmlcm
-from common import filecm
 from common import xlscm
 from common import loadcfgcm
-from common import checkcm
-from common.checkcm import CheckRule
-
-from cncrs.cncrs_mk import CNCRSReportMaker
-from cncrs.cncrs_tag import *
 
 # 配置
 default_config = """
@@ -51,8 +43,80 @@ default_config = """
                     "接口英文名" : "interfaceName"                
                 }
             }
+        },
+        "sub_items" : {
+            "start_col" : "F",
+            "end_col" : "L",
+            "group_keys" : ["req", "resp"],
+            "title_map" : {
+                "参数ID" : "propId",
+                "参数名" : "propName", 
+                "类型" : "propType",
+                "开始版本" : "startVersion",
+                "默认值" : "defaultVal",                
+                "说明" : "desc"
+            }
         }
-    }
+    },
+    "Beans" : {
+        "start_key" : "BEANS",
+        "end_type" : "SORT-NO",
+        "title_group" : {
+            "Bean" : {
+                "start_col" : "A",
+                "end_col" : "E",
+                "title_map" : {
+                    "编号" : "sortNo",
+                    "Bean名称" : "name", 
+                    "开始版本" : "startVersion",
+                    "Bean说明" : "desc",
+                    "Bean英文名" : "className"                
+                }
+            }
+        },
+        "sub_items" : {
+            "start_col" : "F",
+            "end_col" : "L",
+            "group_keys" : ["prop"],
+            "title_map" : {
+                "属性ID" : "propId",
+                "属性名" : "propName", 
+                "类型" : "propType",
+                "开始版本" : "startVersion",
+                "默认值" : "defaultVal",                
+                "说明" : "desc"
+            }
+        }
+    },
+    "Codes" : {
+        "start_key" : "CODES",
+        "end_type" : "SORT-NO",
+        "title_group" : {
+            "Code" : {
+                "start_col" : "A",
+                "end_col" : "E",
+                "title_map" : {
+                    "编号" : "sortNo",
+                    "Code名称" : "name", 
+                    "开始版本" : "startVersion",
+                    "Code说明" : "desc",
+                    "Code英文名" : "codeKey"                
+                }
+            }
+        },
+        "sub_items" : {
+            "start_col" : "F",
+            "end_col" : "L",
+            "group_keys" : ["option"],
+            "title_map" : {
+                "选项KEY" : "optionKey",
+                "选项名称" : "displayName", 
+                "选项CD" : "optionCd",
+                "开始版本" : "startVersion",                                
+                "说明" : "desc"
+            }
+        }
+    }    
 }
 """
 
@@ -85,15 +149,24 @@ class CodeGenXlsLoader:
             logcm.print_info("Module Info need only one!", fg='red')
             sys.exit()
         mdl_info = mdl_list[0]["Module"]
-        logcm.print_obj(mdl_info, "mdl_info", show_json=True, show_table=True)
 
-        # 加载Excel接口信息
-        cfg_mdl = self.cfg_xls['Services']
-        svc_list = xlscm.load_excel_dict(xls_path, sheet_name, **cfg_mdl)
-        logcm.print_obj(svc_list, "svc_list", show_json=True, show_table=True)
+        # 加载接口信息
+        cfg_svc = self.cfg_xls['Services']
+        mdl_info["svcList"] = xlscm.load_excel_dict(xls_path, sheet_name, **cfg_svc)
+
+        # 加载Bean信息
+        cfg_bean = self.cfg_xls['Beans']
+        mdl_info["beanList"] = xlscm.load_excel_dict(xls_path, sheet_name, **cfg_bean)
+
+        # 加载Code信息
+        cfg_code = self.cfg_xls['Codes']
+        mdl_info["codeList"] = xlscm.load_excel_dict(xls_path, sheet_name, **cfg_code)
+
+        logcm.print_obj(mdl_info, "mdl_info", show_json=True)
 
         return mdl_info
 
 
-loader = CodeGenXlsLoader()
-loader.xls_to_module("./input/xxxxx接口明细v1.0.xlsx", "某个模块")
+if __name__ == '__main__':
+    loader = CodeGenXlsLoader()
+    loader.xls_to_module("./input/xxxxx接口明细v1.0.xlsx", "某个模块")
