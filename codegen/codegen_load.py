@@ -11,6 +11,8 @@ from common import datecm
 from common import logcm
 from common import xlscm
 from common import loadcfgcm
+from codegen.codegencm import Module,Service
+
 
 # 配置
 default_config = """
@@ -150,30 +152,27 @@ class CodeGenXlsLoader:
             logcm.print_info("Module Info need only one!", fg='red')
             sys.exit()
         mdl_info = mdl_list[0]["Module"]
+        mdl = Module(**mdl_info)
 
-
-        # 代码时间
-        mdl_info["codeCreateTime"] = datecm.now_time_str("%Y年%m月%d日 00:00:00")
 
         # 加载接口信息
         cfg_svc = self.cfg_xls['Services']
         mdl_info["services"] = xlscm.load_excel_dict(xls_path, sheet_name, **cfg_svc)
         for svc in mdl_info["services"]:
-            svc["Service"]["methodName"] = svc["Service"]["interfaceName"].split(".")[0]
-            svc["Service"]["hasReqData"] = len(svc["subItems"]["req"]) > 0
+            mdl.services.append(Service(svc))
+        return mdl
 
-
-        # 加载Bean信息
-        cfg_bean = self.cfg_xls['Beans']
-        mdl_info["beanList"] = xlscm.load_excel_dict(xls_path, sheet_name, **cfg_bean)
-
-        # 加载Code信息
-        cfg_code = self.cfg_xls['Codes']
-        mdl_info["codeList"] = xlscm.load_excel_dict(xls_path, sheet_name, **cfg_code)
-
-        logcm.print_obj(mdl_info, "mdl_info", show_json=True)
-
-        return mdl_info
+        # # 加载Bean信息
+        # cfg_bean = self.cfg_xls['Beans']
+        # mdl_info["beanList"] = xlscm.load_excel_dict(xls_path, sheet_name, **cfg_bean)
+        #
+        # # 加载Code信息
+        # cfg_code = self.cfg_xls['Codes']
+        # mdl_info["codeList"] = xlscm.load_excel_dict(xls_path, sheet_name, **cfg_code)
+        #
+        # logcm.print_obj(mdl_info, "mdl_info", show_json=True)
+        #
+        # return mdl_info
 
 
 if __name__ == '__main__':

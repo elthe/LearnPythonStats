@@ -34,6 +34,15 @@ class Service(BaseObject):
         self.startVersion = svc["Service"]["startVersion"]
         self.desc = svc["Service"]["desc"]
         self.interfaceName = svc["Service"]["interfaceName"]
+        self.reqProps = []
+        for req in svc["subItems"]["req"]:
+            self.reqProps.append(Prop(**req))
+        self.respProps = []
+        for resp in svc["subItems"]["resp"]:
+            self.respProps.append(Prop(**resp))
+
+        self.methodName = self.interfaceName.split(".")[0]
+        self.hasReqData = len(self.reqProps) > 0
 
 
 class Prop(BaseObject):
