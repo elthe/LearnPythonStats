@@ -37,7 +37,12 @@ def obj_to_json(obj):
     if isinstance(obj, list):
         return obj_list_to_json(obj)
 
-    obj_dict = obj_to_dict(obj)
+    # 不是字典时转换成字典
+    if isinstance(obj, dict):
+        obj_dict = obj
+    else:
+        obj_dict = obj_to_dict(obj)
+
     # 把属性转成JSON字符串显示
     json_str = json.dumps(obj_dict, indent=4, cls=DateEncoder)
     # 把Unicode编码转成中文
@@ -68,6 +73,10 @@ def obj_to_dict(obj):
     :param obj:对象
     :return: 字典
     """
+    # 字典对象无需再转
+    if isinstance(obj, dict):
+        return obj
+
     pr = {}
     for name in dir(obj):
         value = getattr(obj, name)
@@ -85,6 +94,10 @@ def get_name_list(obj):
     """
     if obj is None:
         return None
+
+    # 字典对象直接返回KEY列表
+    if isinstance(obj, dict):
+        return obj.keys()
 
     name_list = []
     for name in dir(obj):
@@ -110,7 +123,11 @@ def get_val_list(obj, name_list):
 
     val_list = []
     for name in name_list:
-        value = getattr(obj, name)
+        # 字典和普通对象取值不同
+        if isinstance(obj, dict):
+            value = obj[name]
+        else:
+            value = getattr(obj, name)
         val_list.append(value)
     return val_list
 

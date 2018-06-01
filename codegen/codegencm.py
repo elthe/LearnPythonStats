@@ -25,3 +25,4 @@ class Prop(BaseObject):
     def __init__(self, name, remark, **kwargs):
         self.name = name
         self.remark = remark
+

@@ -45,7 +45,8 @@ class CheckResult(BaseObject):
 # 规则表达式字典
 REGEX_MAP = {
     "country": r"[A-Z]{2}\([^\(\)]+\)",
-    "key-name": r"[A-Z0-9]+-"
+    "key-name": r"[A-Z0-9]+-",
+    "sort-no": r"[0-9]{3}"
 }
 
 
@@ -313,10 +314,18 @@ def check_regex(obj, title="", pattern=None):
     if obj is None:
         return CheckResult(True)
 
+    if not isinstance(obj, str):
+        msg = "%s值为非字符串!" % title
+        logcm.print_info(msg, fg='red')
+        return CheckResult(False, msg)
+
+    if len(obj) == 0:
+        return CheckResult(True)
+
     if pattern is not None and pattern in REGEX_MAP:
         ptn = re.compile(REGEX_MAP[pattern])
         if not ptn.match(obj):
-            msg = "%s值为%s,与不符合要求的规则表达式:%s!" % (title, obj, pattern)
+            msg = "%s值为%s,不符合要求的规则表达式:%s!" % (title, obj, pattern)
             logcm.print_info(msg, fg='red')
             return CheckResult(False, msg)
 

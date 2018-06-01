@@ -10,6 +10,7 @@ import os
 import xlrd
 from common import filecm
 from common import logcm
+from common import checkcm
 from common.classcm import BaseObject
 from datetime import datetime
 from xlrd import xldate_as_tuple
@@ -36,7 +37,8 @@ class ExcelDiffInfo(BaseObject):
         self.val_to = val_to
 
 
-def cmp_excel(left_file_path, right_file_path, sheet_name, title_line, start_line, pk_col, start_col=0, ignore_new_line=False):
+def cmp_excel(left_file_path, right_file_path, sheet_name, title_line, start_line, pk_col, start_col=0,
+              ignore_new_line=False):
     """
     比较两个Excel文件指定Sheet,从指定行开始的数据,如果指定主键列值相同,比较数据有无不同.如果主键值不存在,列出所有数据.
     :param left_file_path:左文件路径
@@ -205,7 +207,35 @@ def load_excel_data(file_path, short_name, sheet_name, title_line, col_titles):
     return data_list
 
 
-def load_excel_dict(file_path, sheet_name, title_line, data_start_line, title_group):
+def find_first_key(sheet, key, col_index=0):
+    """
+    对指定列搜索指定关键词,返回第一个匹配的行索引
+    :param sheet: Sheet对象
+    :param key: 关键词
+    :param col_index: 列索引
+    :return:行索引,没找到返回-1
+    """
+    if sheet is None:
+        logcm.print_info("Sheet对象为空!", fg='red')
+        return -1
+
+    if key is None or not isinstance(key, str) or len(key) == 0:
+        logcm.print_info("要检索的KEY为空!", fg='red')
+        return -1
+
+    if col_index < 0 or col_index >= sheet.ncols:
+        logcm.print_info("要检索的列索引(%d)不正常!" % col_index, fg='red')
+        return -1
+
+    for i in range(sheet.nrows):
+        cell_val = sheet.cell_value(i, col_index)
+        if cell_val == key:
+            return i
+    return -1
+
+
+def load_excel_dict(file_path, sheet_name, title_line=None, data_start_line=None, title_group=None, start_key=None,
+                    end_type="EMPTY"):
     """
     根据指定路径，Sheet名，标题行，数据开始行，标题组设置
     @param file_path: 文件路径
@@ -213,11 +243,22 @@ def load_excel_dict(file_path, sheet_name, title_line, data_start_line, title_gr
     @param title_line: 标题行索引
     @param data_start_line: 标题行索引
     @param title_group: 文件短名
+    @param start_key: 开始KEY(可以根据开始KEY来查找标题行和数据开始行)
+    @param end_type: 终止类型(SORT-NO:下一行非排序数字, EMPTY:下一行全空)
     @return: 数据字典列表
     """
 
     # 读取Sheet
     worksheet = get_sheet(file_path, sheet_name)
+
+    # 根据开始KEY,初始化标题行和数据开始行
+    if start_key is not None:
+        start_key_row = find_first_key(worksheet, start_key)
+        if start_key_row < 0:
+            logcm.print_info("开始KEY没找到! %s" % start_key, fg='red')
+            return None
+        title_line = start_key_row + 1
+        data_start_line = title_line + 1
 
     # 判断标题行是否在合理范围
     if title_line < 0 or title_line >= worksheet.nrows:
@@ -250,6 +291,13 @@ def load_excel_dict(file_path, sheet_name, title_line, data_start_line, title_gr
     data_list = []
     for i in range(data_start_line, worksheet.nrows):
         row_data = {}
+        # 判断是否到达结束行
+        if end_type == "SORT-NO":
+            val = worksheet.cell_value(i, 0)
+            result = checkcm.check_regex(val, pattern="sort-no")
+            if not result.ok:
+                break
+
         # 是否空行
         is_blank = True
         # 对标题组遍历
@@ -269,7 +317,10 @@ def load_excel_dict(file_path, sheet_name, title_line, data_start_line, title_gr
 
         # 遇到空行,则停止取数
         if is_blank:
-            break
+            if end_type == "EMPTY":
+                break
+            else:
+                continue
         # 非空行则加入数据列表
         data_list.append(row_data)
 
