@@ -23,3 +23,13 @@
 </div>
 {% endraw %}
 
+## 缩进滤镜
+<div>
+    {% if True %}{{txt|indent|upper}}{% endif %}
+</div>
+
+<!-- 1 -->
+{%+ if True %}    <!-- 2 -->
+    foo<!-- 3 -->
+{% endif %}<!-- 4 -->
+    <!-- 5 -->
