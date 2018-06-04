@@ -27,6 +27,8 @@ class Module(BaseObject):
 
         # 模块创建时间
         self.codeCreateTime = datecm.now_time_str("%Y年%m月%d日 00:00:00")
+        # 模块名首字母大写
+        self.moduleNameFcu = strcm.upper_first(self.moduleName)
         # 常量KEY名
         self.keyName = strcm.camel_to_under(self.moduleName).upper()
         # 接口列表
@@ -149,6 +151,8 @@ class Prop(BaseObject):
 
         self.copy_from(kwargs)
 
+        # 首字母大写的ID
+        self.idFcu = strcm.upper_first(self.id)
         # 是否包含Bean
         self.hasBean = False
         # Bean

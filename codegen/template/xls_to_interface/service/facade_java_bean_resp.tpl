@@ -1,23 +1,29 @@
 package {{config.core_base_package}}.facade.bean.dubbo.{{config.package_sysname}}.{{module.moduleName}};
 
 import java.io.Serializable;
+{% if service.hasBigDecimalResp %}
 import java.math.BigDecimal;
+{% endif %}
+{% if service.hasDateResp %}
 import java.util.Date;
+{% endif %}
+{% if service.hasListResp %}
 import java.util.List;
+{% endif %}
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
-import {{config.core_base_package}}.facade.abs.AbstractLcsAppRequest;
-{% for c in service.reqProps %}
+import {{config.core_base_package}}.facade.abs.AbstractDubboResponse;
+{% for c in service.respProps %}
 {% if c.hasBean %}
 import {{config.core_base_package}}.facade.bean.dubbo.{{config.package_sysname}}.{{module.moduleName}}.{{c.bean.className}};
 {% endif %}
 {% endfor %}
 
 /**
- * ClassName: {{service.className}}Req <br/>
- * Function: {{service.desc}}请求对象类. <br/>
+ * ClassName: {{service.className}}Resp <br/>
+ * Function: {{service.desc}}返回对象类. <br/>
  * Reason: TODO ADD REASON. <br/>
  * Date: {{module.codeCreateTime}} <br/>
  *
@@ -27,20 +33,20 @@ import {{config.core_base_package}}.facade.bean.dubbo.{{config.package_sysname}}
  * {{config.copyrightEN}}
  * {{config.copyrightCN}}版权所有.
  */
-public class {{service.className}}Req extends AbstractLcsAppRequest implements Serializable {
+public class {{service.className}}Resp extends AbstractDubboResponse implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    {% for c in service.reqProps %}
+    {% for c in service.respProps %}
     /**
-     * {{c.id}}: {{c.name}} {{c.desc}}.
+     * {{c.id}}: {{c.name}}{{c.descFormat}}.
      * @since JDK 1.7
      */
     private {{c.type}} {{c.id}};
 
     {% endfor %}
 
-    {% for c in service.reqProps %}
+    {% for c in service.respProps %}
     /**
      * get{{c.idFcu}}: 获取{{c.name}}.
      *

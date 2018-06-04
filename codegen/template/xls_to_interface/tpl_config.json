@@ -1,16 +1,30 @@
 {
-    "Module" : {
-        "desc" : "以模块为单位生成的文件说明",
-        "tpl_path" : "module",
-        "path_map" : {
-            "web_java_controller" : "base/{{config.base_project}}-web/src/main/java/{{config.base_package_path}}/controller/{{module.moduleName}}/{{config.base_controller_prefix}}{{module.moduleName}}Controller.java"
-        }
-    },
-    "Service" : {
-        "desc" : "以接口为单位生成的文件说明",
-        "tpl_path" : "service",
-        "path_map" : {
-            "facade_java_bean_req" : "core/{{config.core_base_project}}-facade/src/main/java/{{config.core_base_package_path}}/facade/bean/dubbo/{{config.package_sysname}}/{{module.moduleName}}/{{service.className}}Req.java"
-        }
+  "Module": {
+    "desc": "以模块为单位生成的文件说明",
+    "tpl_path": "module",
+    "path_map": {
+      "web_java_controller": "base/{{config.base_project}}-web/src/main/java/{{config.base_package_path}}/controller/{{module.moduleName}}/{{config.base_controller_prefix}}{{module.moduleName}}Controller.java",
+      "service_java_biz_util": "core/{{config.core_base_project}}-service/src/main/java/{{config.core_base_package_path}}/service/crm/util/{{config.package_sysname}}/{{module.moduleName}}/{{module.moduleNameFcu}}BizUtil.java",
+      "service_java_mock_util": "core/{{config.core_base_project}}-service/src/main/java/{{config.core_base_package_path}}/service/crm/util/{{config.package_sysname}}/{{module.moduleName}}/{{module.moduleNameFcu}}MockUtil.java",
+      "util_java_codeListSettings": "base/{{config.base_project}}-util/src/main/java/{{config.base_package_path}}/util/select/{{module.moduleNameFcu}}CodeListSettings.java",
+      "web_java_service": "base/{{config.base_project}}-web/src/main/java/{{config.base_package_path}}/service/{{module.moduleName}}/I{{config.base_service_prefix}}{{module.moduleNameFcu}}Service.java",
+      "web_java_serviceImpl": "base/{{config.base_project}}-web/src/main/java/{{config.base_package_path}}/service/{{module.moduleName}}/impl/{{config.base_service_prefix}}{{module.moduleNameFcu}}ServiceImpl.java"
     }
+  },
+  "Service": {
+    "desc": "以接口为单位生成的文件说明",
+    "tpl_path": "service",
+    "path_map": {
+      "facade_java_bean_req": "core/{{config.core_base_project}}-facade/src/main/java/{{config.core_base_package_path}}/facade/bean/dubbo/{{config.package_sysname}}/{{module.moduleName}}/{{service.className}}Req.java",
+      "facade_java_bean_resp": "core/{{config.core_base_project}}-facade/src/main/java/{{config.core_base_package_path}}/facade/bean/dubbo/{{config.package_sysname}}/{{module.moduleName}}/{{service.className}}Resp.java",
+      "service_java_service": "core/{{config.core_base_project}}-service/src/main/java/{{config.core_base_package_path}}/service/crm/impl/{{config.package_sysname}}/{{module.moduleName}}/{{config.core_base_service_prefix}}{{service.className}}Service.java"
+    }
+  },
+  "Bean": {
+    "desc": "以Bean为单位生成的文件说明",
+    "tpl_path": "bean",
+    "path_map": {
+      "facade_java_bean_bean": "core/{{config.core_base_project}}-facade/src/main/java/{{config.core_base_package_path}}/facade/bean/dubbo/{{config.package_sysname}}/{{module.moduleName}}/{{bean.className}}.java"
+    }
+  }
 }

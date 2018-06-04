@@ -16,6 +16,7 @@ from jinja2 import Template
 # 配置
 default_config = """
 {
+    "common_package": "com.xxxx.common",
     "base_package": "com.xxxx.kkk",
     "base_package_path": "com/xxxx/kkk",
     "base_project": "xxxx-yyyy",
@@ -81,6 +82,13 @@ class CodeGenModuleMaker:
             cfg_obj["service"] = svc
             total_count += self.make_by_path(path, path_map, cfg_obj)
 
+        # 使用Bean生成代码
+        path = self.cfg_tpl["Bean"]["tpl_path"]
+        path_map = self.cfg_tpl["Bean"]["path_map"]
+        for bean in mdl.beans:
+            cfg_obj["bean"] = bean
+            total_count += self.make_by_path(path, path_map, cfg_obj)
+
         logcm.print_info("Output %d files successfully. " % total_count)
 
     def make_by_path(self, path, path_map, cfg_obj):
@@ -108,6 +116,7 @@ class CodeGenModuleMaker:
         :param cfg_obj: 配置数据
         :return: 无
         """
+        logcm.print_info("Making %s to %s ..." % (tpl_path, out_file_tpl))
         # 读入模版
         tpl_str = filecm.read_str(file_name=tpl_path)
         # 生成代码
