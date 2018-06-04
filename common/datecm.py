@@ -31,21 +31,8 @@ Date common api
 """
 
 import datetime
-import json
 import time
-from xlrd import xldate_as_tuple
 from matplotlib.pylab import date2num, num2date
-
-
-class DateEncoder(json.JSONEncoder):
-    """
-    JSON日期编码类
-    """
-
-    def default(self, obj):
-        if isinstance(obj, datetime.datetime):
-            return obj.__str__()
-        return json.JSONEncoder.default(self, obj)
 
 
 def check_date_format(date_str, check_format):

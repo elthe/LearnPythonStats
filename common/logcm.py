@@ -6,6 +6,7 @@ Log common api
 日志输出相关共通函数
 """
 
+import json
 from numpy import *
 from common import classcm
 

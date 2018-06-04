@@ -7,7 +7,7 @@ Jinjia2 使用示例。
 
 from jinja2 import Template
 from common import filecm
-from codegen.codegencm import Module
+from codegen.codegen_mdl import Module
 
 mdl = Module("aaa", "bbb", "ccc")
 

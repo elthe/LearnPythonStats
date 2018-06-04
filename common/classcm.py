@@ -5,9 +5,22 @@
 共通基类定义
 """
 
+import datetime
 import json
-from common.datecm import DateEncoder
 from prettytable import PrettyTable
+
+
+class BaseJSONEncoder(json.JSONEncoder):
+    """
+    JSON日期编码类
+    """
+
+    def default(self, obj):
+        if isinstance(obj, datetime.datetime):
+            return obj.__str__()
+        if isinstance(obj, BaseObject):
+            return obj_to_dict(obj)
+        return json.JSONEncoder.default(self, obj)
 
 
 class BaseObject:
@@ -27,6 +40,44 @@ class BaseObject:
         """
         return obj_to_json(self)
 
+    def copy_from(self, obj):
+        """
+        从对象或字典复制值
+        :param obj: 对象或字典
+        :return: 无
+        """
+        copy_val(obj, self)
+
+
+def copy_val(obj_from, obj_to):
+    """
+    对象或字典之间复制值
+    :param obj_from:源对象或字典
+    :param obj_to:目标对象或字典
+    :return: 无
+    """
+    if obj_from is None or obj_to is None:
+        return
+
+    # 字典对象无需再转
+    if isinstance(obj_from, dict):
+        dict_from = obj_from
+    else:
+        dict_from = obj_to_dict(obj_from)
+
+    # 如果目标是字典,直接更新
+    if isinstance(obj_to, dict):
+        obj_to.update(dict_from)
+        return
+
+    # 非字典时,对目标的所有属性循环
+    name_list = get_name_list(obj_to)
+    for name in name_list:
+        # 如果属性名在源对象或字典中存在的话,设置属性值
+        if name in dict_from:
+            setattr(obj_to, name, dict_from[name])
+    return
+
 
 def obj_to_json(obj):
     """
@@ -34,6 +85,9 @@ def obj_to_json(obj):
     :param obj:对象
     :return:JSON字符串
     """
+    if obj is None:
+        return None
+
     if isinstance(obj, list):
         return obj_list_to_json(obj)
 
@@ -44,7 +98,7 @@ def obj_to_json(obj):
         obj_dict = obj_to_dict(obj)
 
     # 把属性转成JSON字符串显示
-    json_str = json.dumps(obj_dict, indent=4, cls=DateEncoder)
+    json_str = json.dumps(obj_dict, indent=4, cls=BaseJSONEncoder)
     # 把Unicode编码转成中文
     out_str = json_str.encode('latin-1').decode('unicode_escape')
     return out_str
@@ -61,7 +115,7 @@ def obj_list_to_json(obj_list):
         obj_dict = obj_to_dict(obj)
         dict_list.append(obj_dict)
     # 把属性转成JSON字符串显示
-    json_str = json.dumps(dict_list, indent=4, cls=DateEncoder)
+    json_str = json.dumps(dict_list, indent=4, cls=BaseJSONEncoder)
     # 把Unicode编码转成中文
     out_str = json_str.encode('latin-1').decode('unicode_escape')
     return out_str
@@ -73,6 +127,9 @@ def obj_to_dict(obj):
     :param obj:对象
     :return: 字典
     """
+    if obj is None:
+        return None
+
     # 字典对象无需再转
     if isinstance(obj, dict):
         return obj

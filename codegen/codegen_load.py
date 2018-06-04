@@ -11,8 +11,7 @@ from common import datecm
 from common import logcm
 from common import xlscm
 from common import loadcfgcm
-from codegen.codegencm import Module,Service
-
+from codegen.codegen_mdl import Module, Service, Bean, Code
 
 # 配置
 default_config = """
@@ -82,9 +81,9 @@ default_config = """
             "end_col" : "L",
             "group_keys" : ["prop"],
             "title_map" : {
-                "属性ID" : "propId",
-                "属性名" : "propName", 
-                "类型" : "propType",
+                "属性ID" : "id",
+                "属性名" : "name", 
+                "类型" : "type",
                 "开始版本" : "startVersion",
                 "默认值" : "defaultVal",                
                 "说明" : "desc"
@@ -103,7 +102,7 @@ default_config = """
                     "Code名称" : "name", 
                     "开始版本" : "startVersion",
                     "Code说明" : "desc",
-                    "Code英文名" : "codeKey"                
+                    "Code英文名" : "key"                
                 }
             }
         },
@@ -112,9 +111,9 @@ default_config = """
             "end_col" : "L",
             "group_keys" : ["option"],
             "title_map" : {
-                "选项KEY" : "optionKey",
-                "选项名称" : "displayName", 
-                "选项CD" : "optionCd",
+                "选项KEY" : "key",
+                "选项名称" : "name", 
+                "选项CD" : "code",
                 "开始版本" : "startVersion",                                
                 "说明" : "desc"
             }
@@ -154,25 +153,27 @@ class CodeGenXlsLoader:
         mdl_info = mdl_list[0]["Module"]
         mdl = Module(**mdl_info)
 
-
         # 加载接口信息
         cfg_svc = self.cfg_xls['Services']
-        mdl_info["services"] = xlscm.load_excel_dict(xls_path, sheet_name, **cfg_svc)
-        for svc in mdl_info["services"]:
+        svc_list = xlscm.load_excel_dict(xls_path, sheet_name, **cfg_svc)
+        for svc in svc_list:
             mdl.services.append(Service(svc))
-        return mdl
 
-        # # 加载Bean信息
-        # cfg_bean = self.cfg_xls['Beans']
-        # mdl_info["beanList"] = xlscm.load_excel_dict(xls_path, sheet_name, **cfg_bean)
-        #
-        # # 加载Code信息
-        # cfg_code = self.cfg_xls['Codes']
-        # mdl_info["codeList"] = xlscm.load_excel_dict(xls_path, sheet_name, **cfg_code)
-        #
-        # logcm.print_obj(mdl_info, "mdl_info", show_json=True)
-        #
-        # return mdl_info
+        # 加载Bean信息
+        cfg_bean = self.cfg_xls['Beans']
+        bean_list = xlscm.load_excel_dict(xls_path, sheet_name, **cfg_bean)
+        for bean in bean_list:
+            mdl.beans.append(Bean(bean))
+
+        # 加载Code信息
+        cfg_code = self.cfg_xls['Codes']
+        code_list = xlscm.load_excel_dict(xls_path, sheet_name, **cfg_code)
+        for code in code_list:
+            mdl.codes.append(Code(code))
+
+        logcm.print_obj(mdl, "mdl")
+
+        return mdl
 
 
 if __name__ == '__main__':

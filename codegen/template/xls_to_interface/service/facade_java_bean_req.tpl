@@ -1,4 +1,4 @@
-package {{config.core_base_package}}.facade.bean.dubbo.${config.package_sysname}.${module.moduleName};
+package {{config.core_base_package}}.facade.bean.dubbo.{{config.package_sysname}}.{{module.moduleName}};
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -8,61 +8,61 @@ import java.util.List;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
-import ${config.core_base_package}.facade.abs.AbstractLcsAppRequest;
-<#list service.reqProps as c >
-<#if (c.hasBean == 'Y') >
-import ${config.core_base_package}.facade.bean.dubbo.${config.package_sysname}.${module.moduleName}.${c.bean.className};
-</#if>
-</#list>
+import {{config.core_base_package}}.facade.abs.AbstractLcsAppRequest;
+{% for c in service.reqProps %}
+{% if c.hasBean %}
+import {{config.core_base_package}}.facade.bean.dubbo.{{config.package_sysname}}.{{module.moduleName}}.{{c.bean.className}};
+{% endif %}
+{% endfor %}
 
 /**
- * ClassName: ${service.className}Req <br/>
- * Function: ${service.desc}请求对象类. <br/>
+ * ClassName: {{service.className}}Req <br/>
+ * Function: {{service.desc}}请求对象类. <br/>
  * Reason: TODO ADD REASON. <br/>
- * Date: ${module.codeCreateTime?string("yyyy年M月d日 00:00:00")} <br/>
+ * Date: {{module.codeCreateTime}} <br/>
  *
- * @author ${config.author}
+ * @author {{config.author}}
  * @version
  * @since JDK 1.7
- * Copyright (c) 2017, www.leadfund.com.cn All Rights Reserved.
- * 版权所有.
+* {{config.copyrightEN}}
+ * {{config.copyrightCN}}版权所有.
  */
-public class ${service.className}Req extends AbstractLcsAppRequest implements Serializable {
+public class {{service.className}}Req extends AbstractLcsAppRequest implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-<#list service.reqProps as c >
+{% for c in service.reqProps %}
 	/**
-	 * ${c.id}: ${c.name?if_exists}${c.descFormat?if_exists}.
+	 * {{c.id}}: {{c.name}} {{c.desc}}.
 	 * @since JDK 1.7
 	 */
-	private ${c.type} ${c.id};
+	private {{c.type}} {{c.id}};
 
-</#list>
+{% endfor %}
 
-<#list service.reqProps as c >
+{% for c in service.reqProps %}
 	/**
-	 * get${c.idFcu}: 获取${c.name?if_exists}.
+	 * get{{c.id|capitalize}}: 获取{{c.name}}.
 	 *
-	 * @author ${config.author}
+	 * @author {{config.author}}
 	 * @since JDK 1.7
 	 */
-	public ${c.type} get${c.idFcu}() {
-		return ${c.id};
+	public {{c.type}} get{{c.id|capitalize}}() {
+		return {{c.id}};
 	}
 
 	/**
-	 * set${c.idFcu}: 设置${c.name?if_exists}.
+	 * set{{c.id|capitalize}}: 设置{{c.name}}.
 	 *
-	 * @author ${config.author}
-	 * @param p${c.idFcu} ${c.name?if_exists}
+	 * @author {{config.author}}
+	 * @param p{{c.id|capitalize}} {{c.name}}
 	 * @since JDK 1.7
 	 */
- 	public void set${c.idFcu}(${c.type} p${c.idFcu}) {
-		this.${c.id} = p${c.idFcu};
+ 	public void set{{c.id|capitalize}}({{c.type}} p{{c.id|capitalize}}) {
+		this.{{c.id}} = p{{c.id|capitalize}};
 	}
 
-</#list>
+{% endfor %}
 	@Override
 	public String toString() {
 		return ReflectionToStringBuilder.toString(this,ToStringStyle.DEFAULT_STYLE);
