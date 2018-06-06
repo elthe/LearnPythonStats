@@ -63,7 +63,11 @@ def freemarker_to_jinjia2(fm_str):
 
 if __name__ == '__main__':
     # fm_str = filecm.read_str(file_name="./template/xls_to_interface/tpl_config.json")
-    # fm_str = filecm.read_str(file_name="./template/xls_to_interface/bean/facade_java_bean_bean.tpl")
-    # jj_str = freemarker_to_jinjia2(fm_str)
-    # diffcm.diff_by_text(fm_str, jj_str)
-    convert_freemarker_path("./template/xls_to_interface/")
+    tpl_path = "./template/xls_to_interface/service/core_java_test_service.tpl"
+    fm_str = filecm.read_str(file_name=tpl_path)
+    jj_str = freemarker_to_jinjia2(fm_str)
+    diffcm.diff_by_text(fm_str, jj_str)
+    filecm.save_str(jj_str, file_name=tpl_path)
+    # convert_freemarker_path("./template/xls_to_interface/")
+    # core_java_test_service
+

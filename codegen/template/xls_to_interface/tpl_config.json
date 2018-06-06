@@ -17,7 +17,8 @@
     "path_map": {
       "facade_java_bean_req": "core/{{config.core_base_project}}-facade/src/main/java/{{config.core_base_package_path}}/facade/bean/dubbo/{{config.package_sysname}}/{{module.moduleName}}/{{service.className}}Req.java",
       "facade_java_bean_resp": "core/{{config.core_base_project}}-facade/src/main/java/{{config.core_base_package_path}}/facade/bean/dubbo/{{config.package_sysname}}/{{module.moduleName}}/{{service.className}}Resp.java",
-      "service_java_service": "core/{{config.core_base_project}}-service/src/main/java/{{config.core_base_package_path}}/service/crm/impl/{{config.package_sysname}}/{{module.moduleName}}/{{config.core_base_service_prefix}}{{service.className}}Service.java"
+      "service_java_service": "core/{{config.core_base_project}}-service/src/main/java/{{config.core_base_package_path}}/service/crm/impl/{{config.package_sysname}}/{{module.moduleName}}/{{config.core_base_service_prefix}}{{service.className}}Service.java",
+      "core_java_test_service": "core/{{config.core_base_project}}-core/src/test/java/{{config.core_base_package_path}}/test/service/{{config.package_sysname}}/{{module.moduleName}}/{{config.base_service_prefix}}{{service.className}}ServiceTest.java"
     }
   },
   "Bean": {
