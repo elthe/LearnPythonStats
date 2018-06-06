@@ -28,8 +28,10 @@
     {% if True %}{{txt|indent|upper}}{% endif %}
 </div>
 
+{%+ if True %}
 <!-- 1 -->
-{%+ if True %}    <!-- 2 -->
+    <!-- 2 -->
     foo<!-- 3 -->
-{% endif %}<!-- 4 -->
+<!-- 4 -->
     <!-- 5 -->
+{%+ endif %}

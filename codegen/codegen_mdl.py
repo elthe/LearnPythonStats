@@ -215,3 +215,68 @@ class Option(BaseObject):
         self.desc = ""
 
         self.copy_from(kwargs)
+
+
+class Table(BaseObject):
+    """
+    数据表
+    """
+
+    def __init__(self, **kwargs):
+        """
+        初始化
+        """
+        # 表名
+        self.tableName = ""
+        # 排除前缀
+        self.excludePrefix = ""
+        # 备注
+        self.remarks = ""
+        self.copy_from(kwargs)
+
+        # 表名类名首字母小写
+        self.tableClassNameFcl = strcm.under_to_camel(self.tableName)
+        # 类全名
+        self.fullClassName = strcm.upper_first(self.tableClassNameFcl)
+        # 表名类名
+        self.tableClassName = self.fullClassName
+        if self.excludePrefix:
+            pos = len(self.excludePrefix)
+            if self.tableName.startswith(self.excludePrefix):
+                self.tableClassName = self.fullClassName[pos:]
+
+        # 数据表列数组
+        self.columns = []
+
+
+class Column(BaseObject):
+    """
+    数据表列
+    """
+
+    def __init__(self, **kwargs):
+        """
+        初始化
+        """
+        # 列名
+        self.columnName = ""
+        # 数据类型
+        self.dataType = ""
+        # 类型名
+        self.type_name = ""
+        # Oracle类型
+        self.oracleJavaType = ""
+        # 列大小
+        self.column_size = ""
+        # 备注
+        self.remarks = ""
+        # 是否可为空
+        self.nullable = ""
+        self.copy_from(kwargs)
+
+        # 属性名
+        self.propertyName = strcm.under_to_camel(self.columnName)
+        # 属性名首字母大写
+        self.propertyNameFcu = strcm.upper_first(self.propertyName)
+        # 模块创建时间
+        self.codeCreateTime = datecm.now_time_str("%Y年%m月%d日 00:00:00")
