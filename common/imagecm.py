@@ -40,15 +40,17 @@ class ImageType:
 
 
 class VideoActionOutput:
-    def __init__(self, im_output, img_path, img_no):
+    def __init__(self, im_output, img_path, img_no, img_org_path):
         """
         视频动画输出类
         :param im_output: 视频图片输出
-        :param img_path: 原始图片路径
-        :param img_no: 原始图片编号
+        :param img_path: 临时图片路径
+        :param img_org_path: 原始图片路径
+        :param img_no: 临时图片编号
         """
         self.output = im_output
         self.img_path = img_path
+        self.img_org_path = img_org_path
         self.img_no = img_no
         self.im_bgr = get_bgr_im(img_path, ImageType.IMG_FILE)
         # 最近图片
@@ -96,7 +98,7 @@ class VideoActionOutput:
                 img = imoptcm.change_darker(self.im_bgr, value)
             # 放大动画
             elif action_type == "zoom_in":
-                img = zoom_in(self.img_path, value)
+                img = zoom_in(self.img_path, value, self.img_org_path)
                 out_img_type = ImageType.IMG_PIL
             # 缩小动画
             elif action_type == "zoom_out":
@@ -509,11 +511,12 @@ def resize_canvas(img, canvas_width, canvas_height, back_val=255, save_path=None
     return new_image
 
 
-def zoom_in(img, ratio=1.1, save_path=None):
+def zoom_in(img, ratio=1.1, img_org=None, save_path=None):
     """
     对原始图片居中放大指定倍数后裁切为原始大小
-    @param img: 原始图片或路径
+    @param img: 图片或路径
     @param ratio: 放大比例
+    @param img_org: 原始图片或路径
     @param save_path: 保存路径（可选）
     @return: 放大后的图片
     """
@@ -526,7 +529,13 @@ def zoom_in(img, ratio=1.1, save_path=None):
     # 放大图片
     new_width = int(width * ratio)
     new_height = int(height * ratio)
-    im = resize(im, new_width, new_height)
+    # 如果存在原始图片，使用原始图片更清晰
+    if img_org is not None:
+        im_org = get_im(img_org)
+        im = resize(im_org, new_width, new_height)
+    else:
+        im = resize(im, new_width, new_height)
+
     # 计算居中剪切时，左上角坐标
     x = int(math.floor((new_width - width) / 2))
     y = int(math.floor((new_height - height) / 2))
