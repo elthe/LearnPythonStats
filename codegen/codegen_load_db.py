@@ -12,42 +12,6 @@ from common import loadcfgcm
 from codegen.codegen_mdl import Module, Service, Bean, Code
 from common import loadcfgcm
 from common.dboraclecm import DbOracleClient
-from jinja2 import Template
-from common import filecm
-
-# Oracle数据表模版
-ORACLE_TABLE_TPL = """
-select A.COLUMN_ID as COLUMN_ID,
-       A.COLUMN_NAME as COLUMN_NAME,
-       A.DATA_TYPE as DATA_TYPE,
-       DECODE(A.DATA_TYPE, 'NUMBER', A.DATA_PRECISION, A.DATA_LENGTH) as COLUMN_LENGTH,
-       A.DATA_SCALE as COLUMN_SCALE,
-       DECODE(E.UNIQUENESS, 'UNIQUE', 'Y', 'N') as IS_UNIQUE,
-       DECODE(E.KEY, 'Y', 'Y', 'N') IS_PK,
-       F.COMMENTS as COLUMN_COMMENTS,
-       A.NULLABLE as NULLABLE,
-       A.DATA_DEFAULT as DEFAULT_VAL
-  from USER_TAB_COLUMNS A,
-       USER_COL_COMMENTS F,
-       (select B.TABLE_NAME,
-               B.INDEX_NAME,
-               B.UNIQUENESS,
-               C.COLUMN_NAME,
-               DECODE(D.CONSTRAINT_NAME, null, 'N', 'Y') KEY
-          from USER_INDEXES B,
-               USER_IND_COLUMNS C,
-               (select CONSTRAINT_NAME
-                  from USER_CONSTRAINTS
-                 where CONSTRAINT_TYPE = 'P') D
-         where B.INDEX_NAME = C.INDEX_NAME
-           and B.INDEX_NAME = D.CONSTRAINT_NAME(+)) E
- where A.TABLE_NAME = '{{tableName}}'
-   and A.TABLE_NAME = E.TABLE_NAME(+)
-   and A.COLUMN_NAME = E.COLUMN_NAME(+)
-   and A.TABLE_NAME = F.TABLE_NAME
-   and A.COLUMN_NAME = F.COLUMN_NAME
- order by A.COLUMN_ID
-"""
 
 # 配置
 default_config = """
@@ -82,9 +46,8 @@ class CodeGenDBLoader:
         # 建立和数据库系统的连接
         dbClient = DbOracleClient("oracle", self.cfg_db)
 
-        sql_str = Template(ORACLE_TABLE_TPL, lstrip_blocks=True).render(tableName=table_name)
-        result = dbClient.fetchall(sql_str)
-        logcm.print_obj(result, "result")
+        result = dbClient.getColumns(table_name)
+        logcm.print_obj(result, "result", show_table=True)
 
         return result
 

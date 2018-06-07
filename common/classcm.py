@@ -143,6 +143,44 @@ def obj_to_dict(obj):
     return pr
 
 
+def matrix_to_dict(matrix, name_list):
+    """
+    矩阵转字典列表
+    :param matrix:矩阵
+    :param name_list:名称列表
+    :return:字典列表
+    """
+    if matrix is None or name_list is None:
+        return None
+
+    dict_list = []
+    for row_list in matrix:
+        dict_data = list_to_dict(row_list, name_list)
+        dict_list.append(dict_data)
+    return dict_list
+
+
+def list_to_dict(val_list, name_list):
+    """
+    值和名称列表转字典
+    :param val_list:值列表
+    :param name_list: 名称列表
+    :return: 字典
+    """
+    if val_list is None or name_list is None:
+        return None
+
+    if len(val_list) != len(name_list):
+        return None
+
+    # 按照名称和值修改数据字典
+    dict_data = {}
+    for i in range(len(val_list)):
+        key = name_list[i]
+        dict_data[key] = val_list[i]
+    return dict_data
+
+
 def get_name_list(obj):
     """
     取得属性名列表

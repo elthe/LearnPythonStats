@@ -94,6 +94,15 @@ class DbBaseClient:
         logcm.print_info("Fetch all with Sql Command %s " % sql_command)
         logcm.print_obj(param, "param")
 
+    def getColumns(self, table_name):
+        """
+        取得字段列表
+        :param table_name:表名
+        :return: 字段列表
+        """
+        logcm.print_info("Get columns of table: %s " % table_name)
+        logcm.print_obj(table_name, "table_name")
+
     def __del__(self):
         """
         析构方法
