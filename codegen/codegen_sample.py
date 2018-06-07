@@ -6,7 +6,7 @@
 """
 
 from common import loadcfgcm
-from codegen.codegen_load import CodeGenXlsLoader
+from codegen.codegen_load_xls import CodeGenXlsLoader
 from codegen.codegen_mk import CodeGenModuleMaker
 
 # 配置

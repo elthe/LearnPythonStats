@@ -22,7 +22,7 @@ default_config = """
 """
 
 # 加载配置文件
-cfg = loadcfgcm.load("db_oracle_test1.json", default_config)
+cfg = loadcfgcm.load("codegen_loader_db.json", default_config)
 
 # 建立和数据库系统的连接
 dbClient = DbOracleClient("oracle", cfg)
