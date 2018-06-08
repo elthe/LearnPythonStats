@@ -77,7 +77,7 @@ for i in range(max_size):
     imagecm.resize(path, cfg['width'], cfg['height'], temp_path, keep_ratio=False)
 
     # 动画输出器
-    action_output = VideoActionOutput(im_output, temp_path, (i + 1))
+    action_output = VideoActionOutput(im_output, temp_path, (i + 1), path)
 
     # # 色调动画
     # action_output.out_action("add_hue", range(1, 5, 1))
@@ -87,35 +87,36 @@ for i in range(max_size):
     #
     # # 明度动画
     # action_output.out_action("change_darker", range(-100, 100, 20))
+    act_id = i % 5
+    if act_id == 0:
+        # 放大动画
+        action_output.out_action("zoom_in", speed_zoom)
+        action_output.out_action("hold", normal_5)
+        # 缩小动画
+        action_output.out_action("zoom_out", slow_zoom)
+    elif act_id == 1:
+        # 水平压缩动画
+        action_output.out_action("zip_h", slow_zip)
+        action_output.out_action("zip_h", speed_zip)
 
-    # 放大动画
-    action_output.out_action("zoom_in", speed_zoom)
-    action_output.out_action("hold", normal_5)
-    # 缩小动画
-    action_output.out_action("zoom_out", slow_zoom)
-
-    # 水平压缩动画
-    action_output.out_action("zip_h", slow_zip)
-    action_output.out_action("zip_h", speed_zip)
-
-    # 竖直压缩动画
-    action_output.out_action("zip_v", slow_zip)
-    action_output.out_action("zip_v", speed_zip)
-
-    # 旋转动画
-    action_output.out_action("rotate", slow_rotate)
-    action_output.out_action("hold", normal_5)
-    action_output.out_action("rotate", speed_rotate)
-
-    # 移动图片(水平)
-    action_output.out_action("move_h", slow_move_h)
-    action_output.out_action("hold", normal_5)
-    action_output.out_action("move_h", speed_move_h)
-
-    # 移动图片(竖直)
-    action_output.out_action("move_v", slow_move_v)
-    action_output.out_action("hold", normal_5)
-    action_output.out_action("move_v", speed_move_v)
+        # 竖直压缩动画
+        action_output.out_action("zip_v", slow_zip)
+        action_output.out_action("zip_v", speed_zip)
+    elif act_id == 2:
+        # 旋转动画
+        action_output.out_action("rotate", slow_rotate)
+        action_output.out_action("hold", normal_5)
+        action_output.out_action("rotate", speed_rotate)
+    elif act_id == 3:
+        # 移动图片(水平)
+        action_output.out_action("move_h", slow_move_h)
+        action_output.out_action("hold", normal_5)
+        action_output.out_action("move_h", speed_move_h)
+    elif act_id == 4:
+        # 移动图片(竖直)
+        action_output.out_action("move_v", slow_move_v)
+        action_output.out_action("hold", normal_5)
+        action_output.out_action("move_v", speed_move_v)
 
     # 卷积滤镜
     # action_output.out_action("conv_filter", normal_1, filter_name="Motion_Blur")
