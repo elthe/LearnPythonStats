@@ -6,50 +6,69 @@ turtle 是 python 内置的一个比较有趣味的模块，俗称 海龟绘图�
 它是基于 tkinter 模块打造，提供一些简单的绘图工具
 """
 
+import turtle as tt
 from turtle import *
 
+def nose(x, y):
+    """
+    鼻子
+    :param x:
+    :param y:
+    :return:
+    """
+    # Pull the pen up – no drawing when moving.
+    tt.pu()
+    # Move turtle to an absolute position.
+    # If the pen is down, draw line.
+    # Do not change the turtle’s orientation.
+    tt.goto(x, y)
+    # Pull the pen down – drawing when moving.
+    tt.pd()
 
-def nose(x, y):  # 鼻子
-    pu()
-    goto(x, y)
-    pd()
-    seth(-30)
-    begin_fill()
+    # Set the orientation of the turtle to to_angle.
+    tt.seth(-30)
+    # Call just before drawing a shape to be filled.
+    # Equivalent to fill(True).
+    tt.begin_fill()
     a = 0.4
     for i in range(120):
         if 0 <= i < 30 or 60 <= i < 90:
             a = a + 0.08
-            lt(3)  # 向左转3度
-            fd(a)  # 向前走a的步长
+            # Turn turtle left by angle units.
+            #  (Units are by default degrees, but can be set via the degrees() and radians() functions.)
+            # Angle orientation depends on the turtle mode, see mode().
+            tt.lt(3)  # 向左转3度
+
+            tt.fd(a)  # 向前走a的步长
         else:
             a = a - 0.08
-            lt(3)
-            fd(a)
-    end_fill()
+            tt.lt(3)
+            tt.fd(a)
+        tt.end_fill()
 
-    pu()
-    seth(90)
-    fd(25)
-    seth(0)
-    fd(10)
-    pd()
-    pencolor(255, 155, 192)
-    seth(10)
-    begin_fill()
-    circle(5)
-    color(160, 82, 45)
-    end_fill()
+    tt.pu()
+    tt.seth(90)
+    tt.fd(25)
+    tt.seth(0)
+    tt.fd(10)
+    tt.pd()
+    tt.pencolor(255, 155, 192)
+    tt.seth(10)
+    tt.begin_fill()
+    tt.circle(5)
+    tt.color(160, 82, 45)
+    tt.end_fill()
 
-    pu()
-    seth(0)
-    fd(20)
-    pd()
-    pencolor(255, 155, 192)
-    seth(10)
-    begin_fill()
-    circle(5)
-    color(160, 82, 45)
-    end_fill()
+    tt.pu()
+    tt.seth(0)
+    tt.fd(20)
+    tt.pd()
+    tt.pencolor(255, 155, 192)
+    tt.seth(10)
+    tt.begin_fill()
+    tt.circle(5)
+    tt.color(160, 82, 45)
+    tt.end_fill()
 
 
 def head(x, y):  # 头

@@ -3,6 +3,7 @@
 # Welcome to PyCon APAC 2014/Taiwan!
 # More info on https://tw.pycon.org/2014apac/
 
+import turtle as tt
 from turtle import *
 from time import time, sleep
 from random import randint
@@ -22,12 +23,23 @@ def play_sound(name, vol=100):
     except:
         pass
 
-screensize(216, 500)
-setup(288, 512)
-tracer(False, 0)
-hideturtle()
+
+tt.screensize(216, 500)
+
+# Set the size and position of the main window.
+tt.setup(288, 512)
+
+# Turn turtle animation on/off and set delay for update drawings.
+tt.tracer(False, 0)
+
+# Make the turtle invisible.
+tt.hideturtle()
+
+# glob.glob(pathname, *, recursive=False)：
+# 返回一个与pathname匹配的路径组成的list，该list可能为空。
 for f in glob.glob("*.gif"):
-    addshape(f)
+    # Add a turtle shape to TurtleScreen’s shapelist.
+    tt.addshape(f)
 
 font_name = "Comic Sans MS"
 speed_x = 100
@@ -52,10 +64,14 @@ def GIFTurtle(fname):
     t.up()
     return t
 
+
 score_txt = TextTurtle(0, 130, "white")
 best_txt = TextTurtle(90, 180, "white")
 pycon_apac_txt = TextTurtle(0, -270, "white")
-bgpic("bg1.gif")
+
+# Set background image or return name of current backgroundimage.
+tt.bgpic("bg1.gif")
+
 tubes = [(GIFTurtle("tube1"), GIFTurtle("tube2")) for i in range(3)]
 grounds = [GIFTurtle("ground") for i in range(3)]
 bird = GIFTurtle("bird1")
@@ -65,9 +81,12 @@ PYCON_APAC_AD = """\
 PyCon APAC 2014/TW
 """
 
+
 class Game:
     state = "end"
     score = best = 0
+
+
 game = Game()
 
 
@@ -133,6 +152,8 @@ def update_game(game):
     bg_base = -(x % bg_width)
     for i in range(3):
         grounds[i].goto(bg_base + bg_width * (i - 1), -200)
+
+    #
     bird.shape("bird%d.gif" % abs(int(t * 4) % 4 - 1))
     bird.goto(0, bird_y)
     score_txt.clear()
@@ -142,8 +163,11 @@ def update_game(game):
         best_txt.clear()
         best_txt.write(
             "BEST: %d" % (game.best), align="center", font=(font_name, 14, "bold"))
-    update()
-    ontimer(lambda: update_game(game), 10)
+
+    # Perform a TurtleScreen update. To be used when tracer is turned off.
+    tt.update()
+    # Install a timer that calls fun after t milliseconds.
+    tt.ontimer(lambda: update_game(game), 10)
 
 
 def fly(game=game):
@@ -156,7 +180,15 @@ def fly(game=game):
         game.hit_t, game.hit_y = t, bird_y
         play_sound("tack", 20)
 
-onkey(fly, "space")
-listen()
-mainloop()
+
+# Bind fun to key-release event of key.
+tt.onkey(fly, "space")
+
+# Set focus on TurtleScreen (in order to collect key-events).
+tt.listen()
+
+# Starts event loop - calling Tkinter’s mainloop function.
+# Must be the last statement in a turtle graphics program.
+tt.mainloop()
+
 sys.exit(1)
