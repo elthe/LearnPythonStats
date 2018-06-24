@@ -34,6 +34,7 @@ logcm.print_obj(path_list, 'path_list')
 # 横版图片路径列表
 w_list = []
 h_list = []
+count = 1
 for path in path_list:
     # 调整图片尺寸并保存
     (file_path, file_name) = os.path.split(path)
@@ -45,6 +46,7 @@ for path in path_list:
     # 保存
     save_path = os.path.join(cfg["target_path"], short_name + "." + cfg["target_ext"])
     im_new.save(save_path, quality=100)
-    logcm.print_info("converted %s." % short_name)
+    logcm.print_info("No.%d converted %s." % (count, short_name))
     # 删除源文件
     os.remove(path)
+    count += 1
