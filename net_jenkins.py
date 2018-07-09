@@ -14,9 +14,15 @@ default_config = """
     "host": "locaohost:8080",
     "user": "xxx",
     "token": "xxxxxxx",
-    "jobName": "xxxx",
-    "svnUrl": "http://10.xx.x.xxx/svn/xxxxxxx",
-    "taskNo": "xxxxx"
+    "jobs": {
+        "xxx" : [
+            {
+                "job_name": "xxxxxxx",
+                "svn_url": "http://10.xx.x.xxx/svn/xxxxxxx",
+                "task_no": "xxxxx"
+            }
+        ]
+    }
 }
 """
 
@@ -27,4 +33,6 @@ cfg = loadcfgcm.load("net_jenkins_job.json", default_config)
 jenkins = JenkinsClient(cfg)
 
 # 启动JOB
-jenkins.invoke(cfg['jobName'], cfg['svnUrl'], cfg['taskNo'])
+for job in cfg['jobs']["fims-static-test"]:
+    jenkins.invoke(**job)
+

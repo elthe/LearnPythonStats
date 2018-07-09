@@ -89,6 +89,13 @@ class CodeGenModuleMaker:
             cfg_obj["bean"] = bean
             total_count += self.make_by_path(path, path_map, cfg_obj)
 
+        # 使用Code生成代码
+        path = self.cfg_tpl["Code"]["tpl_path"]
+        path_map = self.cfg_tpl["Code"]["path_map"]
+        for code in mdl.codes:
+            cfg_obj["code"] = code
+            total_count += self.make_by_path(path, path_map, cfg_obj)
+
         logcm.print_info("Output %d files successfully. " % total_count)
 
     def make_by_path(self, path, path_map, cfg_obj):

@@ -27,5 +27,13 @@
     "path_map": {
       "facade_java_bean_bean": "core/{{config.core_base_project}}-facade/src/main/java/{{config.core_base_package_path}}/facade/bean/dubbo/{{config.package_sysname}}/{{module.moduleName}}/{{bean.className}}.java"
     }
+  },
+  "Code": {
+    "desc": "以Code为单位生成的文件说明",
+    "tpl_path": "code",
+    "path_map": {
+      "static_html_list": "static/{{config.package_sysname}}/{{module.moduleName}}/{{code.key}}_list.html",
+      "static_js_list": "static/{{config.package_sysname}}/{{module.moduleName}}/{{code.key}}_list.js"
+    }
   }
 }

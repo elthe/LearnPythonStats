@@ -71,8 +71,10 @@ class JenkinsClient:
         job = self.server[job_name]
 
         # start build the job
-        job.invoke(build_params={'SVN_URL': svn_url, 'TASK_NO': task_no})
+        params = {'url': svn_url, 'TASK_NO': task_no, 'svnPath': svn_url}
+        job.invoke(build_params=params)
         logcm.print_info("Jenkins Job %s is invoked." % job_name)
+        logcm.print_obj(params, "params", show_header=False)
 
         sec = 0
         while True:

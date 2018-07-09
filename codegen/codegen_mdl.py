@@ -185,6 +185,11 @@ class Code(BaseObject):
         if code is not None and "Code" in code:
             self.copy_from(code["Code"])
 
+        # 属性名
+        self.varname = strcm.under_to_camel(self.key.lower())
+        # 类名
+        self.classname = strcm.upper_first(self.varname)
+
         # 选项列表
         self.options = []
         # 选项读取
