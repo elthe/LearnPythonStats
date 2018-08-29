@@ -9,9 +9,13 @@ SSH客户端共通类
 import paramiko
 import datetime
 import os
+import re
+import sys
 import time
 
 from common import logcm
+
+NGX_KEYS = ["listen", "server_name", "access_log", "error_log"]
 
 
 class SshClient:
@@ -36,6 +40,7 @@ class SshClient:
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         # 连接到SSH
         logcm.print_info("Connect SSH to %s:%d" % (self.cfg['ip'], self.cfg['port']))
+        sys.stdout.flush()
 
         self.ssh.connect(self.cfg['ip'], self.cfg['port'], self.cfg['username'], self.cfg['password'], timeout=5)
         # 连接到SFTP
@@ -48,12 +53,12 @@ class SshClient:
         """
 
         # 关闭SFTP连接
-        if self.sftp is not None:
+        if self.sftp:
             logcm.print_info("Close sftp connection.")
             self.sftp.close()
 
         # 关闭SSH连接
-        if self.ssh is not None:
+        if self.ssh:
             logcm.print_info("Close ssh connection.")
             self.ssh.close()
 
@@ -69,6 +74,21 @@ class SshClient:
         relative_path = local_path.replace(local_dir, '').replace('\\', '')
         remote_path = os.path.join(remote_dir, relative_path)
         return remote_path
+
+    def listdir(self, remote_dir):
+        """
+        通过SSH列出远程目录文件一览
+        @param remote_dir: 远程目录
+        @return: 文件名数组
+        """
+
+        try:
+            file_list = self.sftp.listdir(remote_dir)
+            file_list.sort()
+            return file_list
+        except Exception as e:
+            logcm.print_info("List dir Exception : %s" % e, fg='red')
+            return []
 
     def upload(self, local_dir, remote_dir):
         """
@@ -108,20 +128,75 @@ class SshClient:
         """
         执行SSH命令列表
         @param cmd_list: 要执行的指令列表
-        @return: 无
+        @return: 命令结果行列表
         """
 
+        lines = []
         try:
             logcm.print_info('[Execute Commonds]')
             for cmd in cmd_list:
                 logcm.print_info('Commond exec : %s' % cmd, show_header=False)
 
                 stdin, stdout, stderr = self.ssh.exec_command(cmd)
-                out = stdout.readlines()
-                logcm.print_obj(out, 'out')
+                time.sleep(0.5)
+                for line in stdout.readlines():
+                    print(line)
+                    lines.append(line)
 
         except Exception as e:
             logcm.print_info("Execute Commonds Exception : %s" % e, fg='red')
+        return lines
+
+    def read_config_dict(self, config_file):
+        """
+        读取config文件
+        :param config_file:配置文件路径
+        :return: 配置字典
+        """
+
+        remote_file = self.sftp.open(config_file, 'r')
+        config_data = {}
+        # read any new lines from the file
+        line = remote_file.readline()
+        while line:
+            line = line.strip('\r\n')
+            # 排除注释行
+            if not line.startswith("#"):
+                # 数据值
+                dataList = line.split("=");
+                if len(dataList) == 2:
+                    config_data[dataList[0].strip()] = dataList[1].strip()
+            line = remote_file.readline()
+        remote_file.close()
+
+        return config_data
+
+    def read_nginx_dict(self, config_file):
+        """
+        读取Nginx配置文件
+        :param config_file:配置文件路径
+        :return: 配置字典
+        """
+
+        remote_file = self.sftp.open(config_file, 'r')
+        config_data = {}
+        # read any new lines from the file
+        line = remote_file.readline()
+        while line:
+            line = line.strip('\r\n').strip()
+            # 排除注释行
+            if not line.startswith("#"):
+                # 去掉冗余空格
+                line = " ".join(line.split())
+                dataList = line.split(" ");
+                if len(dataList) >= 2:
+                    key = dataList[0]
+                    if key in NGX_KEYS:
+                        config_data[key] = dataList[1]
+            line = remote_file.readline()
+        remote_file.close()
+
+        return config_data
 
     def get_new_lines(self, remote_filename, remote_file_size):
         """
@@ -146,11 +221,10 @@ class SshClient:
 
         remote_file.close()
 
-    def tail_print(self, remote_filename, history_size=5000):
+    def tail_print(self, remote_filename):
         """
         通过SSH监控远程文件新增文本行并输出到控制台
         @param remote_filename: 远程文件路径
-        @param history_size: 显示历史记录大小
         @return: 无
         """
 
@@ -166,19 +240,16 @@ class SshClient:
                         for line in self.get_new_lines(remote_filename, remote_file_size):
                             print(line)
                             # 随时刷新到屏幕上
-                            # sys.stdout.flush()
+                            sys.stdout.flush()
                     remote_file_size = stat_info.st_size
                 else:
                     logcm.print_info("Found remote file (%s) size : %d " % (remote_filename, stat_info.st_size))
-                    if history_size < stat_info.st_size:
-                        remote_file_size = stat_info.st_size - history_size
-                    else:
-                        remote_file_size = 0
+                    remote_file_size = stat_info.st_size
 
                 # 休息1秒后再试
-                time.sleep(1)
+                time.sleep(0.2)
         except Exception as e:
-            logcm.print_info("Tail print Exception : %s" % e, fg='red')
+            logcm.print_info("Tail print Exception : %s - %s" % (e, remote_filename), fg='red')
 
     def deploy_server(self, server_path, war_name, local_path):
         """

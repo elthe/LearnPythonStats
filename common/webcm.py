@@ -9,6 +9,7 @@ WEB连接相关共通函数
 import os
 import pycurl
 import random
+import socket
 import urllib
 
 from common import filecm
@@ -47,7 +48,7 @@ def random_agent():
     return random.choice(agent_list)
 
 
-def read_url(page_url, encoding='utf-8', header=None):
+def read_url(page_url, encoding='utf-8', header=None, method="GET"):
     """
     通过URL得到网页内容
     @param page_url: 请求的网页地址
@@ -63,7 +64,7 @@ def read_url(page_url, encoding='utf-8', header=None):
         headers.update(header)
 
     # 使用Header访问指定URL
-    req = urllib.request.Request(url=page_url, headers=headers)
+    req = urllib.request.Request(url=page_url, headers=headers, method=method)
     logcm.print_obj(req, 'req')
 
     response = urllib.request.urlopen(req)
@@ -167,7 +168,7 @@ def down_img(soup, page_url, img_select, tag_select, local_path, page_no=1):
             local_save_path = local_path + "/" + file_path
 
         if not filecm.exists(local_save_path, file_name):
-            # 如果本地不存在，保存文件到本地        
+            # 如果本地不存在，保存文件到本地
             save_file_url(img_src, page_url, local_save_path, file_name)
             count = count + 1
     return count
@@ -236,3 +237,16 @@ def curl(url, tmp_path, tmp_file='content.txt'):
     file_save.close()
     c.close()
     return result
+
+
+def get_local_ip():
+    local_ip = ''
+    try:
+        socket_objs = [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]
+        ip_from_ip_port = [(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in socket_objs][0][1]
+        ip_from_host_name = [ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if
+                             not ip.startswith("127.")][:1]
+        local_ip = [l for l in (ip_from_ip_port, ip_from_host_name) if l][0]
+    except:
+        logcm.print_info("get_local_ip found exception")
+    return local_ip if ('' != local_ip and None != local_ip) else socket.gethostbyname(socket.gethostname())

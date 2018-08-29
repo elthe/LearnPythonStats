@@ -37,6 +37,24 @@ def is_json(input_str):
         return False
     return True
 
+def bytes2str(input_bytes, encoding="utf-8"):
+    """
+    字节数组转字符串，优先使用指定编码，其次是用GBK编码，最后使用ASCII码
+    @param input_bytes: 输入字节数组
+    @param encoding:指定编码
+    @return: 字符串
+    """
+
+    try:
+        out_str = str(input_bytes, encoding=encoding)
+        return out_str
+    except:
+        try:
+            out_str = str(input_bytes, encoding='gbk')
+            return out_str
+        except:
+            return "%s" % input_bytes
+
 
 def upper_first(input_str):
     """
