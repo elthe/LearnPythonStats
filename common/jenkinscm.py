@@ -45,6 +45,26 @@ class JenkinsClient:
         if self.server is not None:
             logcm.print_info("Close jenkins server.")
 
+
+    def get_jobs(self, searchKey=None, excludeKey=None):
+        """
+        按照检索关键词，以及排除关键词来取得取得符合条件的JOB名称一览。
+        """
+        all_job_list = self.server.get_jobs_list()
+        if not searchKey and not excludeKey:
+            return all_job_list
+
+        rst_job_list = []
+        for job_name in all_job_list:
+            if searchKey and job_name.find(searchKey) < 0:
+                continue
+            if excludeKey and job_name.find(excludeKey) >= 0:
+                continue
+            rst_job_list.append(job_name)
+
+        return rst_job_list
+
+
     def invoke(self, job_name, svn_url, task_no):
         """
         启动JOB

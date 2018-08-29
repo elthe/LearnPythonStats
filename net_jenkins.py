@@ -5,6 +5,7 @@
 Jenkins使用示例。
 """
 
+from common import logcm
 from common import loadcfgcm
 from common.jenkinscm import JenkinsClient
 
@@ -32,7 +33,15 @@ cfg = loadcfgcm.load("net_jenkins_job.json", default_config)
 # 链接到服务器
 jenkins = JenkinsClient(cfg)
 
+dev_jobs = jenkins.get_jobs("dev_build")
+logcm.print_obj(dev_jobs, "dev_jobs")
+
+test_jobs = jenkins.get_jobs("build", "dev_build")
+logcm.print_obj(test_jobs, "test_jobs")
+
+
 # 启动JOB
-for job in cfg['jobs']["fims-static-test"]:
-    jenkins.invoke(**job)
+# for job in cfg['jobs']["wealthgateway-test"]:
+#     jenkins.invoke(**job)
+
 
