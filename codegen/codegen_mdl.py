@@ -63,6 +63,8 @@ class Service(BaseObject):
         # 其他属性初始化
         # 方法名
         self.methodName = self.interfaceName.split(".")[0]
+        # 方法名首字母大写
+        self.methodNameFcu = strcm.upper_first(self.methodName)
         # 类名
         self.className = strcm.upper_first(self.methodName)
 
