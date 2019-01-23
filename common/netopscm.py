@@ -6,6 +6,8 @@ OPS Client common class
 OPS客户端共通类
 """
 
+import time
+
 from common import logcm
 from common import webcm
 from common import htmlcm
@@ -29,8 +31,8 @@ class OpsClient:
                 self.cfg["ip"], self.cfg['port'], self.cfg['sys_name'], self.cfg['sys_env'], key, val)
 
         elif method == 'load':
-            url = "http://%s:%d/ops/zk?method=zkLoad&nameList2=%s&envList2=%s&" % (
-                self.cfg["ip"], self.cfg['port'], self.cfg['sys_name'], self.cfg['sys_env'])
+            url = "http://%s:%d/ops/zk?method=zkLoad&nameList2=%s&envList2=%s&%d" % (
+                self.cfg["ip"], self.cfg['port'], self.cfg['sys_name'], self.cfg['sys_env'], time.time())
 
         elif method == 'update':
             url = "http://%s:%d/ops/zk?method=zkSetData&nameList3=%s&envList3=%s&inputKey=%s&inputValue=%s" % (
@@ -55,8 +57,11 @@ class OpsClient:
 
         # OPS服务器的设定画面访问
         html = webcm.read_url(url, self.cfg['encoding'])
-        soup = htmlcm.to_soup(html)
+        if html is None:
+            return None
+
         ops_map = {}
+        soup = htmlcm.to_soup(html)
 
         # OPS网页的表格解析
         trs = soup.select("body table tr")

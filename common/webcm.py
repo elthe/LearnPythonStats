@@ -48,12 +48,15 @@ def random_agent():
     return random.choice(agent_list)
 
 
-def read_url(page_url, encoding='utf-8', header=None, method="GET"):
+def read_url(page_url, encoding='utf-8', header=None, data=None, method="GET", proxy=None):
     """
     通过URL得到网页内容
     @param page_url: 请求的网页地址
     @param encoding: 网页编码
     @param header: 头信息
+    @param method: 请求方法
+    @param data: 请求数据
+    @param proxy: 代理信息
     @return: 网页文本
     """
 
@@ -63,15 +66,31 @@ def read_url(page_url, encoding='utf-8', header=None, method="GET"):
     if header is not None:
         headers.update(header)
 
+    # 设置代理
+    if proxy:
+        proxy_support = urllib.request.ProxyHandler({'http':proxy})
+        opener = urllib.request.build_opener(proxy_support)
+    else:
+        http_handler = urllib.request.HTTPHandler()
+        opener = urllib.request.build_opener(http_handler)
+
+    # 设置opener
+    urllib.request.install_opener(opener)
+
     # 使用Header访问指定URL
-    req = urllib.request.Request(url=page_url, headers=headers, method=method)
+    req = urllib.request.Request(url=page_url, headers=headers, method=method, data=data)
     logcm.print_obj(req, 'req')
-
-    response = urllib.request.urlopen(req)
-    logcm.print_obj(response, 'response')
-
-    html = response.read().decode(encoding, 'ignore')
-    return html
+    try:
+        # 打开URL
+        response = urllib.request.urlopen(req)
+        logcm.print_obj(response, 'response')
+    except Exception as e:
+        logcm.print_info("Exception when urlopen!");
+        logcm.print_obj(e, "Exception")
+        return None;
+    else:
+        html = response.read().decode(encoding, 'ignore')
+        return html
 
 
 def read_file(path, file_name, encoding):
@@ -250,3 +269,43 @@ def get_local_ip():
     except:
         logcm.print_info("get_local_ip found exception")
     return local_ip if ('' != local_ip and None != local_ip) else socket.gethostbyname(socket.gethostname())
+
+
+def get_client_ip(request):
+    if not request:
+        return None
+    if not request.headers:
+        return None
+
+    key1 = 'x-Real-IP'
+    if key1 in request.headers:
+        return request.headers[key1]
+    else:
+        key2 = 'X-Forwarded-For'
+        if key2 in request.headers:
+            return request.headers[key2]
+        else:
+            return request.remote_addr
+
+
+def reset_by_request(dataInfo, request):
+
+    if not dataInfo:
+        return None
+
+    if not request:
+        return dataInfo
+
+    # Http Headers
+    if request.headers:
+        for (k,v) in request.headers.items():
+            dataInfo[k] = v
+    # Get Args
+    if request.args:
+        for (k,v) in request.args.items():
+            dataInfo[k] = v
+    # Post Args
+    if request.form:
+        for (k,v) in request.form.items():
+            dataInfo[k] = v
+    return dataInfo

@@ -25,10 +25,12 @@ def load(config_name, default_config, config_path='./config', encoding='utf-8'):
 
     if filecm.exists(config_path, config_name):
         # 文件存在，读取文件
-        return load_cfg_file(config_path, config_name, encoding)
+        data = load_cfg_file(config_path, config_name, encoding)
+        if data is not None:
+            return data
 
     # 文件不存在，返回默认值并初始化配置文件。
-    logcm.print_info('配置文件不存在：%s/%s' % (config_path, config_name))
+    logcm.print_info('配置文件不存在或读取失败：%s/%s' % (config_path, config_name))
 
     # 保存默认配置
     save_cfg_file(default_config, config_name, config_path, encoding=encoding)
@@ -45,11 +47,16 @@ def load_cfg_file(config_path, config_name, encoding='utf-8'):
     :param encoding: 文字编码
     :return:
     """
-    # 文件存在，读取文件
-    logcm.print_info('配置文件存在：%s/%s' % (config_path, config_name))
-    cfg_content = filecm.read_str(config_path, config_name, encoding)
-    cfg_info = json.loads(cfg_content)
-    return cfg_info
+    try:
+        # 文件存在，读取文件
+        logcm.print_info('配置文件存在：%s/%s' % (config_path, config_name))
+        cfg_content = filecm.read_str(config_path, config_name, encoding)
+        cfg_info = json.loads(cfg_content)
+        return cfg_info
+
+    except Exception as e:
+        logcm.print_info("load cfg exception: %s - %s/%s" % (e, config_path, config_name), fg='red')
+        return None
 
 
 def save_cfg_file(config_info, config_name, config_path='./config', encoding='utf-8'):
@@ -69,3 +76,15 @@ def save_cfg_file(config_info, config_name, config_path='./config', encoding='ut
         cfg_content = json.dumps(config_info, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
     # 保存到json文件
     filecm.save_str(cfg_content, encoding, config_path, config_name)
+
+
+def clear_cfg_file(config_path, config_name):
+    """
+    清空配置信息
+    :param config_name: 配置文件名
+    :param config_path: 配置路径
+    :return:
+    """
+
+    # 保存到json文件
+    filecm.remove(config_path, config_name)

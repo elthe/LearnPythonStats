@@ -8,6 +8,16 @@ str common api
 
 import json
 import re
+import urllib
+import uuid
+
+
+def uuid():
+    """
+    UUID字符串
+    @return: 全局唯一标识符字符串
+    """
+    return uuid.uuid1()
 
 
 def pad_after(input_str, padding_size, padding_char=" "):
@@ -36,6 +46,7 @@ def is_json(input_str):
     except ValueError:
         return False
     return True
+
 
 def bytes2str(input_bytes, encoding="utf-8"):
     """
@@ -113,3 +124,58 @@ def under_to_camel(under_str):
     # 回调函数的参数x为一个匹配对象，返回值为一个处理后的字符串
     sub = re.sub(r'(_\w)', lambda x: x.group(1)[1].upper(), under_str)
     return sub
+
+
+def contains_keys(check_str, key_list):
+    """
+    判断指定字符串是否包含关键词列表中的关键词
+    :param check_str: 判断字符串
+    :param key_list: 关键词列表
+    :return: True/False
+    """
+    if check_str is None or key_list is None:
+        return False
+
+    for key in key_list:
+        if check_str.find(key) >= 0:
+            return True
+
+    return False
+
+
+def remove_space(input_str):
+    """
+    删除冗余空格
+    :param input_str: 输入字符串
+    :return: 删除冗余空格后的字符串
+    """
+    if input_str is None:
+        return None
+
+    return " ".join(input_str.split())
+
+
+def escape_param_str(input_str, add_slash=True):
+    """
+    把/符号，替换成\/方式
+    :param input_str: 输入字符串
+    :param add_slash:
+    :return: 替换后的字符串
+    """
+    if input_str is None:
+        return None
+
+    if input_str == "$":
+        return input_str
+
+    # 把空格等符号还原
+    out_str = urllib.parse.unquote(input_str)
+
+    if not add_slash:
+        return out_str
+
+    # 把斜杠符号转义
+    if out_str.find("/") >= 0:
+        out_str = out_str.replace("/", "\\/")
+
+    return "/" + out_str + "/"

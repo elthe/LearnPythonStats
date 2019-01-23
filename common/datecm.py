@@ -32,7 +32,6 @@ Date common api
 
 import datetime
 import time
-from matplotlib.pylab import date2num, num2date
 
 
 def check_date_format(date_str, check_format):
@@ -50,37 +49,6 @@ def check_date_format(date_str, check_format):
         return False
 
 
-def date_list_to_num(dates, format_from='%Y-%m-%d'):
-    """
-    时间数组转换，字符串转数值
-    @param dates: 字符串时间列表
-    @param format_from: 字符串源时间格式
-    @return: 数值时间列表
-    """
-
-    num_time = []
-    for date in dates:
-        # 日期对象转数字
-        num_date = date_to_num(date, format_from)
-        num_time.append(num_date)
-    return num_time
-
-
-def date_to_num(date, format_from='%Y-%m-%d'):
-    """
-    时间数组转换，字符串转数值
-    @param date: 字符串时间
-    @param format_from: 字符串源时间格式
-    @return: 数值时间列表
-    """
-
-    # 日期字符串转日期对象
-    date_time = datetime.datetime.strptime(date, format_from)
-    # 日期对象转数字
-    num_date = date2num(date_time)
-    return num_date
-
-
 def to_date(obj, format_from=None):
     """
     把各种日期类型转换成日期对象
@@ -95,11 +63,6 @@ def to_date(obj, format_from=None):
     if isinstance(obj, str):
         # 日期字符串转日期对象
         date_time = datetime.datetime.strptime(obj, format_from)
-        return date_time
-
-    if isinstance(obj, float):
-        # 数值转日期对象
-        date_time = num2date(obj)
         return date_time
 
 
@@ -133,17 +96,6 @@ def now_time_str(format='%Y%m%d%H%M%S'):
     return now_time
 
 
-def get_now_num():
-    """
-    取得当前时间的时间字符串
-    @param format: 时间格式
-    @return: 时间字符串
-    """
-
-    now_time = datetime.datetime.now()
-    return date2num(now_time)
-
-
 def get_now_time(time_type="second"):
     """
     取得当前时间的时间戳数值。
@@ -161,3 +113,61 @@ def get_now_time(time_type="second"):
     elif time_type == "mini":
         # 毫秒级时间戳
         return int(round(t * 1000))
+
+
+def sec_to_hms(seconds, show_format="dhms", only_max=False):
+    """
+    把秒数转换成时分秒。
+    @param seconds: 秒数
+    @return:
+    """
+
+    m, s = divmod(seconds, 60)
+    h, m = divmod(m, 60)
+    d, h = divmod(h, 24)
+    dateVal = {
+        "d": d,
+        "h": h,
+        "m": m,
+        "s": s
+    }
+    unitMap = {
+        "d": "天",
+        "h": "小时",
+        "m": "分钟" if only_max else "分",
+        "s": "秒"
+    }
+
+    keyList = ["d", "h", "m", "s"]
+    dhmsList = []
+    for key in keyList:
+        val = dateVal[key]
+        if val > 0 and show_format.find(key) >= 0:
+            dhmsList.append("%d" % val)
+            dhmsList.append(unitMap[key])
+            if only_max:
+                break
+    dhms = "".join(dhmsList)
+    return dhms
+
+
+def get_diff_sec(timeFrom, timeTo=None):
+    """
+    计算时间差秒数
+    @param timeFrom: 起始时间
+    @param timeTo: 终了时间（默认为当前时间）
+    @return: 秒数差
+    """
+    if timeFrom is None:
+        return 0
+
+    if timeTo is None:
+        timeTo = datetime.datetime.now()
+
+    # 大的减去小的，否则有误差
+    if timeTo > timeFrom:
+        diff_sec = (timeTo - timeFrom).seconds
+    else:
+        diff_sec = (timeFrom - timeTo).seconds
+
+    return diff_sec

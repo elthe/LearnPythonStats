@@ -8,14 +8,13 @@ File common api
 
 import codecs
 import csv
-import datetime
 import os
 import re
 import shutil
-import xlrd
+import datetime
+
 
 from common import logcm
-from xlrd import xldate_as_tuple
 
 
 def extension(path):
@@ -323,3 +322,38 @@ def copy_files(path_list, dest_path, skeep_exist=False):
             # 复制文件
             logcm.print_info("copy %s -> %s" % (src_file, dest_file))
             shutil.copyfile(src_file, dest_file)
+
+
+def remove(path=None, file_name=None):
+    """
+    删除文件
+    @param path: 文件路径
+    @param file_name: 文件名
+    @return: 无
+    """
+
+    # 判断文件是否存在
+    file_path = os.path.join(path, file_name)
+    if os.path.exists(file_path):
+        os.remove(file_path)
+    else:
+        logcm.print_info("文件不存在:%s" % file_path)
+
+
+def last_update_time(path=None, file_name=None):
+    """
+    最近更新时间
+    @param path: 文件路径
+    @param file_name: 文件名
+    @return: 无
+    """
+
+    # 判断文件是否存在
+    file_path = os.path.join(path, file_name)
+    if os.path.exists(file_path):
+        statinfo = os.stat(file_path)
+        updateTime = datetime.datetime.fromtimestamp(statinfo.st_mtime)
+        return updateTime
+    else:
+        logcm.print_info("文件不存在:%s" % file_path)
+        return None
