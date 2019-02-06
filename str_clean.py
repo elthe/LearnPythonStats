@@ -43,6 +43,8 @@ REPLACE_KEYS = [
     r'～[^\n]{0,15}加更',
     r'求月票',
     r'\nps[^\n]+\n',
+    r'\n天才一秒记住本站地址[^\n]+\n',
+    r'\n手机版阅读网址：[^\n]+\n',
 ]
 
 str_org = filecm.read_str("./temp", "test.txt", "utf-8")
