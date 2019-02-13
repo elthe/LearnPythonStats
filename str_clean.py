@@ -47,7 +47,8 @@ REPLACE_KEYS = [
     r'[^\n]{0,15}无弹窗小说[^\n]{0,50}',
     r'[^\n]{0,15}速度最快赶紧来阅读[^\n]{0,50}',
     r'[^\n]{0,15}更新最快，最全的书[^\n]{0,50}',
-
+    r'[^\n]{0,15}本书来自[^\n]{0,50}',
+    r'[^\n]{0,15}记住手机版网址[^\n]{0,50}',
 
     r'求月票',
     r'[^\n]{0,15}有月票吗[^\n]{0,50}',
@@ -70,13 +71,15 @@ for key in REPLACE_KEYS:
     p = re.compile(key, re.IGNORECASE)
 
     findList = p.findall(str_new)
-    find_cnt += len(findList)
-    print("Found %d by key : %s" % (len(findList), key))
-    print(findList)
+    cnt = len(findList)
+    find_cnt += cnt
+    print("Found %d by key : %s" % (cnt, key))
 
-    # 这里第二个参数使用了正则分组的后向引用
-    str_new = re.sub(p, r'', str_new)
+    if cnt > 0:
+        print(findList)
+        # 这里第二个参数使用了正则分组的后向引用
+        str_new = re.sub(p, r'', str_new)
 
-    filecm.save_str(str_new, path="./temp", file_name="test2.txt")
+        filecm.save_str(str_new, path="./temp", file_name="test2.txt")
 
 print("Replace %d String in total!" % find_cnt)
