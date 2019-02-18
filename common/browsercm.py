@@ -39,7 +39,7 @@ class BrowserClient:
             # 打开Firefox浏览器
             self.browser = webdriver.Safari()
 
-    def open(self, url, result_type="html", max_win=True, wait_seconds=5):
+    def open(self, url, result_type="html", max_win=False, wait_seconds=5):
         """
         打开指定URL
         @param url: 指定URL
